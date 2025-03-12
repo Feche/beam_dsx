@@ -1,0 +1,1085 @@
+32.50217|I|libbeamng.print| -- dumping v.data.controller:
+ 32.50777|I|libbeamng.lua.utils| { {
+ 32.50779|I|libbeamng.lua.utils|     cid = 1,
+ 32.50780|I|libbeamng.lua.utils|     fileName = "beamNavigator",
+ 32.50781|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50781|I|libbeamng.lua.utils|     htmlFilePath = "local://local/vehicles/scintilla/civetta_navi_screen.html",
+ 32.50782|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50783|I|libbeamng.lua.utils|     name = "scintilla_navi",
+ 32.50783|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50784|I|libbeamng.lua.utils|     screenMaterialName = "@scintilla_gps_screen",
+ 32.50785|I|libbeamng.lua.utils|     slotType = "main"
+ 32.50785|I|libbeamng.lua.utils|   }, {
+ 32.50786|I|libbeamng.lua.utils|     cid = 2,
+ 32.50786|I|libbeamng.lua.utils|     debugSettings = {
+ 32.50787|I|libbeamng.lua.utils|       peerIP = "127.0.0.1"
+ 32.50788|I|libbeamng.lua.utils|     },
+ 32.50788|I|libbeamng.lua.utils|     fileName = "drivingDynamics/CMU",
+ 32.50789|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50790|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50790|I|libbeamng.lua.utils|     name = "CMU",
+ 32.50791|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50792|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE",
+ 32.50792|I|libbeamng.lua.utils|     slotType = "main"
+ 32.50793|I|libbeamng.lua.utils|   }, {
+ 32.50794|I|libbeamng.lua.utils|     cid = 3,
+ 32.50794|I|libbeamng.lua.utils|     fileName = "drivingDynamics/sensors/sensorHub",
+ 32.50795|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50796|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50796|I|libbeamng.lua.utils|     name = "drivingDynamics/sensors/sensorHub",
+ 32.50797|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50798|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE",
+ 32.50798|I|libbeamng.lua.utils|     slotType = "main"
+ 32.50799|I|libbeamng.lua.utils|   }, {
+ 32.50799|I|libbeamng.lua.utils|     cid = 4,
+ 32.50800|I|libbeamng.lua.utils|     fileName = "drivingDynamics/sensors/virtualSensors",
+ 32.50801|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50801|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50802|I|libbeamng.lua.utils|     name = "sensors",
+ 32.50803|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50803|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE",
+ 32.50804|I|libbeamng.lua.utils|     slotType = "main"
+ 32.50805|I|libbeamng.lua.utils|   }, {
+ 32.50805|I|libbeamng.lua.utils|     cid = 5,
+ 32.50806|I|libbeamng.lua.utils|     fileName = "drivingDynamics/sensors/vehicleData",
+ 32.50807|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50807|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50808|I|libbeamng.lua.utils|     name = "vehicleData",
+ 32.50808|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50809|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE",
+ 32.50810|I|libbeamng.lua.utils|     skewStiffnessFront = 195000,
+ 32.50810|I|libbeamng.lua.utils|     skewStiffnessRear = 287000,
+ 32.50813|I|libbeamng.lua.utils|     slotType = "main"
+ 32.50814|I|libbeamng.lua.utils|   }, {
+ 32.50815|I|libbeamng.lua.utils|     cid = 6,
+ 32.50815|I|libbeamng.lua.utils|     fileName = "drivingDynamics/supervisors/components/motorTorqueControl",
+ 32.50816|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50817|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50817|I|libbeamng.lua.utils|     name = "motorTorqueControl",
+ 32.50818|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50819|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE",
+ 32.50819|I|libbeamng.lua.utils|     slotType = "main",
+ 32.50820|I|libbeamng.lua.utils|     tractionControl = {
+ 32.50820|I|libbeamng.lua.utils|       wheelGroupSettings = { { "motorName", "slipThreshold", "kP", "kI", "kD", "integralInCoef", "integralOutCoef" }, { "mainEngine", 99, 2, 0.1, 0.15, 200, 80 } }
+ 32.50821|I|libbeamng.lua.utils|     },
+ 32.50822|I|libbeamng.lua.utils|     useForTractionControl = true,
+ 32.50822|I|libbeamng.lua.utils|     useForYawControl = true,
+ 32.50823|I|libbeamng.lua.utils|     yawControl = {
+ 32.50824|I|libbeamng.lua.utils|       PIDSettings = { { "type", "kP", "kI", "kD", "integralInCoef", "integralOutCoef" }, { "yawAV", 2, 0.5, 0, 100, 10 }, { "slipAngle", 2, 1, 0, 10, 1 } },
+ 32.50824|I|libbeamng.lua.utils|       slipAngleThreshold = 99,
+ 32.50825|I|libbeamng.lua.utils|       yawAVThreshold = 99,
+ 32.50826|I|libbeamng.lua.utils|       yawControlledMotors = { "mainEngine", "frontMotor", "rearMotor" }
+ 32.50826|I|libbeamng.lua.utils|     }
+ 32.50827|I|libbeamng.lua.utils|   }, {
+ 32.50828|I|libbeamng.lua.utils|     cid = 7,
+ 32.50828|I|libbeamng.lua.utils|     fileName = "drivingDynamics/supervisors/components/brakeControl",
+ 32.50829|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50830|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50830|I|libbeamng.lua.utils|     name = "brakeControl",
+ 32.50832|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50832|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE",
+ 32.50833|I|libbeamng.lua.utils|     slotType = "main",
+ 32.50834|I|libbeamng.lua.utils|     tractionControl = {
+ 32.50834|I|libbeamng.lua.utils|       wheelGroupSettings = { { "motorName", "slipThreshold", "slipRangeThreshold", "maxVelocity", "kP", "kI", "kD", "integralInCoef", "integralOutCoef" }, { "mainEngine", 99, 0.1, 30, 1, 1.5, 0, 20, 2 } }
+ 32.50835|I|libbeamng.lua.utils|     },
+ 32.50836|I|libbeamng.lua.utils|     useForTractionControl = true,
+ 32.50836|I|libbeamng.lua.utils|     useForYawControl = true,
+ 32.50837|I|libbeamng.lua.utils|     yawControl = {
+ 32.50837|I|libbeamng.lua.utils|       PIDSettings = { { "type", "kP", "kI", "kD", "integralInCoef", "integralOutCoef" }, { "yawAV", 2, 0.5, 0, 100, 10 }, { "slipAngle", 2, 1, 0, 10, 1 } },
+ 32.50838|I|libbeamng.lua.utils|       slipAngleThreshold = 99,
+ 32.50839|I|libbeamng.lua.utils|       yawAVThreshold = 99
+ 32.50839|I|libbeamng.lua.utils|     }
+ 32.50840|I|libbeamng.lua.utils|   }, {
+ 32.50841|I|libbeamng.lua.utils|     cid = 8,
+ 32.50841|I|libbeamng.lua.utils|     fileName = "drivingDynamics/supervisors/components/aeroControl",
+ 32.50842|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50843|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50843|I|libbeamng.lua.utils|     name = "aeroControl",
+ 32.50844|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50845|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE",
+ 32.50845|I|libbeamng.lua.utils|     slotType = "main"
+ 32.50846|I|libbeamng.lua.utils|   }, {
+ 32.50846|I|libbeamng.lua.utils|     cid = 9,
+ 32.50847|I|libbeamng.lua.utils|     controlMode = "rearMain",
+ 32.50848|I|libbeamng.lua.utils|     fileName = "drivingDynamics/supervisors/components/awdControl",
+ 32.50848|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50849|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50850|I|libbeamng.lua.utils|     name = "awdControl",
+ 32.50850|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50852|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE",
+ 32.50853|I|libbeamng.lua.utils|     slotType = "main"
+ 32.50853|I|libbeamng.lua.utils|   }, {
+ 32.50854|I|libbeamng.lua.utils|     cid = 10,
+ 32.50855|I|libbeamng.lua.utils|     fileName = "drivingDynamics/supervisors/components/diffControl",
+ 32.50855|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50856|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50856|I|libbeamng.lua.utils|     name = "diffControl",
+ 32.50857|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50858|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE",
+ 32.50858|I|libbeamng.lua.utils|     slotType = "main"
+ 32.50859|I|libbeamng.lua.utils|   }, {
+ 32.50860|I|libbeamng.lua.utils|     cid = 11,
+ 32.50860|I|libbeamng.lua.utils|     fileName = "drivingDynamics/supervisors/slipProviders/virtualSpeedSlip",
+ 32.50861|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50862|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50862|I|libbeamng.lua.utils|     name = "drivingDynamics/supervisors/slipProviders/virtualSpeedSlip",
+ 32.50863|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50864|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE",
+ 32.50864|I|libbeamng.lua.utils|     slotType = "main"
+ 32.50865|I|libbeamng.lua.utils|   }, {
+ 32.50865|I|libbeamng.lua.utils|     cid = 12,
+ 32.50866|I|libbeamng.lua.utils|     fileName = "twoStepLaunch",
+ 32.50867|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50867|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50868|I|libbeamng.lua.utils|     name = "twoStepLaunch",
+ 32.50869|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50869|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE",
+ 32.50870|I|libbeamng.lua.utils|     slotType = "main"
+ 32.50871|I|libbeamng.lua.utils|   }, {
+ 32.50871|I|libbeamng.lua.utils|     cid = 13,
+ 32.50872|I|libbeamng.lua.utils|     fileName = "drivingDynamics/supervisors/yawControl",
+ 32.50873|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50873|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50874|I|libbeamng.lua.utils|     name = "yawControl",
+ 32.50874|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50875|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE_ESC",
+ 32.50876|I|libbeamng.lua.utils|     slotType = "main"
+ 32.50876|I|libbeamng.lua.utils|   }, {
+ 32.50877|I|libbeamng.lua.utils|     cid = 14,
+ 32.50878|I|libbeamng.lua.utils|     fileName = "drivingDynamics/supervisors/yawProviders/STMEstimate",
+ 32.50878|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50879|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50880|I|libbeamng.lua.utils|     maxLateralAcceleration = 15,
+ 32.50880|I|libbeamng.lua.utils|     name = "drivingDynamics/supervisors/yawProviders/STMEstimate",
+ 32.50881|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50882|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE_ESC",
+ 32.50882|I|libbeamng.lua.utils|     slotType = "main"
+ 32.50883|I|libbeamng.lua.utils|   }, {
+ 32.50884|I|libbeamng.lua.utils|     cid = 15,
+ 32.50884|I|libbeamng.lua.utils|     fileName = "drivingDynamics/supervisors/tractionControl",
+ 32.50885|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50885|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50886|I|libbeamng.lua.utils|     name = "tractionControl",
+ 32.50887|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50887|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE_TC_RWD",
+ 32.50888|I|libbeamng.lua.utils|     slotType = "main",
+ 32.50889|I|libbeamng.lua.utils|     tractionControlledMotors = { "mainEngine" }
+ 32.50889|I|libbeamng.lua.utils|   }, {
+ 32.50890|I|libbeamng.lua.utils|     cid = 16,
+ 32.50891|I|libbeamng.lua.utils|     fileName = "adaptiveBrakeLights",
+ 32.50891|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50892|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50893|I|libbeamng.lua.utils|     name = "adaptiveBrakeLights",
+ 32.50894|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.50895|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE_drivemodes_ICE",
+ 32.50895|I|libbeamng.lua.utils|     slotType = "main"
+ 32.50896|I|libbeamng.lua.utils|   }, {
+ 32.50897|I|libbeamng.lua.utils|     cid = 17,
+ 32.50897|I|libbeamng.lua.utils|     defaultMode = "street",
+ 32.50898|I|libbeamng.lua.utils|     defaultSettings = { { "type" }, { "exhaust", {
+ 32.50898|I|libbeamng.lua.utils|           gainOffset = 1,
+ 32.50899|I|libbeamng.lua.utils|           mufflingOffset = -0.25,
+ 32.50900|I|libbeamng.lua.utils|           name = "mainEngine"
+ 32.50900|I|libbeamng.lua.utils|         } }, { "transmission", {
+ 32.50901|I|libbeamng.lua.utils|           defaultForwardMode = "S"
+ 32.50902|I|libbeamng.lua.utils|         } }, { "controller", {
+ 32.50902|I|libbeamng.lua.utils|           controllerName = "twoStepLaunch",
+ 32.50903|I|libbeamng.lua.utils|           isEnabled = true,
+ 32.50904|I|libbeamng.lua.utils|           launchRPM = 3500
+ 32.50904|I|libbeamng.lua.utils|         } }, { "controller", {
+ 32.50905|I|libbeamng.lua.utils|           controllerName = "axleLift",
+ 32.50906|I|libbeamng.lua.utils|           mode = "off"
+ 32.50906|I|libbeamng.lua.utils|         } }, { "controller", {
+ 32.50907|I|libbeamng.lua.utils|           controllerName = "adaptiveBrakeLights",
+ 32.50908|I|libbeamng.lua.utils|           isEnabled = true
+ 32.50908|I|libbeamng.lua.utils|         } } },
+ 32.50909|I|libbeamng.lua.utils|     enabledModes = { "street", "sport", "off" },
+ 32.50909|I|libbeamng.lua.utils|     enabledModes_drift = { "drift" },
+ 32.50910|I|libbeamng.lua.utils|     enabledModes_track = { "track" },
+ 32.50911|I|libbeamng.lua.utils|     fileName = "driveModes",
+ 32.50911|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.50912|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.50913|I|libbeamng.lua.utils|     modes = {
+ 32.50913|I|libbeamng.lua.utils|       drift = {
+ 32.50914|I|libbeamng.lua.utils|         name = "Drift",
+ 32.50915|I|libbeamng.lua.utils|         order = 50,
+ 32.50915|I|libbeamng.lua.utils|         settings = { { "type" }, { "controller", {
+ 32.50916|I|libbeamng.lua.utils|               controllerName = "tractionControl",
+ 32.50917|I|libbeamng.lua.utils|               isEnabled = false
+ 32.50917|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50918|I|libbeamng.lua.utils|               controllerName = "yawControl",
+ 32.50919|I|libbeamng.lua.utils|               isEnabled = true
+ 32.50919|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50920|I|libbeamng.lua.utils|               controllerName = "motorTorqueControl",
+ 32.50921|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = false
+ 32.50921|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50922|I|libbeamng.lua.utils|               controllerName = "brakeControl",
+ 32.50923|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.50923|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.2,
+ 32.50924|I|libbeamng.lua.utils|               ["yawControl.yawAvThreshold"] = 999
+ 32.50924|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50925|I|libbeamng.lua.utils|               controllerName = "awdControl",
+ 32.50926|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.50926|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.3
+ 32.50927|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50928|I|libbeamng.lua.utils|               controllerName = "diffControl",
+ 32.50928|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = false
+ 32.50929|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50930|I|libbeamng.lua.utils|               controllerName = "aeroControl",
+ 32.50930|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = false
+ 32.50931|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50932|I|libbeamng.lua.utils|               controllerName = "electronicSplitShaftLock",
+ 32.50933|I|libbeamng.lua.utils|               isEnabled = false
+ 32.50934|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50934|I|libbeamng.lua.utils|               controllerName = "adaptiveFrontDamper",
+ 32.50935|I|libbeamng.lua.utils|               damperMode = "regular"
+ 32.50936|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50936|I|libbeamng.lua.utils|               controllerName = "adaptiveRearDamper",
+ 32.50937|I|libbeamng.lua.utils|               damperMode = "hard"
+ 32.50937|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50938|I|libbeamng.lua.utils|               controllerName = "adaptiveFrontSwayBar",
+ 32.50939|I|libbeamng.lua.utils|               torsionBarMode = "regular"
+ 32.50939|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50940|I|libbeamng.lua.utils|               controllerName = "adaptiveRearSwayBar",
+ 32.50941|I|libbeamng.lua.utils|               torsionBarMode = "hard"
+ 32.50941|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50942|I|libbeamng.lua.utils|               brakingFrontPosition = 1,
+ 32.50943|I|libbeamng.lua.utils|               brakingRearPosition = 0.5,
+ 32.50943|I|libbeamng.lua.utils|               controllerName = "spoiler",
+ 32.50944|I|libbeamng.lua.utils|               highSpeedCorneringFrontPosition = 1,
+ 32.50945|I|libbeamng.lua.utils|               highSpeedCorneringRearPosition = 0.5,
+ 32.50945|I|libbeamng.lua.utils|               highSpeedFrontPosition = 1,
+ 32.50946|I|libbeamng.lua.utils|               highSpeedRearPosition = 0.5,
+ 32.50946|I|libbeamng.lua.utils|               idleFrontPosition = 1,
+ 32.50947|I|libbeamng.lua.utils|               idleRearPosition = 0.5,
+ 32.50948|I|libbeamng.lua.utils|               mediumSpeedFrontPosition = 1,
+ 32.50948|I|libbeamng.lua.utils|               mediumSpeedRearPosition = 0.5,
+ 32.50949|I|libbeamng.lua.utils|               speedThresholdHigh = 55,
+ 32.50950|I|libbeamng.lua.utils|               speedThresholdMedium = 20
+ 32.50950|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50951|I|libbeamng.lua.utils|               controllerName = "twoStepLaunch",
+ 32.50952|I|libbeamng.lua.utils|               isEnabled = false
+ 32.50952|I|libbeamng.lua.utils|             } }, { "transmission", {
+ 32.50953|I|libbeamng.lua.utils|               defaultForwardMode = "M1"
+ 32.50954|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50954|I|libbeamng.lua.utils|               controllerName = "adaptiveBrakeLights",
+ 32.50955|I|libbeamng.lua.utils|               isEnabled = false
+ 32.50956|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50956|I|libbeamng.lua.utils|               controllerName = "gauge",
+ 32.50957|I|libbeamng.lua.utils|               dseLights = {
+ 32.50957|I|libbeamng.lua.utils|                 esc = "#8506a1",
+ 32.50958|I|libbeamng.lua.utils|                 powertrain = "#555555",
+ 32.50959|I|libbeamng.lua.utils|                 suspension = "#555555",
+ 32.50959|I|libbeamng.lua.utils|                 tcs = "#555555"
+ 32.50960|I|libbeamng.lua.utils|               },
+ 32.50961|I|libbeamng.lua.utils|               modeColor = "#8506a1",
+ 32.50961|I|libbeamng.lua.utils|               modeName = "DRIFT",
+ 32.50962|I|libbeamng.lua.utils|               page = "text"
+ 32.50963|I|libbeamng.lua.utils|             } }, { "simpleControlButton", {
+ 32.50963|I|libbeamng.lua.utils|               buttonId = "dse",
+ 32.50964|I|libbeamng.lua.utils|               color = "8506A1",
+ 32.50965|I|libbeamng.lua.utils|               icon = "powertrain_esc",
+ 32.50965|I|libbeamng.lua.utils|               offColor = "343434",
+ 32.50966|I|libbeamng.lua.utils|               offColorElectric = "dseWarningPulse",
+ 32.50966|I|libbeamng.lua.utils|               uiName = "DSE"
+ 32.50967|I|libbeamng.lua.utils|             } } }
+ 32.50968|I|libbeamng.lua.utils|       },
+ 32.50968|I|libbeamng.lua.utils|       off = {
+ 32.50970|I|libbeamng.lua.utils|         name = "ESC & TC Off",
+ 32.50970|I|libbeamng.lua.utils|         order = 60,
+ 32.50971|I|libbeamng.lua.utils|         settings = { { "type" }, { "controller", {
+ 32.50972|I|libbeamng.lua.utils|               controllerName = "tractionControl",
+ 32.50972|I|libbeamng.lua.utils|               isEnabled = false
+ 32.50973|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50974|I|libbeamng.lua.utils|               controllerName = "yawControl",
+ 32.50974|I|libbeamng.lua.utils|               isEnabled = false
+ 32.50975|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50976|I|libbeamng.lua.utils|               avDiffThreshold = 27,
+ 32.50977|I|libbeamng.lua.utils|               controllerName = "electronicSplitShaftLock",
+ 32.50977|I|libbeamng.lua.utils|               isEnabled = true,
+ 32.50978|I|libbeamng.lua.utils|               minimumLock = 0
+ 32.50979|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50982|I|libbeamng.lua.utils|               controllerName = "adaptiveFrontDamper",
+ 32.50983|I|libbeamng.lua.utils|               damperMode = "hard"
+ 32.50983|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50984|I|libbeamng.lua.utils|               controllerName = "adaptiveRearDamper",
+ 32.50985|I|libbeamng.lua.utils|               damperMode = "hard"
+ 32.50985|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50986|I|libbeamng.lua.utils|               controllerName = "adaptiveFrontSwayBar",
+ 32.50987|I|libbeamng.lua.utils|               torsionBarMode = "hard"
+ 32.50987|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50988|I|libbeamng.lua.utils|               controllerName = "adaptiveRearSwayBar",
+ 32.50989|I|libbeamng.lua.utils|               torsionBarMode = "hard"
+ 32.50989|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50990|I|libbeamng.lua.utils|               brakingFrontPosition = 0.4,
+ 32.50991|I|libbeamng.lua.utils|               brakingRearPosition = 0.4,
+ 32.50991|I|libbeamng.lua.utils|               controllerName = "spoiler",
+ 32.50992|I|libbeamng.lua.utils|               highSpeedCorneringFrontPosition = 0.5,
+ 32.50992|I|libbeamng.lua.utils|               highSpeedCorneringRearPosition = 0.5,
+ 32.50993|I|libbeamng.lua.utils|               highSpeedFrontPosition = 0.4,
+ 32.50994|I|libbeamng.lua.utils|               highSpeedRearPosition = 0.4,
+ 32.50994|I|libbeamng.lua.utils|               idleFrontPosition = 0.4,
+ 32.50995|I|libbeamng.lua.utils|               idleRearPosition = 0.4,
+ 32.50996|I|libbeamng.lua.utils|               mediumSpeedFrontPosition = 0.4,
+ 32.50996|I|libbeamng.lua.utils|               mediumSpeedRearPosition = 0.4,
+ 32.50997|I|libbeamng.lua.utils|               speedThresholdHigh = 55,
+ 32.50998|I|libbeamng.lua.utils|               speedThresholdMedium = 20
+ 32.50998|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.50999|I|libbeamng.lua.utils|               controllerName = "twoStepLaunch",
+ 32.51000|I|libbeamng.lua.utils|               isEnabled = false
+ 32.51000|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51001|I|libbeamng.lua.utils|               controllerName = "adaptiveBrakeLights",
+ 32.51001|I|libbeamng.lua.utils|               isEnabled = false
+ 32.51002|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51003|I|libbeamng.lua.utils|               controllerName = "gauge",
+ 32.51003|I|libbeamng.lua.utils|               dseLights = {
+ 32.51004|I|libbeamng.lua.utils|                 esc = "#555555",
+ 32.51005|I|libbeamng.lua.utils|                 powertrain = "#555555",
+ 32.51005|I|libbeamng.lua.utils|                 suspension = "#555555",
+ 32.51006|I|libbeamng.lua.utils|                 tcs = "#555555"
+ 32.51007|I|libbeamng.lua.utils|               },
+ 32.51007|I|libbeamng.lua.utils|               modeColor = "#999999",
+ 32.51008|I|libbeamng.lua.utils|               modeName = "OFF",
+ 32.51008|I|libbeamng.lua.utils|               page = "text"
+ 32.51010|I|libbeamng.lua.utils|             } }, { "simpleControlButton", {
+ 32.51011|I|libbeamng.lua.utils|               buttonId = "dse",
+ 32.51011|I|libbeamng.lua.utils|               color = "999999",
+ 32.51012|I|libbeamng.lua.utils|               icon = "powertrain_esc",
+ 32.51013|I|libbeamng.lua.utils|               offColor = "343434",
+ 32.51013|I|libbeamng.lua.utils|               offColorElectric = "dseWarningPulse",
+ 32.51014|I|libbeamng.lua.utils|               uiName = "DSE"
+ 32.51014|I|libbeamng.lua.utils|             } } }
+ 32.51015|I|libbeamng.lua.utils|       },
+ 32.51016|I|libbeamng.lua.utils|       sport = {
+ 32.51016|I|libbeamng.lua.utils|         name = "Sport",
+ 32.51017|I|libbeamng.lua.utils|         order = 20,
+ 32.51018|I|libbeamng.lua.utils|         settings = { { "type" }, { "controller", {
+ 32.51018|I|libbeamng.lua.utils|               controllerName = "tractionControl",
+ 32.51019|I|libbeamng.lua.utils|               isEnabled = true
+ 32.51020|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51020|I|libbeamng.lua.utils|               controllerName = "yawControl",
+ 32.51021|I|libbeamng.lua.utils|               isEnabled = true
+ 32.51022|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51022|I|libbeamng.lua.utils|               controllerName = "motorTorqueControl",
+ 32.51023|I|libbeamng.lua.utils|               ["tractionControl.isEnabled"] = true,
+ 32.51023|I|libbeamng.lua.utils|               ["tractionControl.wheelGroupSettings.mainEngine.minimumThrottleLimit"] = 0.2,
+ 32.51024|I|libbeamng.lua.utils|               ["tractionControl.wheelGroupSettings.mainEngine.slipThreshold"] = 0.2,
+ 32.51025|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51025|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.1,
+ 32.51026|I|libbeamng.lua.utils|               ["yawControl.yawAvThreshold"] = 0.6
+ 32.51027|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51027|I|libbeamng.lua.utils|               controllerName = "brakeControl",
+ 32.51028|I|libbeamng.lua.utils|               ["tractionControl.isEnabled"] = true,
+ 32.51029|I|libbeamng.lua.utils|               ["tractionControl.wheelGroupSettings.mainEngine.slipThreshold"] = 0.15,
+ 32.51029|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51030|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.12,
+ 32.51031|I|libbeamng.lua.utils|               ["yawControl.yawAvThreshold"] = 0.7
+ 32.51031|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51032|I|libbeamng.lua.utils|               controllerName = "awdControl",
+ 32.51033|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51033|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.07
+ 32.51034|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51035|I|libbeamng.lua.utils|               controllerName = "diffControl",
+ 32.51035|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51036|I|libbeamng.lua.utils|               ["yawControl.lockableFrontDiffOversteerThresholdMax"] = 0.2,
+ 32.51037|I|libbeamng.lua.utils|               ["yawControl.lockableFrontDiffOversteerThresholdMin"] = 0.05,
+ 32.51037|I|libbeamng.lua.utils|               ["yawControl.lockableRearDiffOversteerThresholdMax"] = 0.2,
+ 32.51038|I|libbeamng.lua.utils|               ["yawControl.lockableRearDiffOversteerThresholdMin"] = 0.05,
+ 32.51038|I|libbeamng.lua.utils|               ["yawControl.openRearDiffOversteerThresholdMax"] = 0.1,
+ 32.51039|I|libbeamng.lua.utils|               ["yawControl.openRearDiffOversteerThresholdMin"] = 0.05
+ 32.51040|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51040|I|libbeamng.lua.utils|               controllerName = "aeroControl",
+ 32.51041|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51042|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.2
+ 32.51042|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51047|I|libbeamng.lua.utils|               avDiffThreshold = 23,
+ 32.51047|I|libbeamng.lua.utils|               controllerName = "electronicSplitShaftLock",
+ 32.51048|I|libbeamng.lua.utils|               isEnabled = true,
+ 32.51049|I|libbeamng.lua.utils|               minimumLock = 0.05
+ 32.51049|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51050|I|libbeamng.lua.utils|               controllerName = "adaptiveFrontDamper",
+ 32.51051|I|libbeamng.lua.utils|               damperMode = "hard"
+ 32.51054|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51055|I|libbeamng.lua.utils|               controllerName = "adaptiveRearDamper",
+ 32.51055|I|libbeamng.lua.utils|               damperMode = "hard"
+ 32.51056|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51056|I|libbeamng.lua.utils|               controllerName = "adaptiveFrontSwayBar",
+ 32.51057|I|libbeamng.lua.utils|               torsionBarMode = "regular"
+ 32.51058|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51058|I|libbeamng.lua.utils|               controllerName = "adaptiveRearSwayBar",
+ 32.51059|I|libbeamng.lua.utils|               torsionBarMode = "regular"
+ 32.51060|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51060|I|libbeamng.lua.utils|               brakingFrontPosition = 0.8,
+ 32.51061|I|libbeamng.lua.utils|               brakingRearPosition = 1,
+ 32.51062|I|libbeamng.lua.utils|               controllerName = "spoiler",
+ 32.51062|I|libbeamng.lua.utils|               highSpeedCorneringFrontPosition = 0.45,
+ 32.51063|I|libbeamng.lua.utils|               highSpeedCorneringRearPosition = 0.45,
+ 32.51064|I|libbeamng.lua.utils|               highSpeedFrontPosition = 0.4,
+ 32.51064|I|libbeamng.lua.utils|               highSpeedRearPosition = 0.4,
+ 32.51065|I|libbeamng.lua.utils|               idleFrontPosition = 0,
+ 32.51066|I|libbeamng.lua.utils|               idleRearPosition = 0,
+ 32.51066|I|libbeamng.lua.utils|               mediumSpeedFrontPosition = 0.2,
+ 32.51067|I|libbeamng.lua.utils|               mediumSpeedRearPosition = 0.2,
+ 32.51067|I|libbeamng.lua.utils|               speedThresholdAirBrake = 14,
+ 32.51068|I|libbeamng.lua.utils|               speedThresholdHigh = 28,
+ 32.51069|I|libbeamng.lua.utils|               speedThresholdMedium = 14
+ 32.51069|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51070|I|libbeamng.lua.utils|               controllerName = "twoStepLaunch",
+ 32.51071|I|libbeamng.lua.utils|               isEnabled = true,
+ 32.51071|I|libbeamng.lua.utils|               launchRPM = 4500
+ 32.51072|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51073|I|libbeamng.lua.utils|               controllerName = "gauge",
+ 32.51073|I|libbeamng.lua.utils|               dseLights = {
+ 32.51074|I|libbeamng.lua.utils|                 esc = "#fbc40f",
+ 32.51075|I|libbeamng.lua.utils|                 powertrain = "#fbc40f",
+ 32.51075|I|libbeamng.lua.utils|                 suspension = "#fbc40f",
+ 32.51076|I|libbeamng.lua.utils|                 tcs = "#fbc40f"
+ 32.51076|I|libbeamng.lua.utils|               },
+ 32.51077|I|libbeamng.lua.utils|               modeColor = "#fbc40f",
+ 32.51078|I|libbeamng.lua.utils|               modeName = "SPORT",
+ 32.51078|I|libbeamng.lua.utils|               page = "gmeter"
+ 32.51079|I|libbeamng.lua.utils|             } }, { "simpleControlButton", {
+ 32.51080|I|libbeamng.lua.utils|               buttonId = "dse",
+ 32.51080|I|libbeamng.lua.utils|               color = "FBC40F",
+ 32.51081|I|libbeamng.lua.utils|               icon = "powertrain_esc",
+ 32.51082|I|libbeamng.lua.utils|               offColor = "343434",
+ 32.51082|I|libbeamng.lua.utils|               offColorElectric = "dseWarningPulse",
+ 32.51083|I|libbeamng.lua.utils|               uiName = "DSE"
+ 32.51084|I|libbeamng.lua.utils|             } } }
+ 32.51084|I|libbeamng.lua.utils|       },
+ 32.51085|I|libbeamng.lua.utils|       street = {
+ 32.51085|I|libbeamng.lua.utils|         name = "Strada",
+ 32.51087|I|libbeamng.lua.utils|         order = 10,
+ 32.51088|I|libbeamng.lua.utils|         settings = { { "type" }, { "controller", {
+ 32.51088|I|libbeamng.lua.utils|               controllerName = "tractionControl",
+ 32.51089|I|libbeamng.lua.utils|               isEnabled = true
+ 32.51090|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51090|I|libbeamng.lua.utils|               controllerName = "yawControl",
+ 32.51091|I|libbeamng.lua.utils|               isEnabled = true
+ 32.51092|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51092|I|libbeamng.lua.utils|               controllerName = "motorTorqueControl",
+ 32.51093|I|libbeamng.lua.utils|               ["tractionControl.isEnabled"] = true,
+ 32.51093|I|libbeamng.lua.utils|               ["tractionControl.wheelGroupSettings.mainEngine.minimumThrottleLimit"] = 0.2,
+ 32.51094|I|libbeamng.lua.utils|               ["tractionControl.wheelGroupSettings.mainEngine.slipThreshold"] = 0.15,
+ 32.51095|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51095|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.06,
+ 32.51096|I|libbeamng.lua.utils|               ["yawControl.yawAvThreshold"] = 0.5
+ 32.51097|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51097|I|libbeamng.lua.utils|               controllerName = "brakeControl",
+ 32.51098|I|libbeamng.lua.utils|               ["tractionControl.isEnabled"] = true,
+ 32.51099|I|libbeamng.lua.utils|               ["tractionControl.wheelGroupSettings.mainEngine.slipThreshold"] = 0.12,
+ 32.51099|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51100|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.08,
+ 32.51101|I|libbeamng.lua.utils|               ["yawControl.yawAvThreshold"] = 0.6
+ 32.51101|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51102|I|libbeamng.lua.utils|               controllerName = "awdControl",
+ 32.51103|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51103|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.03
+ 32.51104|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51104|I|libbeamng.lua.utils|               controllerName = "diffControl",
+ 32.51105|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51106|I|libbeamng.lua.utils|               ["yawControl.lockableFrontDiffOversteerThresholdMax"] = 0.2,
+ 32.51106|I|libbeamng.lua.utils|               ["yawControl.lockableFrontDiffOversteerThresholdMin"] = 0.02,
+ 32.51107|I|libbeamng.lua.utils|               ["yawControl.lockableRearDiffOversteerThresholdMax"] = 0.2,
+ 32.51108|I|libbeamng.lua.utils|               ["yawControl.lockableRearDiffOversteerThresholdMin"] = 0.02,
+ 32.51108|I|libbeamng.lua.utils|               ["yawControl.openRearDiffOversteerThresholdMax"] = 0.1,
+ 32.51109|I|libbeamng.lua.utils|               ["yawControl.openRearDiffOversteerThresholdMin"] = 0.02
+ 32.51110|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51110|I|libbeamng.lua.utils|               controllerName = "aeroControl",
+ 32.51111|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51112|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.2
+ 32.51112|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51113|I|libbeamng.lua.utils|               avDiffThreshold = 16,
+ 32.51114|I|libbeamng.lua.utils|               controllerName = "electronicSplitShaftLock",
+ 32.51114|I|libbeamng.lua.utils|               isEnabled = true,
+ 32.51115|I|libbeamng.lua.utils|               minimumLock = 0
+ 32.51115|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51116|I|libbeamng.lua.utils|               controllerName = "adaptiveFrontDamper",
+ 32.51117|I|libbeamng.lua.utils|               damperMode = "regular"
+ 32.51117|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51118|I|libbeamng.lua.utils|               controllerName = "adaptiveRearDamper",
+ 32.51119|I|libbeamng.lua.utils|               damperMode = "regular"
+ 32.51122|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51123|I|libbeamng.lua.utils|               controllerName = "adaptiveFrontSwayBar",
+ 32.51124|I|libbeamng.lua.utils|               torsionBarMode = "regular"
+ 32.51124|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51125|I|libbeamng.lua.utils|               controllerName = "adaptiveRearSwayBar",
+ 32.51126|I|libbeamng.lua.utils|               torsionBarMode = "regular"
+ 32.51126|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51127|I|libbeamng.lua.utils|               controllerName = "axleLift",
+ 32.51128|I|libbeamng.lua.utils|               mode = "auto"
+ 32.51128|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51129|I|libbeamng.lua.utils|               brakingFrontPosition = 0.8,
+ 32.51129|I|libbeamng.lua.utils|               brakingRearPosition = 1,
+ 32.51130|I|libbeamng.lua.utils|               controllerName = "spoiler",
+ 32.51131|I|libbeamng.lua.utils|               highSpeedCorneringFrontPosition = 0.4,
+ 32.51131|I|libbeamng.lua.utils|               highSpeedCorneringRearPosition = 0.4,
+ 32.51132|I|libbeamng.lua.utils|               highSpeedFrontPosition = 0.4,
+ 32.51133|I|libbeamng.lua.utils|               highSpeedRearPosition = 0.4,
+ 32.51133|I|libbeamng.lua.utils|               idleFrontPosition = 0,
+ 32.51134|I|libbeamng.lua.utils|               idleRearPosition = 0,
+ 32.51135|I|libbeamng.lua.utils|               mediumSpeedFrontPosition = 0.2,
+ 32.51135|I|libbeamng.lua.utils|               mediumSpeedRearPosition = 0.2,
+ 32.51136|I|libbeamng.lua.utils|               speedThresholdAirBrake = 25,
+ 32.51137|I|libbeamng.lua.utils|               speedThresholdHigh = 42,
+ 32.51137|I|libbeamng.lua.utils|               speedThresholdMedium = 25
+ 32.51138|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51138|I|libbeamng.lua.utils|               controllerName = "twoStepLaunch",
+ 32.51139|I|libbeamng.lua.utils|               isEnabled = true,
+ 32.51140|I|libbeamng.lua.utils|               launchRPM = 3500
+ 32.51140|I|libbeamng.lua.utils|             } }, { "exhaust", {
+ 32.51141|I|libbeamng.lua.utils|               gainOffset = 0,
+ 32.51142|I|libbeamng.lua.utils|               mufflingOffset = 0,
+ 32.51142|I|libbeamng.lua.utils|               name = "mainEngine"
+ 32.51143|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51144|I|libbeamng.lua.utils|               controllerName = "gauge",
+ 32.51144|I|libbeamng.lua.utils|               dseLights = {
+ 32.51145|I|libbeamng.lua.utils|                 esc = "#005cfc",
+ 32.51146|I|libbeamng.lua.utils|                 powertrain = "#005cfc",
+ 32.51146|I|libbeamng.lua.utils|                 suspension = "#005cfc",
+ 32.51147|I|libbeamng.lua.utils|                 tcs = "#005cfc"
+ 32.51147|I|libbeamng.lua.utils|               },
+ 32.51148|I|libbeamng.lua.utils|               modeColor = "#005cfc",
+ 32.51149|I|libbeamng.lua.utils|               modeName = "STRADA",
+ 32.51149|I|libbeamng.lua.utils|               page = "time"
+ 32.51150|I|libbeamng.lua.utils|             } }, { "simpleControlButton", {
+ 32.51151|I|libbeamng.lua.utils|               buttonId = "dse",
+ 32.51151|I|libbeamng.lua.utils|               color = "005CFC",
+ 32.51152|I|libbeamng.lua.utils|               icon = "powertrain_esc",
+ 32.51153|I|libbeamng.lua.utils|               offColor = "343434",
+ 32.51153|I|libbeamng.lua.utils|               offColorElectric = "dseWarningPulse",
+ 32.51154|I|libbeamng.lua.utils|               uiName = "DSE"
+ 32.51154|I|libbeamng.lua.utils|             } } }
+ 32.51155|I|libbeamng.lua.utils|       },
+ 32.51156|I|libbeamng.lua.utils|       topspeed = {
+ 32.51156|I|libbeamng.lua.utils|         name = "Velocità",
+ 32.51157|I|libbeamng.lua.utils|         order = 40,
+ 32.51158|I|libbeamng.lua.utils|         settings = { { "type" }, { "controller", {
+ 32.51158|I|libbeamng.lua.utils|               controllerName = "tractionControl",
+ 32.51160|I|libbeamng.lua.utils|               isEnabled = true
+ 32.51160|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51161|I|libbeamng.lua.utils|               controllerName = "yawControl",
+ 32.51162|I|libbeamng.lua.utils|               isEnabled = true
+ 32.51162|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51163|I|libbeamng.lua.utils|               controllerName = "motorTorqueControl",
+ 32.51164|I|libbeamng.lua.utils|               ["tractionControl.isEnabled"] = true,
+ 32.51164|I|libbeamng.lua.utils|               ["tractionControl.wheelGroupSettings.mainEngine.minimumThrottleLimit"] = 0.2,
+ 32.51165|I|libbeamng.lua.utils|               ["tractionControl.wheelGroupSettings.mainEngine.slipThreshold"] = 0.1,
+ 32.51165|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51166|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.05,
+ 32.51167|I|libbeamng.lua.utils|               ["yawControl.yawAvThreshold"] = 0.4
+ 32.51167|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51168|I|libbeamng.lua.utils|               controllerName = "brakeControl",
+ 32.51169|I|libbeamng.lua.utils|               ["tractionControl.isEnabled"] = true,
+ 32.51169|I|libbeamng.lua.utils|               ["tractionControl.wheelGroupSettings.mainEngine.slipThreshold"] = 0.15,
+ 32.51170|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51171|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.08,
+ 32.51171|I|libbeamng.lua.utils|               ["yawControl.yawAvThreshold"] = 0.5
+ 32.51172|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51173|I|libbeamng.lua.utils|               controllerName = "awdControl",
+ 32.51173|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51174|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.1
+ 32.51175|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51175|I|libbeamng.lua.utils|               controllerName = "diffControl",
+ 32.51176|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51177|I|libbeamng.lua.utils|               ["yawControl.lockableFrontDiffOversteerThresholdMax"] = 0.2,
+ 32.51178|I|libbeamng.lua.utils|               ["yawControl.lockableFrontDiffOversteerThresholdMin"] = 0,
+ 32.51178|I|libbeamng.lua.utils|               ["yawControl.lockableRearDiffOversteerThresholdMax"] = 0.2,
+ 32.51179|I|libbeamng.lua.utils|               ["yawControl.lockableRearDiffOversteerThresholdMin"] = 0,
+ 32.51180|I|libbeamng.lua.utils|               ["yawControl.openRearDiffOversteerThresholdMax"] = 0.1,
+ 32.51180|I|libbeamng.lua.utils|               ["yawControl.openRearDiffOversteerThresholdMin"] = 0
+ 32.51181|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51182|I|libbeamng.lua.utils|               controllerName = "aeroControl",
+ 32.51182|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51183|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.2
+ 32.51183|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51184|I|libbeamng.lua.utils|               avDiffThreshold = 16,
+ 32.51185|I|libbeamng.lua.utils|               controllerName = "electronicSplitShaftLock",
+ 32.51185|I|libbeamng.lua.utils|               isEnabled = true,
+ 32.51186|I|libbeamng.lua.utils|               minimumLock = 0
+ 32.51187|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51187|I|libbeamng.lua.utils|               controllerName = "adaptiveFrontDamper",
+ 32.51190|I|libbeamng.lua.utils|               damperMode = "hard"
+ 32.51191|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51191|I|libbeamng.lua.utils|               controllerName = "adaptiveRearDamper",
+ 32.51192|I|libbeamng.lua.utils|               damperMode = "hard"
+ 32.51193|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51193|I|libbeamng.lua.utils|               controllerName = "adaptiveFrontSwayBar",
+ 32.51195|I|libbeamng.lua.utils|               torsionBarMode = "hard"
+ 32.51196|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51196|I|libbeamng.lua.utils|               controllerName = "adaptiveRearSwayBar",
+ 32.51197|I|libbeamng.lua.utils|               torsionBarMode = "regular"
+ 32.51197|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51198|I|libbeamng.lua.utils|               brakingFrontPosition = 0.8,
+ 32.51199|I|libbeamng.lua.utils|               brakingRearPosition = 1,
+ 32.51199|I|libbeamng.lua.utils|               controllerName = "spoiler",
+ 32.51200|I|libbeamng.lua.utils|               highSpeedCorneringFrontPosition = 0.35,
+ 32.51201|I|libbeamng.lua.utils|               highSpeedCorneringRearPosition = 0.35,
+ 32.51201|I|libbeamng.lua.utils|               highSpeedFrontPosition = 0,
+ 32.51202|I|libbeamng.lua.utils|               highSpeedRearPosition = 0,
+ 32.51203|I|libbeamng.lua.utils|               idleFrontPosition = 0,
+ 32.51203|I|libbeamng.lua.utils|               idleRearPosition = 0,
+ 32.51204|I|libbeamng.lua.utils|               mediumSpeedFrontPosition = 0,
+ 32.51205|I|libbeamng.lua.utils|               mediumSpeedRearPosition = 0,
+ 32.51205|I|libbeamng.lua.utils|               speedThresholdAirBrake = 26,
+ 32.51206|I|libbeamng.lua.utils|               speedThresholdHigh = 41,
+ 32.51206|I|libbeamng.lua.utils|               speedThresholdMedium = 22
+ 32.51207|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51208|I|libbeamng.lua.utils|               controllerName = "twoStepLaunch",
+ 32.51208|I|libbeamng.lua.utils|               isEnabled = true,
+ 32.51209|I|libbeamng.lua.utils|               launchRPM = 3500
+ 32.51210|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51210|I|libbeamng.lua.utils|               controllerName = "gauge",
+ 32.51211|I|libbeamng.lua.utils|               dseLights = {
+ 32.51212|I|libbeamng.lua.utils|                 esc = "#005cfc",
+ 32.51212|I|libbeamng.lua.utils|                 powertrain = "#fbc40f",
+ 32.51213|I|libbeamng.lua.utils|                 suspension = "#fbc40f",
+ 32.51213|I|libbeamng.lua.utils|                 tcs = "#005cfc"
+ 32.51214|I|libbeamng.lua.utils|               },
+ 32.51215|I|libbeamng.lua.utils|               modeColor = "#03C91D",
+ 32.51215|I|libbeamng.lua.utils|               modeName = "VELOCITÀ",
+ 32.51216|I|libbeamng.lua.utils|               page = "time"
+ 32.51217|I|libbeamng.lua.utils|             } }, { "simpleControlButton", {
+ 32.51217|I|libbeamng.lua.utils|               buttonId = "dse",
+ 32.51218|I|libbeamng.lua.utils|               color = "03C91D",
+ 32.51219|I|libbeamng.lua.utils|               icon = "powertrain_esc",
+ 32.51219|I|libbeamng.lua.utils|               offColor = "343434",
+ 32.51220|I|libbeamng.lua.utils|               offColorElectric = "dseWarningPulse",
+ 32.51221|I|libbeamng.lua.utils|               uiName = "DSE"
+ 32.51221|I|libbeamng.lua.utils|             } } }
+ 32.51222|I|libbeamng.lua.utils|       },
+ 32.51222|I|libbeamng.lua.utils|       track = {
+ 32.51223|I|libbeamng.lua.utils|         name = "Corse",
+ 32.51224|I|libbeamng.lua.utils|         order = 30,
+ 32.51224|I|libbeamng.lua.utils|         settings = { { "type" }, { "controller", {
+ 32.51225|I|libbeamng.lua.utils|               controllerName = "tractionControl",
+ 32.51226|I|libbeamng.lua.utils|               isEnabled = true
+ 32.51226|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51227|I|libbeamng.lua.utils|               controllerName = "yawControl",
+ 32.51228|I|libbeamng.lua.utils|               isEnabled = true
+ 32.51228|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51229|I|libbeamng.lua.utils|               controllerName = "motorTorqueControl",
+ 32.51230|I|libbeamng.lua.utils|               ["tractionControl.isEnabled"] = true,
+ 32.51230|I|libbeamng.lua.utils|               ["tractionControl.wheelGroupSettings.mainEngine.minimumThrottleLimit"] = 0.2,
+ 32.51231|I|libbeamng.lua.utils|               ["tractionControl.wheelGroupSettings.mainEngine.slipThreshold"] = 0.2,
+ 32.51232|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = false
+ 32.51233|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51233|I|libbeamng.lua.utils|               controllerName = "brakeControl",
+ 32.51234|I|libbeamng.lua.utils|               ["tractionControl.isEnabled"] = true,
+ 32.51235|I|libbeamng.lua.utils|               ["tractionControl.wheelGroupSettings.mainEngine.slipThreshold"] = 0.15,
+ 32.51235|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51236|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.2,
+ 32.51237|I|libbeamng.lua.utils|               ["yawControl.yawAvThreshold"] = 0.7
+ 32.51237|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51238|I|libbeamng.lua.utils|               controllerName = "awdControl",
+ 32.51239|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51239|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.1
+ 32.51240|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51241|I|libbeamng.lua.utils|               controllerName = "diffControl",
+ 32.51241|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51242|I|libbeamng.lua.utils|               ["yawControl.lockableFrontDiffOversteerThresholdMax"] = 0.2,
+ 32.51242|I|libbeamng.lua.utils|               ["yawControl.lockableFrontDiffOversteerThresholdMin"] = 0.05,
+ 32.51243|I|libbeamng.lua.utils|               ["yawControl.lockableRearDiffOversteerThresholdMax"] = 0.2,
+ 32.51244|I|libbeamng.lua.utils|               ["yawControl.lockableRearDiffOversteerThresholdMin"] = 0.05,
+ 32.51244|I|libbeamng.lua.utils|               ["yawControl.openRearDiffOversteerThresholdMax"] = 0.1,
+ 32.51245|I|libbeamng.lua.utils|               ["yawControl.openRearDiffOversteerThresholdMin"] = 0.05
+ 32.51246|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51246|I|libbeamng.lua.utils|               controllerName = "aeroControl",
+ 32.51247|I|libbeamng.lua.utils|               ["yawControl.isEnabled"] = true,
+ 32.51248|I|libbeamng.lua.utils|               ["yawControl.slipAngleThreshold"] = 0.2
+ 32.51248|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51249|I|libbeamng.lua.utils|               avDiffThreshold = 27,
+ 32.51250|I|libbeamng.lua.utils|               controllerName = "electronicSplitShaftLock",
+ 32.51250|I|libbeamng.lua.utils|               isEnabled = true,
+ 32.51251|I|libbeamng.lua.utils|               minimumLock = 0.05
+ 32.51252|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51252|I|libbeamng.lua.utils|               controllerName = "adaptiveFrontDamper",
+ 32.51253|I|libbeamng.lua.utils|               damperMode = "hard"
+ 32.51253|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51254|I|libbeamng.lua.utils|               controllerName = "adaptiveRearDamper",
+ 32.51255|I|libbeamng.lua.utils|               damperMode = "hard"
+ 32.51255|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51258|I|libbeamng.lua.utils|               controllerName = "adaptiveFrontSwayBar",
+ 32.51259|I|libbeamng.lua.utils|               torsionBarMode = "hard"
+ 32.51259|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51260|I|libbeamng.lua.utils|               controllerName = "adaptiveRearSwayBar",
+ 32.51261|I|libbeamng.lua.utils|               torsionBarMode = "hard"
+ 32.51261|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51262|I|libbeamng.lua.utils|               brakingFrontPosition = 0.8,
+ 32.51263|I|libbeamng.lua.utils|               brakingRearPosition = 1,
+ 32.51263|I|libbeamng.lua.utils|               controllerName = "spoiler",
+ 32.51264|I|libbeamng.lua.utils|               highSpeedCorneringFrontPosition = 0.45,
+ 32.51264|I|libbeamng.lua.utils|               highSpeedCorneringRearPosition = 0.45,
+ 32.51265|I|libbeamng.lua.utils|               highSpeedFrontPosition = 0.4,
+ 32.51266|I|libbeamng.lua.utils|               highSpeedRearPosition = 0.4,
+ 32.51267|I|libbeamng.lua.utils|               idleFrontPosition = 0.4,
+ 32.51268|I|libbeamng.lua.utils|               idleRearPosition = 0.4,
+ 32.51268|I|libbeamng.lua.utils|               mediumSpeedFrontPosition = 0.4,
+ 32.51269|I|libbeamng.lua.utils|               mediumSpeedRearPosition = 0.4,
+ 32.51270|I|libbeamng.lua.utils|               speedThresholdAirBrake = 14,
+ 32.51270|I|libbeamng.lua.utils|               speedThresholdHigh = 55,
+ 32.51271|I|libbeamng.lua.utils|               speedThresholdMedium = 20
+ 32.51272|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51272|I|libbeamng.lua.utils|               controllerName = "twoStepLaunch",
+ 32.51273|I|libbeamng.lua.utils|               isEnabled = true,
+ 32.51274|I|libbeamng.lua.utils|               launchRPM = 5000
+ 32.51274|I|libbeamng.lua.utils|             } }, { "exhaust", {
+ 32.51275|I|libbeamng.lua.utils|               gainOffset = 1.5,
+ 32.51275|I|libbeamng.lua.utils|               mufflingOffset = -0.2,
+ 32.51276|I|libbeamng.lua.utils|               name = "mainEngine"
+ 32.51277|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51277|I|libbeamng.lua.utils|               controllerName = "adaptiveBrakeLights",
+ 32.51278|I|libbeamng.lua.utils|               isEnabled = false
+ 32.51279|I|libbeamng.lua.utils|             } }, { "controller", {
+ 32.51279|I|libbeamng.lua.utils|               controllerName = "gauge",
+ 32.51280|I|libbeamng.lua.utils|               dseLights = {
+ 32.51281|I|libbeamng.lua.utils|                 esc = "#555555",
+ 32.51281|I|libbeamng.lua.utils|                 powertrain = "#fbc40f",
+ 32.51282|I|libbeamng.lua.utils|                 suspension = "#fb0003",
+ 32.51283|I|libbeamng.lua.utils|                 tcs = "#fb0003"
+ 32.51283|I|libbeamng.lua.utils|               },
+ 32.51284|I|libbeamng.lua.utils|               modeColor = "#fb0003",
+ 32.51284|I|libbeamng.lua.utils|               modeName = "CORSE",
+ 32.51285|I|libbeamng.lua.utils|               page = "tires"
+ 32.51286|I|libbeamng.lua.utils|             } }, { "simpleControlButton", {
+ 32.51286|I|libbeamng.lua.utils|               buttonId = "dse",
+ 32.51287|I|libbeamng.lua.utils|               color = "FB0003",
+ 32.51288|I|libbeamng.lua.utils|               icon = "powertrain_esc",
+ 32.51288|I|libbeamng.lua.utils|               offColor = "343434",
+ 32.51289|I|libbeamng.lua.utils|               offColorElectric = "dseWarningPulse",
+ 32.51290|I|libbeamng.lua.utils|               uiName = "DSE"
+ 32.51290|I|libbeamng.lua.utils|             } } }
+ 32.51291|I|libbeamng.lua.utils|       }
+ 32.51291|I|libbeamng.lua.utils|     },
+ 32.51292|I|libbeamng.lua.utils|     name = "driveModes",
+ 32.51293|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51293|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE_drivemodes_ICE",
+ 32.51294|I|libbeamng.lua.utils|     slotType = "main"
+ 32.51295|I|libbeamng.lua.utils|   }, {
+ 32.51295|I|libbeamng.lua.utils|     cid = 18,
+ 32.51296|I|libbeamng.lua.utils|     fileName = "axleLift",
+ 32.51297|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51297|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51298|I|libbeamng.lua.utils|     name = "axleLift",
+ 32.51299|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51299|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE_drivemodes_ICE",
+ 32.51300|I|libbeamng.lua.utils|     slotType = "main"
+ 32.51300|I|libbeamng.lua.utils|   }, {
+ 32.51301|I|libbeamng.lua.utils|     brakeThreshold = 55,
+ 32.51302|I|libbeamng.lua.utils|     cid = 19,
+ 32.51302|I|libbeamng.lua.utils|     fileName = "postCrashBrake",
+ 32.51303|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51304|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51304|I|libbeamng.lua.utils|     name = "postCrashBrake",
+ 32.51305|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51306|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE_drivemodes_ICE",
+ 32.51307|I|libbeamng.lua.utils|     slotType = "main"
+ 32.51308|I|libbeamng.lua.utils|   }, {
+ 32.51308|I|libbeamng.lua.utils|     breakgroups = { "doorhinge_a_R", "doorhinge_b_R", "doorlatch_R1", "doorlatch_R2" },
+ 32.51309|I|libbeamng.lua.utils|     cid = 20,
+ 32.51309|I|libbeamng.lua.utils|     eventName = "event:>Vehicle>Failures>pyrotechnic_charge",
+ 32.51310|I|libbeamng.lua.utils|     eventNode = "d7r",
+ 32.51311|I|libbeamng.lua.utils|     eventVolume = 1,
+ 32.51311|I|libbeamng.lua.utils|     fileName = "pyrotechnicCharge",
+ 32.51312|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51313|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51313|I|libbeamng.lua.utils|     name = "doorDisconnectR",
+ 32.51314|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51315|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE_drivemodes_ICE",
+ 32.51315|I|libbeamng.lua.utils|     slotType = "main",
+ 32.51316|I|libbeamng.lua.utils|     triggerElectrics = { "dseRollOverStopped" },
+ 32.51317|I|libbeamng.lua.utils|     uiName = "Right Door"
+ 32.51317|I|libbeamng.lua.utils|   }, {
+ 32.51318|I|libbeamng.lua.utils|     breakgroups = { "doorhinge_a_L", "doorhinge_b_L", "doorlatch_L1", "doorlatch_L2" },
+ 32.51318|I|libbeamng.lua.utils|     cid = 21,
+ 32.51319|I|libbeamng.lua.utils|     eventName = "event:>Vehicle>Failures>pyrotechnic_charge",
+ 32.51320|I|libbeamng.lua.utils|     eventNode = "d7l",
+ 32.51320|I|libbeamng.lua.utils|     eventVolume = 1,
+ 32.51321|I|libbeamng.lua.utils|     fileName = "pyrotechnicCharge",
+ 32.51322|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51322|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51323|I|libbeamng.lua.utils|     name = "doorDisconnectL",
+ 32.51325|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51326|I|libbeamng.lua.utils|     partOrigin = "scintilla_DSE_drivemodes_ICE",
+ 32.51327|I|libbeamng.lua.utils|     slotType = "main",
+ 32.51327|I|libbeamng.lua.utils|     triggerElectrics = { "dseRollOverStopped" },
+ 32.51328|I|libbeamng.lua.utils|     uiName = "Left Door"
+ 32.51329|I|libbeamng.lua.utils|   }, {
+ 32.51329|I|libbeamng.lua.utils|     attachSoundEvent = "event:>Vehicle>Latches>Door>90s_03_close",
+ 32.51330|I|libbeamng.lua.utils|     attachSoundVolume = 1,
+ 32.51331|I|libbeamng.lua.utils|     cid = 22,
+ 32.51331|I|libbeamng.lua.utils|     closeForceDuration = 3,
+ 32.51332|I|libbeamng.lua.utils|     closeForceMagnitude = 110,
+ 32.51333|I|libbeamng.lua.utils|     couplerNodes = { { "cid1", "cid2", "autoCouplingStrength", "autoCouplingRadius", "autoCouplingLockRadius", "autoCouplingSpeed", "couplingStartRadius", "breakGroup" }, { "rf3r", "d15r", 70000, 0.01, 0.005, 0.2, 0.1, "doorlatch_R2" }, { "f8rr", "d20r", 70000, 0.01, 0.005, 0.2, 0.1, "doorlatch_R1" } },
+ 32.51333|I|libbeamng.lua.utils|     detachSoundEvent = "event:>Vehicle>Latches>Door>90s_03_open",
+ 32.51334|I|libbeamng.lua.utils|     detachSoundVolume = 1,
+ 32.51335|I|libbeamng.lua.utils|     fileName = "advancedCouplerControl",
+ 32.51335|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51336|I|libbeamng.lua.utils|     groupType = "autoCoupling",
+ 32.51337|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51337|I|libbeamng.lua.utils|     name = "doorRCoupler",
+ 32.51338|I|libbeamng.lua.utils|     openForceDuration = 1,
+ 32.51339|I|libbeamng.lua.utils|     openForceMagnitude = 240,
+ 32.51339|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51340|I|libbeamng.lua.utils|     partOrigin = "scintilla_door_R_hardtop",
+ 32.51340|I|libbeamng.lua.utils|     slotType = "main",
+ 32.51341|I|libbeamng.lua.utils|     soundNode_nodes = { 94 }
+ 32.51342|I|libbeamng.lua.utils|   }, {
+ 32.51342|I|libbeamng.lua.utils|     attachSoundEvent = "event:>Vehicle>Latches>Door>90s_03_close",
+ 32.51343|I|libbeamng.lua.utils|     attachSoundVolume = 1,
+ 32.51344|I|libbeamng.lua.utils|     cid = 23,
+ 32.51344|I|libbeamng.lua.utils|     closeForceDuration = 3,
+ 32.51346|I|libbeamng.lua.utils|     closeForceMagnitude = 110,
+ 32.51346|I|libbeamng.lua.utils|     couplerNodes = { { "cid1", "cid2", "autoCouplingStrength", "autoCouplingRadius", "autoCouplingLockRadius", "autoCouplingSpeed", "couplingStartRadius", "breakGroup" }, { "rf3l", "d15l", 70000, 0.01, 0.005, 0.2, 0.1, "doorlatch_L2" }, { "f8ll", "d20l", 70000, 0.01, 0.005, 0.2, 0.1, "doorlatch_L1" } },
+ 32.51347|I|libbeamng.lua.utils|     detachSoundEvent = "event:>Vehicle>Latches>Door>90s_03_open",
+ 32.51348|I|libbeamng.lua.utils|     detachSoundVolume = 1,
+ 32.51348|I|libbeamng.lua.utils|     fileName = "advancedCouplerControl",
+ 32.51349|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51350|I|libbeamng.lua.utils|     groupType = "autoCoupling",
+ 32.51350|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51351|I|libbeamng.lua.utils|     name = "doorLCoupler",
+ 32.51352|I|libbeamng.lua.utils|     openForceDuration = 1,
+ 32.51352|I|libbeamng.lua.utils|     openForceMagnitude = 240,
+ 32.51353|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51353|I|libbeamng.lua.utils|     partOrigin = "scintilla_door_L_hardtop",
+ 32.51354|I|libbeamng.lua.utils|     slotType = "main",
+ 32.51355|I|libbeamng.lua.utils|     soundNode_nodes = { 93 }
+ 32.51355|I|libbeamng.lua.utils|   }, {
+ 32.51356|I|libbeamng.lua.utils|     attachSoundEvent = "event:>Vehicle>Latches>Hood>modern_07_close",
+ 32.51357|I|libbeamng.lua.utils|     attachSoundVolume = 1,
+ 32.51357|I|libbeamng.lua.utils|     cid = 24,
+ 32.51358|I|libbeamng.lua.utils|     closeForceDuration = 0,
+ 32.51359|I|libbeamng.lua.utils|     closeForceMagnitude = 0,
+ 32.51359|I|libbeamng.lua.utils|     couplerNodes = { { "cid1", "cid2", "autoCouplingStrength", "autoCouplingRadius", "autoCouplingLockRadius", "autoCouplingSpeed", "couplingStartRadius", "breakGroup" }, { "bbf2", "h5", 30000, 0.01, 0.005, 0.2, 0.1, "hood_latch" } },
+ 32.51360|I|libbeamng.lua.utils|     detachSoundEvent = "event:>Vehicle>Latches>Hood>modern_06_open_lever",
+ 32.51361|I|libbeamng.lua.utils|     detachSoundVolume = 1,
+ 32.51361|I|libbeamng.lua.utils|     fileName = "advancedCouplerControl",
+ 32.51362|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51362|I|libbeamng.lua.utils|     groupType = "autoCoupling",
+ 32.51363|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51364|I|libbeamng.lua.utils|     name = "hoodLatchCoupler",
+ 32.51364|I|libbeamng.lua.utils|     openForceDuration = 0,
+ 32.51365|I|libbeamng.lua.utils|     openForceMagnitude = 0,
+ 32.51366|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51366|I|libbeamng.lua.utils|     partOrigin = "scintilla_hood",
+ 32.51367|I|libbeamng.lua.utils|     slotType = "main",
+ 32.51368|I|libbeamng.lua.utils|     soundNode_nodes = { 64 }
+ 32.51368|I|libbeamng.lua.utils|   }, {
+ 32.51369|I|libbeamng.lua.utils|     attachSoundEvent = "event:>Vehicle>Latches>Hood>modern_07_close",
+ 32.51370|I|libbeamng.lua.utils|     attachSoundVolume = 0,
+ 32.51370|I|libbeamng.lua.utils|     cid = 25,
+ 32.51371|I|libbeamng.lua.utils|     closeForceDuration = 1.5,
+ 32.51371|I|libbeamng.lua.utils|     closeForceMagnitude = 150,
+ 32.51372|I|libbeamng.lua.utils|     couplerNodes = { { "cid1", "cid2", "autoCouplingStrength", "autoCouplingRadius", "autoCouplingLockRadius", "autoCouplingSpeed", "couplingStartRadius", "breakGroup" }, { "h6", "h4", 30000, 0.02, 0.005, 0.2, 0.1, "hood_latch" } },
+ 32.51373|I|libbeamng.lua.utils|     detachSoundEvent = "event:>Vehicle>Latches>Hood>modern_06_open_hood",
+ 32.51373|I|libbeamng.lua.utils|     detachSoundVolume = 1,
+ 32.51374|I|libbeamng.lua.utils|     fileName = "advancedCouplerControl",
+ 32.51375|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51376|I|libbeamng.lua.utils|     groupType = "autoCoupling",
+ 32.51377|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51378|I|libbeamng.lua.utils|     name = "hoodCatchCoupler",
+ 32.51379|I|libbeamng.lua.utils|     openForceDuration = 2,
+ 32.51379|I|libbeamng.lua.utils|     openForceMagnitude = 50,
+ 32.51381|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51381|I|libbeamng.lua.utils|     partOrigin = "scintilla_hood",
+ 32.51382|I|libbeamng.lua.utils|     slotType = "main",
+ 32.51382|I|libbeamng.lua.utils|     soundNode_nodes = { 23 }
+ 32.51383|I|libbeamng.lua.utils|   }, {
+ 32.51384|I|libbeamng.lua.utils|     cid = 26,
+ 32.51384|I|libbeamng.lua.utils|     dampBeamNames = { "damper_FR", "damper_FL" },
+ 32.51385|I|libbeamng.lua.utils|     fileName = "drivingDynamics/actuators/adaptiveDampers",
+ 32.51386|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51386|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51387|I|libbeamng.lua.utils|     modes = { { "name", "beamDampCoef", "beamDampFastCoef", "beamDampReboundCoef", "beamDampReboundFastCoef", "beamDampVelocitySplitCoef" }, { "regular", 0.8, 0.77, 0.9, 0.87, 1.08 }, { "hard", 1, 1, 1, 1, 1 } },
+ 32.51388|I|libbeamng.lua.utils|     name = "adaptiveFrontDamper",
+ 32.51388|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51389|I|libbeamng.lua.utils|     partOrigin = "scintilla_coilover_F_adaptive",
+ 32.51390|I|libbeamng.lua.utils|     slotType = "main"
+ 32.51390|I|libbeamng.lua.utils|   }, {
+ 32.51391|I|libbeamng.lua.utils|     cid = 27,
+ 32.51391|I|libbeamng.lua.utils|     fileName = "drivingDynamics/actuators/adaptiveTorsionBars",
+ 32.51392|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51395|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51395|I|libbeamng.lua.utils|     modes = { { "name", "springCoef", "dampCoef" }, { "regular", 0.74, 1 }, { "hard", 1, 1 } },
+ 32.51396|I|libbeamng.lua.utils|     name = "adaptiveFrontSwayBar",
+ 32.51397|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51397|I|libbeamng.lua.utils|     partOrigin = "scintilla_swaybar_F_adaptive",
+ 32.51398|I|libbeamng.lua.utils|     slotType = "main",
+ 32.51399|I|libbeamng.lua.utils|     torsionBarNames = { "torsionBarFront" }
+ 32.51399|I|libbeamng.lua.utils|   }, {
+ 32.51400|I|libbeamng.lua.utils|     attachSoundEvent = "event:>Vehicle>Latches>Special>rearwindow_close",
+ 32.51401|I|libbeamng.lua.utils|     attachSoundVolume = 1,
+ 32.51401|I|libbeamng.lua.utils|     cid = 28,
+ 32.51402|I|libbeamng.lua.utils|     closeForceDuration = 0,
+ 32.51403|I|libbeamng.lua.utils|     closeForceMagnitude = 0,
+ 32.51403|I|libbeamng.lua.utils|     couplerNodes = { { "cid1", "cid2", "autoCouplingStrength", "autoCouplingRadius", "autoCouplingLockRadius", "autoCouplingSpeed", "couplingStartRadius", "breakGroup" }, { "rfs2", "tg5", 40000, 0.01, 0.005, 0.2, 0.1, "tailgate_latch" } },
+ 32.51404|I|libbeamng.lua.utils|     detachSoundEvent = "event:>Vehicle>Latches>Special>rearwindow_open",
+ 32.51405|I|libbeamng.lua.utils|     detachSoundVolume = 1,
+ 32.51405|I|libbeamng.lua.utils|     fileName = "advancedCouplerControl",
+ 32.51406|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51407|I|libbeamng.lua.utils|     groupType = "autoCoupling",
+ 32.51407|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51408|I|libbeamng.lua.utils|     name = "tailgateCoupler",
+ 32.51408|I|libbeamng.lua.utils|     openForceDuration = 0,
+ 32.51409|I|libbeamng.lua.utils|     openForceMagnitude = 0,
+ 32.51410|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51410|I|libbeamng.lua.utils|     partOrigin = "scintilla_tailgate_hardtop",
+ 32.51411|I|libbeamng.lua.utils|     slotType = "main",
+ 32.51412|I|libbeamng.lua.utils|     soundNode_nodes = { 43 }
+ 32.51412|I|libbeamng.lua.utils|   }, {
+ 32.51413|I|libbeamng.lua.utils|     attachSoundEvent = "event:>Vehicle>Latches>Special>rearwindow_close",
+ 32.51414|I|libbeamng.lua.utils|     attachSoundVolume = 1,
+ 32.51414|I|libbeamng.lua.utils|     cid = 29,
+ 32.51415|I|libbeamng.lua.utils|     closeForceDuration = 3,
+ 32.51416|I|libbeamng.lua.utils|     closeForceMagnitude = 120,
+ 32.51416|I|libbeamng.lua.utils|     couplerNodes = { { "cid1", "cid2", "autoCouplingStrength", "autoCouplingRadius", "autoCouplingLockRadius", "autoCouplingSpeed", "couplingStartRadius", "breakGroup" }, { "tg6", "tg4", 40000, 0.01, 0.005, 0.2, 0.1, "tailgate_latch" } },
+ 32.51418|I|libbeamng.lua.utils|     detachSoundEvent = "event:>Vehicle>Latches>Special>rearwindow_open",
+ 32.51418|I|libbeamng.lua.utils|     detachSoundVolume = 1,
+ 32.51419|I|libbeamng.lua.utils|     fileName = "advancedCouplerControl",
+ 32.51419|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51420|I|libbeamng.lua.utils|     groupType = "autoCoupling",
+ 32.51421|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51421|I|libbeamng.lua.utils|     name = "tailgateCatch",
+ 32.51422|I|libbeamng.lua.utils|     openForceDuration = 0,
+ 32.51423|I|libbeamng.lua.utils|     openForceMagnitude = 0,
+ 32.51423|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51424|I|libbeamng.lua.utils|     partOrigin = "scintilla_tailgate_hardtop",
+ 32.51425|I|libbeamng.lua.utils|     slotType = "main",
+ 32.51425|I|libbeamng.lua.utils|     soundNode_nodes = { 42 }
+ 32.51426|I|libbeamng.lua.utils|   }, {
+ 32.51427|I|libbeamng.lua.utils|     cid = 30,
+ 32.51427|I|libbeamng.lua.utils|     fileName = "spoiler",
+ 32.51428|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51428|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51429|I|libbeamng.lua.utils|     name = "spoiler",
+ 32.51430|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51430|I|libbeamng.lua.utils|     partOrigin = "scintilla_spoiler",
+ 32.51431|I|libbeamng.lua.utils|     slotType = "main"
+ 32.51432|I|libbeamng.lua.utils|   }, {
+ 32.51432|I|libbeamng.lua.utils|     cid = 31,
+ 32.51433|I|libbeamng.lua.utils|     dampBeamNames = { "damper_RR", "damper_RL" },
+ 32.51434|I|libbeamng.lua.utils|     fileName = "drivingDynamics/actuators/adaptiveDampers",
+ 32.51434|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51435|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51435|I|libbeamng.lua.utils|     modes = { { "name", "beamDampCoef", "beamDampFastCoef", "beamDampReboundCoef", "beamDampReboundFastCoef", "beamDampVelocitySplitCoef" }, { "regular", 0.8, 0.77, 0.86, 0.83, 1.1 }, { "hard", 1, 1, 1, 1, 1 } },
+ 32.51436|I|libbeamng.lua.utils|     name = "adaptiveRearDamper",
+ 32.51437|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51437|I|libbeamng.lua.utils|     partOrigin = "scintilla_coilover_R_adaptive",
+ 32.51438|I|libbeamng.lua.utils|     slotType = "main"
+ 32.51439|I|libbeamng.lua.utils|   }, {
+ 32.51439|I|libbeamng.lua.utils|     cid = 32,
+ 32.51440|I|libbeamng.lua.utils|     fileName = "drivingDynamics/actuators/adaptiveTorsionBars",
+ 32.51441|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51441|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51442|I|libbeamng.lua.utils|     modes = { { "name", "springCoef", "dampCoef" }, { "regular", 0.6, 1 }, { "hard", 1, 1 } },
+ 32.51443|I|libbeamng.lua.utils|     name = "adaptiveRearSwayBar",
+ 32.51443|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51444|I|libbeamng.lua.utils|     partOrigin = "scintilla_swaybar_R_adaptive",
+ 32.51444|I|libbeamng.lua.utils|     slotType = "main",
+ 32.51445|I|libbeamng.lua.utils|     torsionBarNames = { "torsionBarRear" }
+ 32.51446|I|libbeamng.lua.utils|   }, {
+ 32.51446|I|libbeamng.lua.utils|     cid = 33,
+ 32.51447|I|libbeamng.lua.utils|     differentialName = "differential_R",
+ 32.51448|I|libbeamng.lua.utils|     fileName = "drivingDynamics/actuators/electronicDiffLock",
+ 32.51448|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51449|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51450|I|libbeamng.lua.utils|     name = "lockRear",
+ 32.51450|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51451|I|libbeamng.lua.utils|     partOrigin = "scintilla_differential_R",
+ 32.51451|I|libbeamng.lua.utils|     slotType = "main"
+ 32.51453|I|libbeamng.lua.utils|   }, {
+ 32.51454|I|libbeamng.lua.utils|     cid = 34,
+ 32.51455|I|libbeamng.lua.utils|     configuration = {
+ 32.51455|I|libbeamng.lua.utils|       displayHeight = 512,
+ 32.51456|I|libbeamng.lua.utils|       displayWidth = 1024,
+ 32.51458|I|libbeamng.lua.utils|       htmlPath = "local://local/vehicles/scintilla/gauges_screen/gauges_screen.html",
+ 32.51459|I|libbeamng.lua.utils|       materialName = "@scintilla_gauges_screen"
+ 32.51460|I|libbeamng.lua.utils|     },
+ 32.51460|I|libbeamng.lua.utils|     displayData = {
+ 32.51461|I|libbeamng.lua.utils|       customModules = { { "moduleName", "property" }, { "environmentData", "time" }, { "environmentData", "temperatureEnv" }, { "accelerationData", "accelerationSmooth" }, { "dynamicRedlineData" }, { "tireData", "pressures" }, { "tireData", "temperatures" }, { "combustionEngineData", "remainingRange" }, { "combustionEngineData", "fuelConsumption" } },
+ 32.51462|I|libbeamng.lua.utils|       electrics = { "gear", "fuel", "watertemp", "wheelspeed", "rpmTacho", "lowfuel", "signal_L", "signal_R", "parkingbrake", "checkengine", "engineRunning", "lowpressure", "lights", "turboBoost", "oiltemp", "escActive", "tcsActive", "odometer", "trip" }
+ 32.51463|I|libbeamng.lua.utils|     },
+ 32.51465|I|libbeamng.lua.utils|     fileName = "gauges/genericGauges",
+ 32.51466|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51467|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51467|I|libbeamng.lua.utils|     name = "gauge",
+ 32.51468|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51469|I|libbeamng.lua.utils|     partOrigin = "scintilla_gauges",
+ 32.51469|I|libbeamng.lua.utils|     slotType = "main"
+ 32.51470|I|libbeamng.lua.utils|   }, {
+ 32.51471|I|libbeamng.lua.utils|     cid = 35,
+ 32.51471|I|libbeamng.lua.utils|     fileName = "gauges/customModules/environmentData",
+ 32.51472|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51473|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51473|I|libbeamng.lua.utils|     name = "gauges/customModules/environmentData",
+ 32.51474|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51475|I|libbeamng.lua.utils|     partOrigin = "scintilla_gauges",
+ 32.51475|I|libbeamng.lua.utils|     slotType = "main"
+ 32.51476|I|libbeamng.lua.utils|   }, {
+ 32.51476|I|libbeamng.lua.utils|     cid = 36,
+ 32.51477|I|libbeamng.lua.utils|     fileName = "gauges/customModules/accelerationData",
+ 32.51478|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51478|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51479|I|libbeamng.lua.utils|     name = "gauges/customModules/accelerationData",
+ 32.51480|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51480|I|libbeamng.lua.utils|     partOrigin = "scintilla_gauges",
+ 32.51481|I|libbeamng.lua.utils|     slotType = "main"
+ 32.51482|I|libbeamng.lua.utils|   }, {
+ 32.51482|I|libbeamng.lua.utils|     cid = 37,
+ 32.51483|I|libbeamng.lua.utils|     fileName = "gauges/customModules/tireData",
+ 32.51483|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51484|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51485|I|libbeamng.lua.utils|     name = "gauges/customModules/tireData",
+ 32.51485|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51486|I|libbeamng.lua.utils|     partOrigin = "scintilla_gauges",
+ 32.51487|I|libbeamng.lua.utils|     slotType = "main"
+ 32.51487|I|libbeamng.lua.utils|   }, {
+ 32.51488|I|libbeamng.lua.utils|     cid = 38,
+ 32.51489|I|libbeamng.lua.utils|     coldOilRPMCoef = 0.5,
+ 32.51489|I|libbeamng.lua.utils|     fileName = "gauges/customModules/dynamicRedlineData",
+ 32.51490|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51490|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51491|I|libbeamng.lua.utils|     maxOilTemp = 90,
+ 32.51492|I|libbeamng.lua.utils|     maxOutput = 20,
+ 32.51492|I|libbeamng.lua.utils|     maxOutputRPM = 10000,
+ 32.51493|I|libbeamng.lua.utils|     minOilTemp = 50,
+ 32.51494|I|libbeamng.lua.utils|     minOutput = 0,
+ 32.51494|I|libbeamng.lua.utils|     minOutputRPM = 0,
+ 32.51495|I|libbeamng.lua.utils|     name = "gauges/customModules/dynamicRedlineData",
+ 32.51496|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51496|I|libbeamng.lua.utils|     partOrigin = "scintilla_gauges",
+ 32.51498|I|libbeamng.lua.utils|     slotType = "main",
+ 32.51498|I|libbeamng.lua.utils|     yellowOutputOffset = -2
+ 32.51499|I|libbeamng.lua.utils|   }, {
+ 32.51500|I|libbeamng.lua.utils|     cid = 39,
+ 32.51500|I|libbeamng.lua.utils|     fileName = "gauges/customModules/combustionEngineData",
+ 32.51501|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51501|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51502|I|libbeamng.lua.utils|     name = "gauges/customModules/combustionEngineData",
+ 32.51503|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51503|I|libbeamng.lua.utils|     partOrigin = "scintilla_gauges",
+ 32.51504|I|libbeamng.lua.utils|     slotType = "main"
+ 32.51505|I|libbeamng.lua.utils|   },
+ 32.51505|I|libbeamng.lua.utils|   [0] = {
+ 32.51506|I|libbeamng.lua.utils|     aggressionSmoothingDown = 0.1,
+ 32.51507|I|libbeamng.lua.utils|     aggressionSmoothingUp = 3,
+ 32.51507|I|libbeamng.lua.utils|     automaticModes = "PRNDSM",
+ 32.51508|I|libbeamng.lua.utils|     calculateOptimalLoadShiftPoints = true,
+ 32.51508|I|libbeamng.lua.utils|     cid = 0,
+ 32.51509|I|libbeamng.lua.utils|     clutchLaunchStartRPM = 2600,
+ 32.51510|I|libbeamng.lua.utils|     clutchLaunchTargetRPM = 2100,
+ 32.51510|I|libbeamng.lua.utils|     dctClutchTime = 0.02,
+ 32.51511|I|libbeamng.lua.utils|     fileName = "vehicleController/vehicleController",
+ 32.51512|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+ 32.51512|I|libbeamng.lua.utils|     highShiftDownRPM = { 0, 0, 0, 3500, 4200, 4400, 4500, 4600 },
+ 32.51513|I|libbeamng.lua.utils|     highShiftUpRPM = 7000,
+ 32.51514|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+ 32.51514|I|libbeamng.lua.utils|     lowShiftDownRPM = { 0, 0, 0, 1400, 1500, 1500, 1500, 1500, 1500 },
+ 32.51515|I|libbeamng.lua.utils|     lowShiftUpRPM = { 0, 0, 2600, 2500, 2300, 2300, 2300, 2300 },
+ 32.51516|I|libbeamng.lua.utils|     name = "vehicleController",
+ 32.51516|I|libbeamng.lua.utils|     partName = "scintilla",
+ 32.51517|I|libbeamng.lua.utils|     revMatchThrottle = 0.7,
+ 32.51517|I|libbeamng.lua.utils|     shiftDownRPMOffsetCoef = 1.17,
+ 32.51518|I|libbeamng.lua.utils|     slotType = "main"
+ 32.51519|I|libbeamng.lua.utils|   }
+ 32.51519|I|libbeamng.lua.utils| }

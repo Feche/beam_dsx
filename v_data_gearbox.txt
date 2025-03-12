@@ -1,0 +1,15 @@
+1992.77284|I|libbeamng.print| -- dumping v.data.gearbox:
+1992.77308|I|libbeamng.lua.utils| {
+1992.77309|I|libbeamng.lua.utils|   additionalEngineInertia = 0.02,
+1992.77310|I|libbeamng.lua.utils|   dynamicFriction = 0.0012,
+1992.77311|I|libbeamng.lua.utils|   friction = 1.24,
+1992.77311|I|libbeamng.lua.utils|   gearRatios = { -2.64, 0, 3.08, 2.19, 1.63, 1.29, 1.03, 0.84, 0.69 },
+1992.77312|I|libbeamng.lua.utils|   gearWhineCoefsInput = { 0.6, 0, 0.13, 0.13, 0.13, 0.13, 0.13, 0.13, 0.13, 0.13 },
+1992.77313|I|libbeamng.lua.utils|   gearWhineCoefsOutput = { 0, 0, 0.27, 0.27, 0.27, 0.27, 0.27, 0.27, 0.27, 0.27 },
+1992.77313|I|libbeamng.lua.utils|   gearWhineInputEvent = "event:>Vehicle>Transmission>helical_01>twine_in_tuned",
+1992.77314|I|libbeamng.lua.utils|   gearWhineOutputEvent = "event:>Vehicle>Transmission>helical_01>twine_out_tuned",
+1992.77315|I|libbeamng.lua.utils|   gearboxNode_nodes = { 635 },
+1992.77315|I|libbeamng.lua.utils|   parkLockTorque = 2000,
+1992.77316|I|libbeamng.lua.utils|   torqueLossCoef = 0.0155,
+1992.77317|I|libbeamng.lua.utils|   uiName = "Gearbox"
+1992.77317|I|libbeamng.lua.utils| }

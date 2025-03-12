@@ -1,0 +1,22 @@
+787.45864|I|libbeamng.print| -- dumping v.data.energyStorage:
+787.45889|I|libbeamng.lua.utils| { {
+787.45890|I|libbeamng.lua.utils|     cid = 1,
+787.45891|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+787.45892|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+787.45892|I|libbeamng.lua.utils|     name = "fueltank_L",
+787.45893|I|libbeamng.lua.utils|     partName = "scintilla",
+787.45896|I|libbeamng.lua.utils|     partOrigin = "scintilla_fueltank_L",
+787.45897|I|libbeamng.lua.utils|     slotType = "main",
+787.45898|I|libbeamng.lua.utils|     type = "fuelTank"
+787.45898|I|libbeamng.lua.utils|   },
+787.45899|I|libbeamng.lua.utils|   [0] = {
+787.45899|I|libbeamng.lua.utils|     cid = 0,
+787.45900|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+787.45901|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+787.45901|I|libbeamng.lua.utils|     name = "fueltank_R",
+787.45902|I|libbeamng.lua.utils|     partName = "scintilla",
+787.45903|I|libbeamng.lua.utils|     partOrigin = "scintilla_fueltank_R",
+787.45903|I|libbeamng.lua.utils|     slotType = "main",
+787.45904|I|libbeamng.lua.utils|     type = "fuelTank"
+787.45905|I|libbeamng.lua.utils|   }
+787.45905|I|libbeamng.lua.utils| }

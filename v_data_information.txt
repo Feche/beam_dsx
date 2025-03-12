@@ -1,0 +1,5 @@
+926.09585|I|libbeamng.print| -- dumping v.data.information:
+926.09591|I|libbeamng.lua.utils| {
+926.09592|I|libbeamng.lua.utils|   authors = "BeamNG",
+926.09592|I|libbeamng.lua.utils|   name = "Civetta Scintilla"
+926.09593|I|libbeamng.lua.utils| }

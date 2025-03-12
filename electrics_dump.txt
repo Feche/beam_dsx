@@ -1,0 +1,248 @@
+4661.77503|I|libbeamng.print| -- dumping electrics:
+4661.77506|I|libbeamng.print| key: set_lightbar_signal, value: function: 0x012a0241de18
+4661.77507|I|libbeamng.print| key: setLightsState, value: function: 0x012a0241ded8
+4661.77508|I|libbeamng.print| key: toggleIgnitionLevelOnDown, value: function: 0x012a0241e0c0
+4661.77509|I|libbeamng.print| key: toggleIgnitionLevelOnUp, value: function: 0x012a0241e0f8
+4661.77510|I|libbeamng.print| key: horn, value: function: 0x012a0241df80
+4661.77511|I|libbeamng.print| key: set_fog_lights, value: function: 0x012a0241df48
+4661.77512|I|libbeamng.print| key: reset, value: function: 0x012a0241d8a8
+4661.77513|I|libbeamng.print| key: light_flash_highbeams, value: function: 0x012a0241ddd8
+4661.77514|I|libbeamng.print| key: initLastStage, value: function: 0x012a0241dc10
+4661.77515|I|libbeamng.print| key: values, value: table: 0x012a024101d8
+4661.77516|I|libbeamng.print| key: updateGFXSecondStep, value: function: 0x012a0241d648
+4661.77517|I|libbeamng.print| key: disabledState, value: table: 0x012a200254b0
+4661.77518|I|libbeamng.print| key: set_warn_signal, value: function: 0x012a0241dc50
+4661.77519|I|libbeamng.print| key: toggle_warn_signal, value: function: 0x012a0241dca8
+4661.77520|I|libbeamng.print| key: resetLastStage, value: function: 0x012a0241dc10
+4661.77521|I|libbeamng.print| key: setAllowedIgnitionLevels, value: function: 0x012a0241d828
+4661.77522|I|libbeamng.print| key: toggle_left_signal, value: function: 0x012a0241d0e8
+4661.77524|I|libbeamng.print| key: toggle_lights, value: function: 0x012a0241dd20
+4661.77525|I|libbeamng.print| key: setIgnitionLevel, value: function: 0x012a0241e038
+4661.77526|I|libbeamng.print| key: init, value: function: 0x012a0241da78
+4661.77527|I|libbeamng.print| key: updateGFX, value: function: 0x012a0241d370
+4661.77528|I|libbeamng.print| key: toggle_fog_lights, value: function: 0x012a0241df10
+4661.77529|I|libbeamng.print| key: toggle_right_signal, value: function: 0x012a0241d1d0
+4661.77530|I|libbeamng.print| key: stop_turn_signal, value: function: 0x012a0241d048
+4661.77531|I|libbeamng.print| key: toggle_lightbar_signal, value: function: 0x012a0241de60
+
+
+98.67502|I|libbeamng.print| dumping electrics.values:
+ 98.67504|I|libbeamng.print| lowhighbeam_signal_L: 0
+ 98.67505|I|libbeamng.print| gearModeIndex: 0.039000000804663
+ 98.67506|I|libbeamng.print| lowhighbeam_signal_R: 0
+ 98.67506|I|libbeamng.print| wheelspeed: 0
+ 98.67507|I|libbeamng.print| engineLoad: 0
+ 98.67508|I|libbeamng.print| horn: 0
+ 98.67509|I|libbeamng.print| airflowspeed: 0
+ 98.67509|I|libbeamng.print| checkengine: false
+ 98.67510|I|libbeamng.print| lowpressure: 0
+ 98.67511|I|libbeamng.print| oil: 0
+ 98.67512|I|libbeamng.print| feet_input: 0
+ 98.67512|I|libbeamng.print| feet: 0
+ 98.67513|I|libbeamng.print| brakelights: 1
+ 98.67514|I|libbeamng.print| tilt: 0
+ 98.67514|I|libbeamng.print| parking: 0
+ 98.67515|I|libbeamng.print| hazard_enabled: 0
+ 98.67516|I|libbeamng.print| steering: 0
+ 98.67517|I|libbeamng.print| extend_input: 0
+ 98.67517|I|libbeamng.print| boostMax: 0
+ 98.67518|I|libbeamng.print| lockupClutchRatio: 0
+ 98.67519|I|libbeamng.print| oiltemp: 0.2999541015625
+ 98.67520|I|libbeamng.print| hoodCatchCoupler_notAttached: 1
+ 98.67520|I|libbeamng.print| accXSmooth: 0
+ 98.67521|I|libbeamng.print| odometer: 0
+ 98.67522|I|libbeamng.print| brake_input: 0
+ 98.67523|I|libbeamng.print| hasABS: 1
+ 98.67523|I|libbeamng.print| doorFLCoupler_notAttached: 1
+ 98.67524|I|libbeamng.print| trip: 0
+ 98.67525|I|libbeamng.print| wheelThermals: table: 0x01f4eafa5430
+ 98.67526|I|libbeamng.print| abs: 0
+ 98.67526|I|libbeamng.print| lowhighbeam: 0
+ 98.67527|I|libbeamng.print| tilt_input: 0
+ 98.67528|I|libbeamng.print| highbeam_wigwag_R: 0
+ 98.67528|I|libbeamng.print| signal_right_input: 0
+ 98.67529|I|libbeamng.print| brakelight_signal_L: 1
+ 98.67530|I|libbeamng.print| gearboxMode: arcade
+ 98.67531|I|libbeamng.print| clutch: 0
+ 98.67531|I|libbeamng.print| freezeState: false
+ 98.67532|I|libbeamng.print| doorFRCoupler_notAttached: 1
+ 98.67533|I|libbeamng.print| brakelight_signal_R: 1
+ 98.67533|I|libbeamng.print| lights_state: 0
+ 98.67534|I|libbeamng.print| smoothShiftLogicAV: 0
+ 98.67535|I|libbeamng.print| parkingbrakelight: 1
+ 98.67536|I|libbeamng.print| parkingbrake_input: 1
+ 98.67536|I|libbeamng.print| tailgateCoupler_notAttached: 1
+ 98.67537|I|libbeamng.print| radiatorFanSpin: 0
+ 98.67538|I|libbeamng.print| engineThrottle: 0
+ 98.67539|I|libbeamng.print| watertemp: 0.2999541015625
+ 98.67540|I|libbeamng.print| running: true
+ 98.67541|I|libbeamng.print| ignition: true
+ 98.67542|I|libbeamng.print| lightbar: 0
+ 98.67542|I|libbeamng.print| engineRunning: 1
+ 98.67543|I|libbeamng.print| lights: 0
+ 98.67544|I|libbeamng.print| maxrpm: 5600
+ 98.67545|I|libbeamng.print| idlerpm: 750
+ 98.67545|I|libbeamng.print| maxGearIndex: 4
+ 98.67546|I|libbeamng.print| parkingbrake: 1
+ 98.67547|I|libbeamng.print| minGearIndex: -1
+ 98.67547|I|libbeamng.print| steering_input: 0
+ 98.67548|I|libbeamng.print| gearIndex: 0
+ 98.67549|I|libbeamng.print| boost: 0
+ 98.67550|I|libbeamng.print| ignitionLevel: 2
+ 98.67550|I|libbeamng.print| reverse: 0
+ 98.67551|I|libbeamng.print| gear: N
+ 98.67552|I|libbeamng.print| transfercase_state: 1
+ 98.67553|I|libbeamng.print| clutchRatio: 1
+ 98.67553|I|libbeamng.print| accYSmooth: 0
+ 98.67554|I|libbeamng.print| modeRangeBox: 0
+ 98.67555|I|libbeamng.print| clutch_input: 0
+ 98.67555|I|libbeamng.print| rpm: 150
+ 98.67556|I|libbeamng.print| gear_A: 0.08
+ 98.67557|I|libbeamng.print| lowfuel: false
+ 98.67558|I|libbeamng.print| fuel: 0.02
+ 98.67558|I|libbeamng.print| mode4WD: 0
+ 98.67559|I|libbeamng.print| fuelVolume: 1
+ 98.67560|I|libbeamng.print| brake: 0.3
+ 98.67560|I|libbeamng.print| signal_left_input: 0
+ 98.67561|I|libbeamng.print| hoodLatchCoupler_notAttached: 1
+ 98.67562|I|libbeamng.print| reverse_wigwag_R: 0
+ 98.67566|I|libbeamng.print| reverse_wigwag_L: 0
+ 98.67567|I|libbeamng.print| rpmTacho: 0
+ 98.67568|I|libbeamng.print| nop: 0
+ 98.67568|I|libbeamng.print| extend: 0
+ 98.67571|I|libbeamng.print| rpmspin: 0
+ 98.67572|I|libbeamng.print| turnsignal: 0
+ 98.67573|I|libbeamng.print| hazard: 0
+ 98.67574|I|libbeamng.print| signal_R: 0
+ 98.67575|I|libbeamng.print| highbeam: 0
+ 98.67576|I|libbeamng.print| altitude: 0.061980009078979
+ 98.67576|I|libbeamng.print| airspeed: 0
+ 98.67577|I|libbeamng.print| steeringUnassisted: 0
+ 98.67578|I|libbeamng.print| fuelCapacity: 90
+ 98.67578|I|libbeamng.print| throttle: 0
+ 98.67579|I|libbeamng.print| absActive: 0
+ 98.67580|I|libbeamng.print| fog: 0
+ 98.67581|I|libbeamng.print| avgWheelAV: 0
+ 98.67581|I|libbeamng.print| highbeam_wigwag_L: 0
+ 98.67582|I|libbeamng.print| isShifting: false
+ 98.67583|I|libbeamng.print| throttle_input: 0
+ 98.67585|I|libbeamng.print| electricalLoadCoef: 1
+ 98.67586|I|libbeamng.print| accZSmooth: -0.023102668101971
+ 98.67587|I|libbeamng.print| signal_L: 0
+ 98.67589|I|libbeamng.print| lowbeam: 0
+
+5252.56260|I|libbeamng.print| -- dumping electrics.values: scintilla
+5252.56263|I|libbeamng.print| key: lowhighbeam_signal_L, value: 0
+5252.56264|I|libbeamng.print| key: hasESC, value: 1
+5252.56265|I|libbeamng.print| key: lowhighbeam_signal_R, value: 0
+5252.56268|I|libbeamng.print| key: wheelspeed, value: 0.00039311415088658
+5252.56271|I|libbeamng.print| key: engineLoad, value: 0.24039009353571
+5252.56272|I|libbeamng.print| key: horn, value: 0
+5252.56273|I|libbeamng.print| key: isYCBrakeActive, value: 0
+5252.56274|I|libbeamng.print| key: strut_R_axleLift, value: 0
+5252.56275|I|libbeamng.print| key: checkengine, value: false
+5252.56276|I|libbeamng.print| key: lowbeam, value: 0
+5252.56277|I|libbeamng.print| key: oil, value: 0
+5252.56281|I|libbeamng.print| key: running, value: true
+5252.56282|I|libbeamng.print| key: brakelights, value: 1
+5252.56284|I|libbeamng.print| key: tcsActive, value: false
+5252.56286|I|libbeamng.print| key: parking, value: 0
+5252.56287|I|libbeamng.print| key: hazard_enabled, value: 0
+5252.56288|I|libbeamng.print| key: steering, value: -0
+5252.56290|I|libbeamng.print| key: yawControlRequestReduceOversteer, value: 0
+5252.56291|I|libbeamng.print| key: gear_M, value: 1
+5252.56292|I|libbeamng.print| key: exhaustFlow, value: 0.24015575321412
+5252.56293|I|libbeamng.print| key: boostMax, value: 0
+5252.56294|I|libbeamng.print| key: brakelight_signal_L, value: 1
+5252.56295|I|libbeamng.print| key: maxGearIndex, value: 7
+5252.56296|I|libbeamng.print| key: esc, value: 0
+5252.56297|I|libbeamng.print| key: oiltemp, value: 9.2656723183357
+5252.56298|I|libbeamng.print| key: hoodLatchCoupler_notAttached, value: 0
+5252.56299|I|libbeamng.print| key: avgWheelAV, value: -0.00032733235275373
+5252.56300|I|libbeamng.print| key: throttle, value: 0
+5252.56361|I|libbeamng.print| key: brake_input, value: 0
+5252.56364|I|libbeamng.print| key: twoStep, value: true
+5252.56365|I|libbeamng.print| key: freezeState, value: false
+5252.56366|I|libbeamng.print| key: gearboxMode, value: arcade
+5252.56367|I|libbeamng.print| key: smoothShiftLogicAV, value: -0.00035200776795412
+5252.56368|I|libbeamng.print| key: radiatorFanSpin, value: 0
+5252.56369|I|libbeamng.print| key: hasABS, value: 1
+5252.56371|I|libbeamng.print| key: engineRunning, value: 1
+5252.56372|I|libbeamng.print| key: trip, value: 0.016006579316285
+5252.56373|I|libbeamng.print| key: wheelThermals, value: table: 0x012aa0e68118
+5252.56374|I|libbeamng.print| key: abs, value: 0
+5252.56375|I|libbeamng.print| key: strut_F_axleLift, value: 0
+5252.56378|I|libbeamng.print| key: gearIndex, value: 0
+5252.56380|I|libbeamng.print| key: nop, value: 0
+5252.56381|I|libbeamng.print| key: highbeam_wigwag_R, value: 0
+5252.56381|I|libbeamng.print| key: ignition, value: true
+5252.56382|I|libbeamng.print| key: signal_right_input, value: 0
+5252.56383|I|libbeamng.print| key: watertemp, value: 9.233595970494
+5252.56385|I|libbeamng.print| key: reverse, value: 0
+5252.56386|I|libbeamng.print| key: clutch, value: 0
+5252.56387|I|libbeamng.print| key: idlerpm, value: 920
+5252.56389|I|libbeamng.print| key: lowfuel, value: false
+5252.56390|I|libbeamng.print| key: brakelight_signal_R, value: 1
+5252.56397|I|libbeamng.print| key: lights_state, value: 0
+5252.56398|I|libbeamng.print| key: minGearIndex, value: -1
+5252.56400|I|libbeamng.print| key: parkingbrakelight, value: 1
+5252.56402|I|libbeamng.print| key: parkingbrake_input, value: 1
+5252.56403|I|libbeamng.print| key: tailgateCoupler_notAttached, value: 0
+5252.56404|I|libbeamng.print| key: clutchRatio1, value: 0
+5252.56404|I|libbeamng.print| key: engineThrottle, value: 0
+5252.56405|I|libbeamng.print| key: gearModeIndex, value: 3
+5252.56407|I|libbeamng.print| key: dseWarningPulse, value: 0
+5252.56407|I|libbeamng.print| key: gear, value: N
+5252.56408|I|libbeamng.print| key: lightbar, value: 0
+5252.56409|I|libbeamng.print| key: tailgateCatch_notAttached, value: 0
+5252.56410|I|libbeamng.print| key: lights, value: 0
+5252.56411|I|libbeamng.print| key: maxrpm, value: 8600
+5252.56412|I|libbeamng.print| key: clutchRatio, value: 1
+5252.56413|I|libbeamng.print| key: turnsignal, value: 0
+5252.56413|I|libbeamng.print| key: parkingbrake, value: 1
+5252.56414|I|libbeamng.print| key: spoilerF, value: 0
+5252.56415|I|libbeamng.print| key: steering_input, value: 0
+5252.56416|I|libbeamng.print| key: escActive, value: false
+5252.56417|I|libbeamng.print| key: boost, value: 0
+5252.56418|I|libbeamng.print| key: ignitionLevel, value: 2
+5252.56419|I|libbeamng.print| key: fuelCapacity, value: 80
+5252.56421|I|libbeamng.print| key: fuel, value: 0.61307145754255
+5252.56422|I|libbeamng.print| key: lowhighbeam, value: 0
+5252.56423|I|libbeamng.print| key: isABSBrakeActive, value: 0
+5252.56424|I|libbeamng.print| key: accYSmooth, value: 0.0026055510097413
+5252.56426|I|libbeamng.print| key: reverse_wigwag_L, value: 0
+5252.56428|I|libbeamng.print| key: clutch_input, value: 0
+5252.56430|I|libbeamng.print| key: rpm, value: 905.06879074825
+5252.56431|I|libbeamng.print| key: gear_A, value: 0.181813113467
+5252.56433|I|libbeamng.print| key: signal_left_input, value: 0
+5252.56434|I|libbeamng.print| key: doorLCoupler_notAttached, value: 0
+5252.56436|I|libbeamng.print| key: tcs, value: 0
+5252.56436|I|libbeamng.print| key: fuelVolume, value: 79.998974075614
+5252.56437|I|libbeamng.print| key: brake, value: 0.3
+5252.56438|I|libbeamng.print| key: odometer, value: 0.016006579316285
+5252.56439|I|libbeamng.print| key: lowpressure, value: 0
+5252.56440|I|libbeamng.print| key: reverse_wigwag_R, value: 0
+5252.56441|I|libbeamng.print| key: accZSmooth, value: -9.8100704648524
+5252.56442|I|libbeamng.print| key: rpmTacho, value: 904.7987187235
+5252.56442|I|libbeamng.print| key: altitude, value: 0.13430029874835
+5252.56443|I|libbeamng.print| key: airflowspeed, value: 0.00077383653727453
+5252.56444|I|libbeamng.print| key: rpmspin, value: 317.1105604298
+5252.56445|I|libbeamng.print| key: spoilerR, value: 0
+5252.56446|I|libbeamng.print| key: hazard, value: 0
+5252.56447|I|libbeamng.print| key: signal_R, value: 0
+5252.56447|I|libbeamng.print| key: doorRCoupler_notAttached, value: 0
+5252.56448|I|libbeamng.print| key: highbeam, value: 0
+5252.56449|I|libbeamng.print| key: airspeed, value: 0.0011692562713687
+5252.56450|I|libbeamng.print| key: steeringUnassisted, value: 0
+5252.56450|I|libbeamng.print| key: clutchRatio2, value: 0
+5252.56451|I|libbeamng.print| key: hoodCatchCoupler_notAttached, value: 0
+5252.56452|I|libbeamng.print| key: absActive, value: 0
+5252.56453|I|libbeamng.print| key: fog, value: 0
+5252.56453|I|libbeamng.print| key: accXSmooth, value: 0.0023049287601207
+5252.56454|I|libbeamng.print| key: highbeam_wigwag_L, value: 0
+5252.56455|I|libbeamng.print| key: isShifting, value: false
+5252.56456|I|libbeamng.print| key: throttle_input, value: 0
+5252.56457|I|libbeamng.print| key: electricalLoadCoef, value: 1
+5252.56457|I|libbeamng.print| key: isTCBrakeActive, value: 0
+5252.56458|I|libbeamng.print| key: signal_L, value: 0
+5252.56459|I|libbeamng.print| key: hasTCS, value: 1

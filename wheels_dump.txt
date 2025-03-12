@@ -1,0 +1,168 @@
+239.45804|I|libbeamng.print| -- dumping wheels:
+239.45805|I|libbeamng.print| key: beamBroke, value: function: 0x0284ddb36500
+239.45806|I|libbeamng.print| key: updateThermalsGFX, value: function: 0x0284ca3bd8c8
+239.45807|I|libbeamng.print| key: wheelCount, value: 4
+239.45808|I|libbeamng.print| key: wheelTorque, value: 0
+239.45809|I|libbeamng.print| key: updateABSCoef, value: function: 0x0284de84dba8
+239.45810|I|libbeamng.print| key: initSounds, value: function: 0x0284e75e2890
+239.45811|I|libbeamng.print| key: wheelRotatorIDs, value: table: 0x028521bee410
+239.45812|I|libbeamng.print| key: settingsChanged, value: function: 0x0284de84e068
+239.45813|I|libbeamng.print| key: updateWheelTorques, value: function: 0x0284de84deb0
+239.45814|I|libbeamng.print| key: wheelPower, value: 0
+239.45815|I|libbeamng.print| key: updateGFX, value: function: 0x0284de84d768
+239.45816|I|libbeamng.print| key: reset, value: function: 0x0284de84e2b0
+239.45817|I|libbeamng.print| key: initSecondStage, value: function: 0x0284e75e2d00
+239.45818|I|libbeamng.print| key: resetABSBehavior, value: function: 0x0284de84e0a0
+239.45819|I|libbeamng.print| key: toggleABSBehavior, value: function: 0x0284de84e150
+239.45820|I|libbeamng.print| key: rotators, value: table: 0x028522687700
+239.45821|I|libbeamng.print| key: scaleBrakeTorque, value: function: 0x0284ddb36638
+239.45822|I|libbeamng.print| key: wheelRotatorCount, value: 4
+239.45822|I|libbeamng.print| key: rotatorIDs, value: table: 0x028522687748
+239.45823|I|libbeamng.print| key: updateWheelVelocities, value: function: 0x0284de84dd78
+239.45825|I|libbeamng.print| key: setWheelRotatorType, value: function: 0x0284de84e198
+239.45826|I|libbeamng.print| key: wheelRotators, value: table: 0x02851fc838a8
+239.45826|I|libbeamng.print| key: nodeCollision, value: function: 0x0284ddb36490
+239.45827|I|libbeamng.print| key: resetSecondStage, value: function: 0x0284e75e2c38
+239.45828|I|libbeamng.print| key: setWheelBrakeUpdate, value: function: 0x0284e75e2da8
+239.45829|I|libbeamng.print| key: setABSBehavior, value: function: 0x0284de84df80
+239.45830|I|libbeamng.print| key: init, value: function: 0x0284e75e2b88
+239.45831|I|libbeamng.print| key: rotatorCount, value: 0
+239.45832|I|libbeamng.print| key: wheelIDs, value: table: 0x0285226876b8
+239.45833|I|libbeamng.print| key: treadNodeLookup, value: table: 0x028521bee4a0
+239.45834|I|libbeamng.print| key: isPhysicsStepUsed, value: function: 0x0284e75e2de8
+239.45837|I|libbeamng.print| key: wheels, value: table: 0x028522687670
+
+239.45838|I|libbeamng.print| -- dumping wheels.rotators:
+239.45839|I|libbeamng.print| -- dumping wheels.rotatorIDs:
+
+239.45840|I|libbeamng.print| -- dumping wheels.wheelRotators:
+239.45841|I|libbeamng.print| key: 0, value: table: 0x028521bfcf28
+239.45842|I|libbeamng.print| key: 1, value: table: 0x02851fb29990
+239.45843|I|libbeamng.print| key: 2, value: table: 0x02851fb2a380
+239.45844|I|libbeamng.print| key: 3, value: table: 0x02851fb2e320
+
+239.45845|I|libbeamng.print| -- dumping wheels.wheelIDs:
+239.45846|I|libbeamng.print| key: RR, value: 1
+239.45847|I|libbeamng.print| key: RL, value: 0
+239.45848|I|libbeamng.print| key: FR, value: 3
+239.45848|I|libbeamng.print| key: FL, value: 2
+
+239.45849|I|libbeamng.print| -- dumping wheels.wheels:
+239.45850|I|libbeamng.print| key: 0, value: table: 0x028521bfcf28
+239.45851|I|libbeamng.print| key: 1, value: table: 0x02851fb29990
+239.45852|I|libbeamng.print| key: 2, value: table: 0x02851fb2a380
+239.45853|I|libbeamng.print| key: 3, value: table: 0x02851fb2e320
+
+47.29825|I|libbeamng.print| -- dumping wheels.wheelRotators[0]:
+ 47.29826|I|libbeamng.print| key: padGlazingSusceptibility, value: 0.7
+ 47.29826|I|libbeamng.print| key: propulsionTorque, value: 0
+ 47.29827|I|libbeamng.print| key: hasTire, value: true
+ 47.29828|I|libbeamng.print| key: absTime, value: 0.01
+ 47.29829|I|libbeamng.print| key: name, value: RL
+ 47.29829|I|libbeamng.print| key: node1, value: 442
+ 47.29831|I|libbeamng.print| key: lastABSCoef, value: 0
+ 47.29832|I|libbeamng.print| key: squealCoefGlazing, value: 1
+ 47.29833|I|libbeamng.print| key: brakeSquealVolumeSmoother, value: table: 0x012af6928958
+ 47.29834|I|libbeamng.print| key: contactDepth, value: 0
+ 47.29835|I|libbeamng.print| key: defaultBrakeInputUsageCoef, value: 1
+ 47.29836|I|libbeamng.print| key: brakeMeltingPoint, value: 1500
+ 47.29838|I|libbeamng.print| key: kRadiationToAir, value: 4.2525e-08
+ 47.29840|I|libbeamng.print| key: deflatedTireAngle, value: 0
+ 47.29841|I|libbeamng.print| key: desiredMainBrakingTorque, value: 0
+ 47.29841|I|libbeamng.print| key: downForce, value: 0
+ 47.29842|I|libbeamng.print| key: brakeSquealLoop, value: table: 0x012af6928848
+ 47.29843|I|libbeamng.print| key: smokeParticleTick, value: 0
+ 47.29844|I|libbeamng.print| key: padGlazingFactor, value: 0
+ 47.29845|I|libbeamng.print| key: parkingTorque, value: 2000
+ 47.29846|I|libbeamng.print| key: flatTireSound, value: event:>Surfaces>Flat_Tire
+ 47.29847|I|libbeamng.print| key: dynamicRadius, value: 0.37
+ 47.29848|I|libbeamng.print| key: cid, value: 0
+ 47.29851|I|libbeamng.print| key: dynamicRadiusSmoother, value: table: 0x012af680b668
+ 47.29852|I|libbeamng.print| key: padMaterial, value: premium
+ 47.29863|I|libbeamng.print| key: brakeSurfaceTemperature, value: 14.997705078125
+ 47.29864|I|libbeamng.print| key: isPropulsed, value: true
+ 47.29865|I|libbeamng.print| key: absFrequency, value: 100
+ 47.29866|I|libbeamng.print| key: lastAngularVelocity, value: 0
+ 47.29867|I|libbeamng.print| key: node2, value: 441
+ 47.29867|I|libbeamng.print| key: downForceSmoother, value: table: 0x012ae0fd57a0
+ 47.29868|I|libbeamng.print| key: wheelSpeedCoreCooling, value: 1
+ 47.29869|I|libbeamng.print| key: hasABS, value: true
+ 47.29870|I|libbeamng.print| key: contactMaterialID2, value: -1
+ 47.29871|I|libbeamng.print| key: hubRadius, value: 0.22
+ 47.29871|I|libbeamng.print| key: frictionTorque, value: 0
+ 47.29872|I|libbeamng.print| key: torsionReactorIdx, value: 1
+ 47.29873|I|libbeamng.print| key: invRelativeBrakingTorqueCoef, value: 0.000625
+ 47.29874|I|libbeamng.print| key: tireVolume, value: 0.056996344717753
+ 47.29875|I|libbeamng.print| key: softnessCoef, value: 0.7
+ 47.29875|I|libbeamng.print| key: tireSoundVolumeCoef, value: 1
+ 47.29876|I|libbeamng.print| key: isBrakeMolten, value: false
+ 47.29877|I|libbeamng.print| key: wheelSection, value: pressureWheels
+ 47.29879|I|libbeamng.print| key: slipErrorIntegral, value: 0
+ 47.29879|I|libbeamng.print| key: angularVelocity, value: 0
+ 47.29880|I|libbeamng.print| key: invInitialBrakeTorque, value: 0.000625
+ 47.29881|I|libbeamng.print| key: brakeSplitCoef, value: 0.5
+ 47.29882|I|libbeamng.print| key: brakeTypeSurfaceCoolingCoef, value: 0.25
+ 47.29883|I|libbeamng.print| key: brakeCoreTemperature, value: 14.997705078125
+ 47.29883|I|libbeamng.print| key: obj, value: userdata: 0x012ae0fd4c10
+ 47.29884|I|libbeamng.print| key: brakeCoreEnergyCoef, value: 0.00023767082590612
+ 47.29885|I|libbeamng.print| key: rayCount, value: 16
+ 47.29886|I|libbeamng.print| key: slipEnergy, value: 0
+ 47.29886|I|libbeamng.print| key: updateBrakeABS, value: function: 0x012ad2d5e220
+ 47.29887|I|libbeamng.print| key: nodes, value: table: 0x012adeda3010
+ 47.29888|I|libbeamng.print| key: brakeCoolingArea, value: 0.07463874366215
+ 47.29889|I|libbeamng.print| key: kSurfaceToCore, value: 5500
+ 47.29890|I|libbeamng.print| key: underwaterSurfaceCoolingCoef, value: 20
+ 47.29890|I|libbeamng.print| key: airSpeedCoreCooling, value: 1
+ 47.29891|I|libbeamng.print| key: brakeTypeCoreCoolingCoef, value: 1
+ 47.29892|I|libbeamng.print| key: steamParticleTick, value: 0
+ 47.29893|I|libbeamng.print| key: initialBrakeTorque, value: 1600
+ 47.29893|I|libbeamng.print| key: brakeType, value: drum
+ 47.29894|I|libbeamng.print| key: brakingTorque, value: 0
+ 47.29895|I|libbeamng.print| key: updateBrake, value: function: 0x012ad2d5e220
+ 47.29896|I|libbeamng.print| key: tireWidth, value: 0.205
+ 47.29896|I|libbeamng.print| key: brakeSpecHeat, value: 450
+ 47.29897|I|libbeamng.print| key: updateBrakeNoABS, value: function: 0x012ad2d5e2a0
+ 47.29898|I|libbeamng.print| key: treadCoef, value: 0.7
+ 47.29899|I|libbeamng.print| key: brakePressureDelay, value: table: 0x012ae0fd5888
+ 47.29900|I|libbeamng.print| key: squealCoefNatural, value: 0
+ 47.29900|I|libbeamng.print| key: desiredBrakingTorque, value: 0
+ 47.29901|I|libbeamng.print| key: isBroken, value: false
+ 47.29902|I|libbeamng.print| key: pressureGroupId, value: 0
+ 47.29903|I|libbeamng.print| key: lastSlip, value: 0
+ 47.29903|I|libbeamng.print| key: absTimer, value: 0
+ 47.29904|I|libbeamng.print| key: brakeVentingCoef, value: 0.9
+ 47.29905|I|libbeamng.print| key: torsionReactor, value: table: 0x012ae11b12f0
+ 47.29906|I|libbeamng.print| key: useDefaultBrakeInput, value: true
+ 47.29906|I|libbeamng.print| key: squealCoefLowSpeed, value: 0
+ 47.29907|I|libbeamng.print| key: inertia, value: 0.77439999999998
+ 47.29908|I|libbeamng.print| key: brakeMass, value: 11
+ 47.29909|I|libbeamng.print| key: initialParkingTorque, value: 2000
+ 47.29909|I|libbeamng.print| key: brakeThermalEfficiency, value: 1
+ 47.29910|I|libbeamng.print| key: isTireDeflated, value: false
+ 47.29913|I|libbeamng.print| key: wheelSpeed, value: 0
+ 47.29914|I|libbeamng.print| key: angularVelocityBrakeCouple, value: 0
+ 47.29914|I|libbeamng.print| key: brakeInputSplit, value: 0.5
+ 47.29915|I|libbeamng.print| key: isSpeedo, value: 1
+ 47.29916|I|libbeamng.print| key: coreData, value: cdata<struct 97>: 0x012ae0fd5860
+ 47.29917|I|libbeamng.print| key: wheelID, value: 0
+ 47.29917|I|libbeamng.print| key: lastAngularVelocityBrakeCouple, value: 0
+ 47.29918|I|libbeamng.print| key: enableBrakeThermals, value: true
+ 47.29919|I|libbeamng.print| key: downForceRaw, value: 0
+ 47.29920|I|libbeamng.print| key: slipRatioTarget, value: 0.18
+ 47.29920|I|libbeamng.print| key: thermalEfficiencyConfig, value: table: 0x012ad2d5ed48
+ 47.29921|I|libbeamng.print| key: rotorMaterial, value: steel
+ 47.29922|I|libbeamng.print| key: lastTorqueMode, value: 0
+ 47.29923|I|libbeamng.print| key: oppositeWheelSide, value: right
+ 47.29923|I|libbeamng.print| key: brakeDiameter, value: 0.29
+ 47.29924|I|libbeamng.print| key: treadNodes, value: table: 0x012adeda2eb8
+ 47.29925|I|libbeamng.print| key: lastSideSlip, value: 0
+ 47.29926|I|libbeamng.print| key: contactMaterialID1, value: -1
+ 47.29926|I|libbeamng.print| key: peakForce, value: 0
+ 47.29927|I|libbeamng.print| key: ownWheelSide, value: left
+ 47.29928|I|libbeamng.print| key: lastSlipError, value: 0
+ 47.29929|I|libbeamng.print| key: pressureGroup, value: _wheelPressureGroup0
+ 47.29929|I|libbeamng.print| key: radius, value: 0.37
+ 47.29930|I|libbeamng.print| key: rotatorType, value: wheel
+ 47.29931|I|libbeamng.print| key: wheelDir, value: -1
+ 47.29932|I|libbeamng.print| key: brakeSurfaceEnergyCoef, value: 0.0013468013468013
+ 47.29932|I|libbeamng.print| key: brakeTorque, value: 1600

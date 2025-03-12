@@ -1,0 +1,1 @@
+setExtensionUnloadMode("beam__dsx", "manual")

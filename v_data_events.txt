@@ -1,0 +1,114 @@
+1071.90039|I|libbeamng.print| -- dumping v.data.events:
+1071.90138|I|libbeamng.lua.utils| { {
+1071.90139|I|libbeamng.lua.utils|     cid = 1,
+1071.90140|I|libbeamng.lua.utils|     desc = "ui.inputActions.scintilla.doorLatch_L.description",
+1071.90141|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+1071.90141|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+1071.90142|I|libbeamng.lua.utils|     name = "doorLatch_L",
+1071.90143|I|libbeamng.lua.utils|     onUp = "controller.getControllerSafe('doorLCoupler').toggleGroup()",
+1071.90143|I|libbeamng.lua.utils|     partName = "scintilla",
+1071.90144|I|libbeamng.lua.utils|     partOrigin = "scintilla_door_L_hardtop",
+1071.90145|I|libbeamng.lua.utils|     slotType = "main",
+1071.90145|I|libbeamng.lua.utils|     title = "ui.inputActions.scintilla.doorLatch_L.title"
+1071.90146|I|libbeamng.lua.utils|   }, {
+1071.90147|I|libbeamng.lua.utils|     cid = 2,
+1071.90147|I|libbeamng.lua.utils|     desc = "ui.inputActions.scintilla.doorLatch_R.description",
+1071.90148|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+1071.90149|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+1071.90149|I|libbeamng.lua.utils|     name = "doorLatch_R",
+1071.90150|I|libbeamng.lua.utils|     onUp = "controller.getControllerSafe('doorRCoupler').toggleGroup()",
+1071.90151|I|libbeamng.lua.utils|     partName = "scintilla",
+1071.90151|I|libbeamng.lua.utils|     partOrigin = "scintilla_door_R_hardtop",
+1071.90152|I|libbeamng.lua.utils|     slotType = "main",
+1071.90152|I|libbeamng.lua.utils|     title = "ui.inputActions.scintilla.doorLatch_R.title"
+1071.90153|I|libbeamng.lua.utils|   }, {
+1071.90154|I|libbeamng.lua.utils|     cid = 3,
+1071.90154|I|libbeamng.lua.utils|     desc = "ui.inputActions.handbrake.description",
+1071.90155|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+1071.90156|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+1071.90156|I|libbeamng.lua.utils|     name = "handbrake",
+1071.90157|I|libbeamng.lua.utils|     onDown = "input.toggleEvent('parkingbrake')",
+1071.90158|I|libbeamng.lua.utils|     partName = "scintilla",
+1071.90158|I|libbeamng.lua.utils|     partOrigin = "scintilla_dash",
+1071.90159|I|libbeamng.lua.utils|     slotType = "main",
+1071.90161|I|libbeamng.lua.utils|     title = "ui.inputActions.handbrake.title"
+1071.90162|I|libbeamng.lua.utils|   }, {
+1071.90163|I|libbeamng.lua.utils|     cid = 4,
+1071.90163|I|libbeamng.lua.utils|     desc = "ui.inputActions.hazard.description",
+1071.90164|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+1071.90165|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+1071.90165|I|libbeamng.lua.utils|     name = "hazard",
+1071.90166|I|libbeamng.lua.utils|     onDown = "electrics.toggle_warn_signal()",
+1071.90167|I|libbeamng.lua.utils|     partName = "scintilla",
+1071.90167|I|libbeamng.lua.utils|     partOrigin = "scintilla_dash",
+1071.90168|I|libbeamng.lua.utils|     slotType = "main",
+1071.90169|I|libbeamng.lua.utils|     title = "ui.inputActions.hazard.title"
+1071.90169|I|libbeamng.lua.utils|   }, {
+1071.90170|I|libbeamng.lua.utils|     cid = 5,
+1071.90170|I|libbeamng.lua.utils|     desc = "ui.inputActions.scintilla.hoodCatch.description",
+1071.90171|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+1071.90172|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+1071.90172|I|libbeamng.lua.utils|     name = "hoodCatch",
+1071.90173|I|libbeamng.lua.utils|     onDown = "controller.getControllerSafe('hoodCatchCoupler').toggleGroupConditional({{'hoodLatchCoupler','attached','vehicle.advancedCouplerControl.releaseHoodFirstInterior'}})",
+1071.90174|I|libbeamng.lua.utils|     partName = "scintilla",
+1071.90177|I|libbeamng.lua.utils|     partOrigin = "scintilla_hood",
+1071.90178|I|libbeamng.lua.utils|     slotType = "main",
+1071.90179|I|libbeamng.lua.utils|     title = "ui.inputActions.scintilla.hoodCatch.title"
+1071.90180|I|libbeamng.lua.utils|   }, {
+1071.90181|I|libbeamng.lua.utils|     cid = 6,
+1071.90183|I|libbeamng.lua.utils|     desc = "ui.inputActions.scintilla.hoodLatch.description",
+1071.90184|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+1071.90185|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+1071.90185|I|libbeamng.lua.utils|     name = "hoodRelease",
+1071.90186|I|libbeamng.lua.utils|     onDown = "controller.getControllerSafe('hoodLatchCoupler').toggleGroup()",
+1071.90187|I|libbeamng.lua.utils|     partName = "scintilla",
+1071.90187|I|libbeamng.lua.utils|     partOrigin = "scintilla_hood",
+1071.90188|I|libbeamng.lua.utils|     slotType = "main",
+1071.90189|I|libbeamng.lua.utils|     title = "ui.inputActions.scintilla.hoodLatch.title"
+1071.90189|I|libbeamng.lua.utils|   }, {
+1071.90190|I|libbeamng.lua.utils|     cid = 7,
+1071.90191|I|libbeamng.lua.utils|     desc = "ui.inputActions.vehicle.toggleTwoStep.description",
+1071.90191|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+1071.90192|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+1071.90193|I|libbeamng.lua.utils|     name = "launch",
+1071.90193|I|libbeamng.lua.utils|     onDown = "controller.getControllerSafe('twoStepLaunch').toggleTwoStep()",
+1071.90194|I|libbeamng.lua.utils|     partName = "scintilla",
+1071.90195|I|libbeamng.lua.utils|     partOrigin = "scintilla_dash",
+1071.90195|I|libbeamng.lua.utils|     slotType = "main",
+1071.90196|I|libbeamng.lua.utils|     title = "ui.inputActions.vehicle.toggleTwoStep.title"
+1071.90196|I|libbeamng.lua.utils|   }, {
+1071.90197|I|libbeamng.lua.utils|     cid = 8,
+1071.90198|I|libbeamng.lua.utils|     desc = "ui.inputActions.scintilla.tailgateLatch.description",
+1071.90198|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+1071.90199|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+1071.90200|I|libbeamng.lua.utils|     name = "tailgateCatch",
+1071.90200|I|libbeamng.lua.utils|     onUp = "controller.getControllerSafe('tailgateCatch').toggleGroupConditional({{'tailgateCoupler','attached','vehicle.advancedCouplerControl.releaseHoodFirstInterior'}})",
+1071.90201|I|libbeamng.lua.utils|     partName = "scintilla",
+1071.90202|I|libbeamng.lua.utils|     partOrigin = "scintilla_tailgate_hardtop",
+1071.90202|I|libbeamng.lua.utils|     slotType = "main",
+1071.90203|I|libbeamng.lua.utils|     title = "ui.inputActions.scintilla.tailgateLatch.title"
+1071.90204|I|libbeamng.lua.utils|   }, {
+1071.90204|I|libbeamng.lua.utils|     cid = 9,
+1071.90205|I|libbeamng.lua.utils|     desc = "ui.inputActions.scintilla.tailgateLatch.description",
+1071.90206|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+1071.90206|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+1071.90207|I|libbeamng.lua.utils|     name = "tailgateLatch",
+1071.90208|I|libbeamng.lua.utils|     onUp = "controller.getControllerSafe('tailgateCoupler').toggleGroup()",
+1071.90208|I|libbeamng.lua.utils|     partName = "scintilla",
+1071.90209|I|libbeamng.lua.utils|     partOrigin = "scintilla_tailgate_hardtop",
+1071.90209|I|libbeamng.lua.utils|     slotType = "main",
+1071.90210|I|libbeamng.lua.utils|     title = "ui.inputActions.scintilla.tailgateLatch.title"
+1071.90211|I|libbeamng.lua.utils|   },
+1071.90211|I|libbeamng.lua.utils|   [0] = {
+1071.90212|I|libbeamng.lua.utils|     cid = 0,
+1071.90213|I|libbeamng.lua.utils|     desc = "ui.inputActions.scintilla.axle_lift.description",
+1071.90213|I|libbeamng.lua.utils|     globalSkin = "blackroof",
+1071.90214|I|libbeamng.lua.utils|     licenseplateFormat = "52-11",
+1071.90215|I|libbeamng.lua.utils|     name = "axle_lift",
+1071.90216|I|libbeamng.lua.utils|     onUp = "controller.getControllerSafe('axleLift').toggleMode()",
+1071.90216|I|libbeamng.lua.utils|     partName = "scintilla",
+1071.90217|I|libbeamng.lua.utils|     partOrigin = "scintilla_dash",
+1071.90218|I|libbeamng.lua.utils|     slotType = "main",
+1071.90218|I|libbeamng.lua.utils|     title = "ui.inputActions.scintilla.axle_lift.title"
+1071.90219|I|libbeamng.lua.utils|   }
+1071.90220|I|libbeamng.lua.utils| }
