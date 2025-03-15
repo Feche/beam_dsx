@@ -1,5 +1,10 @@
+local ffi = require("ffi")
+
 local im = ui_imgui
 local show = true
+local setting = nil
+local color = ffi.new("float[4]", { 1, 0, 0, 1 })
+local showColorPicker = false
 
 local settings =
 {
@@ -88,9 +93,6 @@ local settings =
     },
     rgb =
     {
-        enable = true, -- bool - disables all led functionality, led enters in stand by mode
-        standbyColor = { 255, 255, 255, 100 }, -- rgb -- rgb color when rgb is disabled (stand by)
-
         hazardLights =
         {
             enable = true,
@@ -154,17 +156,7 @@ local function onVehicleResetted(vehId)
 	print("[beam_dsx] GE: vehicle reset")
 end
 
-local function renderImgui()
-    im.SetNextWindowSizeConstraints(im.ImVec2(500, 500), im.ImVec2(500, 500))
-    im.Begin("BeamDSX settings", ui_imgui.BoolPtr(false), im.WindowFlags_AlwaysAutoResize)
-    
-    local imguisize = im.GetWindowSize()
-    local setting = nil
-
-    im.TextColored(im.ImVec4(1, 1, 1, 0.6), "Welcome to BeamDSX configuration windows, here you can change\nthe feel of the different haptics provided by the mod created by Feche.")
-
-    im.Separator()
-
+local function dsxSettings()
     -- Throttle trigger
     if im.TreeNode1("Throttle trigger") then
         -- Rigidity
@@ -654,9 +646,9 @@ local function renderImgui()
                 if im.Checkbox("Enable", enable) then
                     setting.enable = enable[0]
 
-                   -- if(settings.throttle.rigidity.constant.enable == true) then
+                    -- if(settings.throttle.rigidity.constant.enable == true) then
                         --settings.throttle.rigidity.constant.enable = false
-                   -- end
+                    -- end
                 end
 
                 if im.IsItemHovered() then
@@ -812,7 +804,7 @@ local function renderImgui()
                 local minAmplitude = im.FloatPtr(setting.minAmplitude)
 
                 if im.SliderFloat("##20", minAmplitude, 1, 8, "%.0f") then
-                    setting.minAmplitude  = minAmplitude[0]
+                    setting.minAmplitude = minAmplitude[0]
                 end
 
                 -- maxAmplitude  
@@ -829,7 +821,7 @@ local function renderImgui()
                 local maxAmplitude = im.FloatPtr(setting.maxAmplitude)
 
                 if im.SliderFloat("##21", maxAmplitude, 1, 8, "%.0f") then
-                    setting.maxAmplitude  = maxAmplitude[0]
+                    setting.maxAmplitude = maxAmplitude[0]
                 end
 
                 im.Separator()
@@ -841,47 +833,133 @@ local function renderImgui()
         im.Separator()
 
         -- Engine off
-        setting = settings.throttle.engineOff
+        setting = settings.brake.engineOff
 
         local enable = im.BoolPtr(setting.enable)
 
-        if im.Checkbox("Brake trigger force will be disabled when the engine is off.", enable) then
+        if im.Checkbox("Brake trigger force will be at maximum when the engine is off.", enable) then
             setting.enable = enable[0]
         end
 
         -- Wheel missing
-        setting = settings.throttle.engineOff
+        setting = settings.brake.wheelMissing
 
         local enable = im.BoolPtr(setting.enable)
 
-        if im.Checkbox("Brake trigger force will be disabled when a wheel is missing.", enable) then
+        if im.Checkbox("Brake trigger force will be at maximum when a wheel is missing.", enable) then
             setting.enable = enable[0]
         end
 
         im.TreePop()
     end
-
+   
     im.Separator()
 
-    local flags = 0
-    local editEnded = 0
+    showColorPicker = false
+
     -- RGB and leds
     if im.TreeNode1("RGB and leds") then
-        --im.ColorPicker3("test", im.FloatPtr(0), flags, editEnded)
-    end
+        -- Hazard lights
+        setting = settings.rgb.hazardLights
 
-    --[[if im.TreeNode1("Brake trigger") then
-        im.Text("Brake trigger settings")
-	    im.Separator()
-    end
+        if im.TreeNode1("Hazard lights") then
+            local enable = im.BoolPtr(setting.enable)
 
-    if im.TreeNode1("RGB and leds") then
-        im.Text("RGB and leds settings")
-	    im.Separator()
-    end
+            if im.Checkbox("Enable", enable) then
+                setting.enable = enable[0]
+            end
 
-    im.TextColored(im.ImVec4(1, 0, 0, 1), "Game Version mismatch!")
-    im.TextColored(im.ImVec4(1, 0, 0, 1), "Please remove mod or check forum thread")]]--
+            if im.IsItemHovered() then
+                im.BeginTooltip()
+                im.Text("Enable or disable led flashing while hazards are active.")
+                im.EndTooltip()
+            end
+
+            if(setting.enable == true) then
+                im.Separator()
+
+                --showColorPicker = true
+
+                local r, g, b
+
+                -- colorOn
+                im.Text("Color while on:")
+
+                r = im.FloatPtr(setting.colorOn[1])
+
+                if im.SliderFloat("R##22", r, 0, 255, "%.0f") then
+                    setting.colorOn[1] = r[0]
+                end
+
+                g = im.FloatPtr(setting.colorOn[2])
+
+                if im.SliderFloat("G##23", g, 0, 255, "%.0f") then
+                    setting.colorOn[2] = g[0]
+                end
+
+                b = im.FloatPtr(setting.colorOn[3])
+
+                if im.SliderFloat("B##24", b, 0, 255, "%.0f") then
+                    setting.colorOn[3] = b[0]
+                end
+
+                -- colorOff
+                im.Text("Color while off:")
+
+                r = im.FloatPtr(setting.colorOff[1])
+
+                if im.SliderFloat("R##25", r, 0, 255, "%.0f") then
+                    setting.colorOff[1] = r[0]
+                end
+
+                g = im.FloatPtr(setting.colorOff[2])
+
+                if im.SliderFloat("G##26", g, 0, 255, "%.0f") then
+                    setting.colorOff[2] = g[0]
+                end
+
+                b = im.FloatPtr(setting.colorOff[3])
+
+                if im.SliderFloat("B##27", b, 0, 255, "%.0f") then
+                    setting.colorOff[3] = b[0]
+                end
+            end
+        end
+    end
+end
+
+local function colorPicker()
+    im.TextColored(im.ImVec4(1, 1, 1, 0.6), "Color picker:")
+    im.Separator()
+
+    if(im.ColorPicker4("", color, nil)) then
+
+    end
+end
+
+local settingsWidth = 475
+local colorPickerWidth = 300
+local totalWidth = settingsWidth + colorPickerWidth
+local height = 500
+
+local function renderImgui()
+    im.SetNextWindowSizeConstraints(im.ImVec2(showColorPicker and totalWidth or settingsWidth, height), im.ImVec2(showColorPicker and totalWidth or settingsWidth, height))
+    im.Begin("BeamDSX settings", ui_imgui.BoolPtr(false), im.WindowFlags_AlwaysAutoResize)
+
+    im.TextColored(im.ImVec4(1, 1, 1, 0.6), "Welcome to BeamDSX configuration windows, here you can change\nthe feel of the different haptics provided by the mod created by Feche.")
+    im.Separator()
+
+    im.BeginChild1("TriggerSettings", im.ImVec2(settingsWidth, false, im.WindowFlags_ChildWindow))
+    dsxSettings()
+    im.EndChild()
+
+    if(showColorPicker == true) then
+        im.SameLine()
+
+        im.BeginChild1("ColorPicker", im.ImVec2(colorPickerWidth, 0, false, im.WindowFlags_ChildWindow))
+        colorPicker()
+        im.EndChild()
+    end
 
     im.End()
 end
