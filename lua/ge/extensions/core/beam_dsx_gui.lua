@@ -863,9 +863,11 @@ local function renderImgui()
 
     im.Separator()
 
+    local flags = 0
+    local editEnded = 0
     -- RGB and leds
     if im.TreeNode1("RGB and leds") then
-
+        --im.ColorPicker3("test", im.FloatPtr(0), flags, editEnded)
     end
 
     --[[if im.TreeNode1("Brake trigger") then
@@ -884,9 +886,38 @@ local function renderImgui()
     im.End()
 end
 
+local function dumpTable(table)
+    if(type(table) == "table") then
+        local f = 0
+
+        for key, value in pairs(table) do
+            local isFunction = tostring(value):find("function")
+
+            if(not isFunction) then
+                --print("key: " ..tostring(key).. ", value: " ..tostring(value))
+            else
+                f = f + 1
+                print("key: " ..tostring(key).. ", value: " ..tostring(value))
+            end
+        end
+
+        print("-- " ..f.. " function(s)")
+    else
+        print("value: " ..tostring(table))
+    end
+end
+
+local dumped = false
+
 local function onUpdate()
     if(show == true) then
         renderImgui()
+    end
+
+    if(dumped == false) then
+        dumpTable(ui_imgui)
+
+        dumped = true
     end
 end
 
