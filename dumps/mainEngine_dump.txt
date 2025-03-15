@@ -1,0 +1,242 @@
+4579.64650|I|libbeamng.print| -- dumping powertrain.getDevice("mainEngine"):
+4579.64653|I|libbeamng.print| key: compressionBrakeCoefDesired, value: 0
+4579.64654|I|libbeamng.print| key: slowIgnitionErrorInterval, value: 5
+4579.64654|I|libbeamng.print| key: connectingRodDamageThreshold, value: 2000000
+4579.64655|I|libbeamng.print| key: parent, value: table: 0x027895f73200
+4579.64656|I|libbeamng.print| key: wearDynamicFrictionCoef, value: 1
+4579.64657|I|libbeamng.print| key: energyStorageRatios, value: table: 0x0278db40ba80
+4579.64658|I|libbeamng.print| key: forcedInductionCoef, value: 0.99571864180455
+4579.64658|I|libbeamng.print| key: name, value: mainEngine
+4579.64659|I|libbeamng.print| key: checkHydroLocking, value: function: 0x0278db3fe1c8
+4579.64660|I|libbeamng.print| key: shutOffSoundRequested, value: false
+4579.64661|I|libbeamng.print| key: setEngineSoundParameterList, value: function: 0x0278db3ff078
+4579.64662|I|libbeamng.print| key: throttleSmoother, value: table: 0x0278db407c78
+4579.64663|I|libbeamng.print| key: applyRevLimiter, value: function: 0x0278db3feb28
+4579.64663|I|libbeamng.print| key: engineNodeID, value: 104
+4579.64664|I|libbeamng.print| key: ignitionCutTime, value: 0
+4579.64665|I|libbeamng.print| key: engineWorkPerUpdate, value: 46.873596842815
+4579.64666|I|libbeamng.print| key: slowIgnitionErrorTimer, value: 0.20999999493361
+4579.64666|I|libbeamng.print| key: slowIgnitionErrorActive, value: false
+4579.64667|I|libbeamng.print| key: fastIgnitionErrorCoef, value: 1
+4579.64668|I|libbeamng.print| key: starterDisabled, value: false
+4579.64669|I|libbeamng.print| key: idleTorque, value: 95.5703125
+4579.64672|I|libbeamng.print| key: redlineTorqueDropOffRange, value: 500
+4579.64673|I|libbeamng.print| key: revLimiterActiveTimer, value: 0
+4579.64674|I|libbeamng.print| key: soundLoadSmoother, value: table: 0x0278c4d2cc30
+4579.64675|I|libbeamng.print| key: pistonRingDamageThreshold, value: 1500000
+4579.64675|I|libbeamng.print| key: updateSoundNodeDebug, value: function: 0x0278db402688
+4579.64676|I|libbeamng.print| key: maxCumulativeGearRatio, value: 13.668
+4579.64677|I|libbeamng.print| key: cumulativeGearRatio, value: 0
+4579.64678|I|libbeamng.print| key: soundRPMSmoother, value: table: 0x0278e0d36250
+4579.64678|I|libbeamng.print| key: sustainedAfterFireFuel, value: 0
+4579.64679|I|libbeamng.print| key: exhaustMainGain, value: 3
+4579.64680|I|libbeamng.print| key: exhaustAudioMufflingCoefRange, value: 1
+4579.64681|I|libbeamng.print| key: exhaustAudioMufflingMinCoef, value: 0
+4579.64682|I|libbeamng.print| key: inputAV, value: 0
+4579.64683|I|libbeamng.print| key: soundMinLoadMixExhaust, value: 0
+4579.64684|I|libbeamng.print| key: maxTorqueLimit, value: inf
+4579.64685|I|libbeamng.print| key: isPropulsed, value: true
+4579.64686|I|libbeamng.print| key: soundMaxLoadMixExhaust, value: 0.8
+4579.64686|I|libbeamng.print| key: waterDamageNodes, value: table: 0x0278e1d5fcf8
+4579.64687|I|libbeamng.print| key: starterEngagedCoef, value: 0
+4579.64688|I|libbeamng.print| key: idleAVStartOffsetSmoother, value: table: 0x0278e22360e8
+4579.64689|I|libbeamng.print| key: engineSoundIDExhaust, value: 1
+4579.64689|I|libbeamng.print| key: nitrousOxideTorque, value: 0
+4579.64690|I|libbeamng.print| key: electricsThrottleName, value: throttle
+4579.64691|I|libbeamng.print| key: invStarterMaxAV, value: 0.018189136374144
+4579.64692|I|libbeamng.print| key: frictionTorque, value: 34.68767319327
+4579.64693|I|libbeamng.print| key: maxTorque, value: 280.70296478319
+4579.64694|I|libbeamng.print| key: soundMinLoadMix, value: 0
+4579.64694|I|libbeamng.print| key: soundMaxLoadMix, value: 1
+4579.64695|I|libbeamng.print| key: maxPower, value: 215.20372895232
+4579.64696|I|libbeamng.print| key: headGasketDamageThreshold, value: 1500000
+4579.64696|I|libbeamng.print| key: instantAfterFireFuel, value: 0
+4579.64697|I|libbeamng.print| key: initEngineSound, value: function: 0x0278db3fefb8
+4579.64698|I|libbeamng.print| key: soundConfiguration, value: table: 0x0278e1ed1d48
+4579.64699|I|libbeamng.print| key: uiName, value: Engine
+4579.64700|I|libbeamng.print| key: maxAV, value: 733.038285
+4579.64700|I|libbeamng.print| key: slowIgnitionErrorSmoother, value: table: 0x0278e2236280
+4579.64701|I|libbeamng.print| key: starterMaxAV, value: 54.977871375
+4579.64702|I|libbeamng.print| key: lastOutputAV1, value: 77.229784182022
+4579.64703|I|libbeamng.print| key: outputRPM, value: 735.84199174992
+4579.64704|I|libbeamng.print| key: outputAV1, value: 77.229784182022
+4579.64704|I|libbeamng.print| key: activeOutputPorts, value: table: 0x0278e22a6740
+4579.64705|I|libbeamng.print| key: idleAVReadErrorRangeHalf, value: 2.617993875
+4579.64706|I|libbeamng.print| key: isDisabled, value: false
+4579.64707|I|libbeamng.print| key: clutchChildren, value: table: 0x0278e22a66b0
+4579.64707|I|libbeamng.print| key: maxOverTorqueDamage, value: 380
+4579.64708|I|libbeamng.print| key: deformGroupLastDamages, value: table: 0x027891d22420
+4579.64709|I|libbeamng.print| key: throttleFactor, value: 1
+4579.64710|I|libbeamng.print| key: updateGFX, value: function: 0x0278db3fe2c0
+4579.64710|I|libbeamng.print| key: isPhysicallyDisconnected, value: true
+4579.64711|I|libbeamng.print| key: setExhaustGainMufflingOffsetRevLimiter, value: function: 0x0278db402718
+4579.64713|I|libbeamng.print| key: torqueUpdate, value: function: 0x0278db3febc8
+4579.64714|I|libbeamng.print| key: deformGroupDamages, value: table: 0x02789636bd10
+4579.64715|I|libbeamng.print| key: deformGroups, value: table: 0x0278c3b2d980
+4579.64715|I|libbeamng.print| key: enable, value: function: 0x0278db3f4d60
+4579.64716|I|libbeamng.print| key: visualShaftAVName, value: inputAV
+4579.64717|I|libbeamng.print| key: registerStorage, value: function: 0x0278db3fef58
+4579.64719|I|libbeamng.print| key: numberOfOutputPorts, value: 1
+4579.64720|I|libbeamng.print| key: lockUp, value: function: 0x0278db3f4d90
+4579.64721|I|libbeamng.print| key: parentOutputTorqueName, value: outputTorque0
+4579.64722|I|libbeamng.print| key: maxIdleThrottle, value: 0.15
+4579.64722|I|libbeamng.print| key: storageWithEnergyCounter, value: 1
+4579.64723|I|libbeamng.print| key: isBroken, value: false
+4579.64724|I|libbeamng.print| key: invEngInertia, value: 7.1428571428571
+4579.64725|I|libbeamng.print| key: maxRPM, value: 7000
+4579.64725|I|libbeamng.print| key: sustainedAfterFireTime, value: 1.5
+4579.64726|I|libbeamng.print| key: children, value: table: 0x0278db00ff98
+4579.64727|I|libbeamng.print| key: registeredEnergyStorages, value: table: 0x0278db40b9f0
+4579.64728|I|libbeamng.print| key: spentEnergy, value: 104.07193311807
+4579.64728|I|libbeamng.print| key: uiSimpleModeControl, value: true
+4579.64729|I|libbeamng.print| key: outputTorqueState, value: 1
+4579.64730|I|libbeamng.print| key: exhaustFlowCoef, value: 0.42818039804081
+4579.64732|I|libbeamng.print| key: engineMiscSounds, value: table: 0x0278e1ed1d00
+4579.64733|I|libbeamng.print| key: reset, value: function: 0x0278db402788
+4579.64734|I|libbeamng.print| key: breakTriggerBeam, value: table: 0x0278e1ec3978
+4579.64735|I|libbeamng.print| key: damageFrictionCoef, value: 1
+4579.64735|I|libbeamng.print| key: fastIgnitionErrorChance, value: 0
+4579.64736|I|libbeamng.print| key: engineSoundID, value: 0
+4579.64737|I|libbeamng.print| key: pumpingLossPerUpdate, value: 2.38021941938
+4579.64738|I|libbeamng.print| key: outputAVState, value: 1
+4579.64739|I|libbeamng.print| key: updateEnergyStorageRatios, value: function: 0x0278db3fe258
+4579.64739|I|libbeamng.print| key: spawnVehicleIgnitionLevel, value: 3
+4579.64740|I|libbeamng.print| key: getSoundConfiguration, value: function: 0x0278db4026b8
+4579.64741|I|libbeamng.print| key: deviceCategories, value: table: 0x0278db4073a8
+4579.64742|I|libbeamng.print| key: validate, value: function: 0x0278db3fed70
+4579.64742|I|libbeamng.print| key: turbocharger, value: table: 0x0278e2271b10
+4579.64743|I|libbeamng.print| key: invBurnEfficiencyTable, value: table: 0x0278e22373f0
+4579.64744|I|libbeamng.print| key: outputPorts, value: table: 0x0278db408268
+4579.64745|I|libbeamng.print| key: thermals, value: table: 0x0278e2262bf8
+4579.64747|I|libbeamng.print| key: outputAVNames, value: table: 0x0278db40bbb0
+4579.64748|I|libbeamng.print| key: fixedStepTime, value: 0.01
+4579.64749|I|libbeamng.print| key: sustainedAfterFireCoef, value: 1.15
+4579.64750|I|libbeamng.print| key: setIgnition, value: function: 0x0278db3fee98
+4579.64750|I|libbeamng.print| key: revLimiterActiveMaxExhaustFlowCoef, value: 0.5
+4579.64751|I|libbeamng.print| key: deactivateStarter, value: function: 0x0278db3fee68
+4579.64752|I|libbeamng.print| key: maxAvailableRPM, value: 10000
+4579.64753|I|libbeamng.print| key: requiredEnergyType, value: gasoline
+4579.64753|I|libbeamng.print| key: damageDynamicFrictionCoef, value: 1
+4579.64754|I|libbeamng.print| key: tempRevLimiterAV, value: 7330.38285
+4579.64755|I|libbeamng.print| key: particulates, value: 0.03
+4579.64756|I|libbeamng.print| key: invBurnEfficiencyCoef, value: 1
+4579.64757|I|libbeamng.print| key: inputIndex, value: 0
+4579.64757|I|libbeamng.print| key: fixedStepTimer, value: 0.0015000955411233
+4579.64758|I|libbeamng.print| key: maxOverRevDamage, value: 1500
+4579.64759|I|libbeamng.print| key: slowIgnitionErrorChance, value: 0
+4579.64760|I|libbeamng.print| key: setCompressionBrakeCoef, value: function: 0x0278db3feec8
+4579.64760|I|libbeamng.print| key: maxPowerThrottleMap, value: 158282.1274407
+4579.64761|I|libbeamng.print| key: exhaustFlowDelay, value: table: 0x0278db408220
+4579.64762|I|libbeamng.print| key: cylinderWallTemperatureDamageThreshold, value: 135
+4579.64763|I|libbeamng.print| key: outputTorque1, value: 0
+4579.64763|I|libbeamng.print| key: engineLoad, value: 0.42818039804081
+4579.64764|I|libbeamng.print| key: torqueReactionNodes, value: table: 0x0278e1d601f8
+4579.64766|I|libbeamng.print| key: intakeAirDensityCoef, value: 0.99039077758789
+4579.64767|I|libbeamng.print| key: previousEnergyLevels, value: table: 0x0278db40ba38
+4579.64768|I|libbeamng.print| key: onBreak, value: function: 0x0278db3feef8
+4579.64769|I|libbeamng.print| key: beamBroke, value: function: 0x0278db3fef28
+4579.64769|I|libbeamng.print| key: continuousAfterFireFuel, value: 0
+4579.64770|I|libbeamng.print| key: minIdleAV, value: 75.921822375
+4579.64771|I|libbeamng.print| key: cutIgnition, value: function: 0x0278db3fee38
+4579.64772|I|libbeamng.print| key: maxIdleAV, value: 81.157810125
+4579.64773|I|libbeamng.print| key: updateFuelUsage, value: function: 0x0278db3fe288
+4579.64774|I|libbeamng.print| key: setEngineSoundParameter, value: function: 0x0278db3ff048
+4579.64774|I|libbeamng.print| key: initialInertia, value: 0.14
+4579.64775|I|libbeamng.print| key: idleAVReadErrorSmoother, value: table: 0x0278e21903c0
+4579.64776|I|libbeamng.print| key: prevFloodPercent, value: 0
+4579.64777|I|libbeamng.print| key: halfInvEngInertia, value: 3.5714285714286
+4579.64777|I|libbeamng.print| key: starterThrottleKillCoef, value: 1
+4579.64778|I|libbeamng.print| key: parentOutputAVName, value: outputAV0
+4579.64779|I|libbeamng.print| key: frictionLossPerUpdate, value: 13.121967451105
+4579.64780|I|libbeamng.print| key: resetTempRevLimiter, value: function: 0x0278db3fe388
+4579.64781|I|libbeamng.print| key: idleAV, value: 78.53981625
+4579.64782|I|libbeamng.print| key: setPartCondition, value: function: 0x0278db3fed08
+4579.64784|I|libbeamng.print| key: torqueCurve, value: table: 0x0278e2128608
+4579.64785|I|libbeamng.print| key: idleAVReadErrorRange, value: 5.23598775
+4579.64786|I|libbeamng.print| key: revLimiterWasActiveTimer, value: 1000
+4579.64787|I|libbeamng.print| key: invTempRevLimiterRange, value: 0.013641852280608
+4579.64788|I|libbeamng.print| key: visualPosition, value: table: 0x0278e2237b08
+4579.64790|I|libbeamng.print| key: electricsThrottleFactorName, value: throttleFactor
+4579.64790|I|libbeamng.print| key: revLimiterType, value: timeBased
+4579.64791|I|libbeamng.print| key: revLimiterCutTime, value: 0.1
+4579.64792|I|libbeamng.print| key: engineBlockNodes, value: table: 0x0278e1d5ffc0
+4579.64793|I|libbeamng.print| key: soundLocations, value: table: 0x0278db40bac8
+4579.64793|I|libbeamng.print| key: wearFrictionCoef, value: 1
+4579.64794|I|libbeamng.print| key: throttle, value: 0.016510524170093
+4579.64795|I|libbeamng.print| key: revLimiterMaxAVDrop, value: 52.3598775
+4579.64796|I|libbeamng.print| key: sustainedAfterFireTimer, value: 1.1014999914914
+4579.64797|I|libbeamng.print| key: scaleFrictionInitial, value: function: 0x0278db3f4c20
+4579.64797|I|libbeamng.print| key: inputName, value: dummy
+4579.64798|I|libbeamng.print| key: wearIdleAVReadErrorRangeCoef, value: 1
+4579.64799|I|libbeamng.print| key: remainingFuelRatio, value: 0.99999168265829
+4579.64800|I|libbeamng.print| key: hasRevLimiter, value: true
+4579.64800|I|libbeamng.print| key: isTempRevLimiterActive, value: false
+4579.64801|I|libbeamng.print| key: exhaustEndNodesChanged, value: function: 0x0278db3ff0a8
+4579.64802|I|libbeamng.print| key: revLimiterActive, value: false
+4579.64803|I|libbeamng.print| key: compressionBrakeCoefActual, value: 0
+4579.64804|I|libbeamng.print| key: compressionBrakeCurve, value: table: 0x0278e0d26ee8
+4579.64804|I|libbeamng.print| key: setExhaustGainMufflingOffset, value: function: 0x0278db4026e8
+4579.64805|I|libbeamng.print| key: instantAfterFireFuelDelay, value: table: 0x0278db407e58
+4579.64806|I|libbeamng.print| key: stallTimer, value: 1
+4579.64807|I|libbeamng.print| key: engineBrakeTorque, value: 40
+4579.64807|I|libbeamng.print| key: getTorqueData, value: function: 0x0278db3ec938
+4579.64808|I|libbeamng.print| key: initialFriction, value: 10
+4579.64810|I|libbeamng.print| key: starterThrottleKillTime, value: 0.65
+4579.64810|I|libbeamng.print| key: disable, value: function: 0x0278db3f4d30
+4579.64811|I|libbeamng.print| key: isStalled, value: false
+4579.64814|I|libbeamng.print| key: engineVolumeCoef, value: 1
+4579.64815|I|libbeamng.print| key: ignitionCoef, value: 1
+4579.64816|I|libbeamng.print| key: revLimiterAV, value: 733.038285
+4579.64817|I|libbeamng.print| key: outputTorqueNames, value: table: 0x0278db40bb68
+4579.64818|I|libbeamng.print| key: supercharger, value: table: 0x0278e229e280
+4579.64818|I|libbeamng.print| key: loadSmoother, value: table: 0x0278db407480
+4579.64819|I|libbeamng.print| key: initSounds, value: function: 0x0278db402888
+4579.64820|I|libbeamng.print| key: getPartCondition, value: function: 0x0278db3fed38
+4579.64821|I|libbeamng.print| key: applyDeformGroupDamage, value: function: 0x0278db3fecd0
+4579.64822|I|libbeamng.print| key: shiftAfterFireFuel, value: 0
+4579.64822|I|libbeamng.print| key: activeOutputPortCount, value: 1
+4579.64823|I|libbeamng.print| key: idleAVStartOffset, value: 0
+4579.64824|I|libbeamng.print| key: starterTorque, value: 150
+4579.64825|I|libbeamng.print| key: idleAVOverwrite, value: 0
+4579.64825|I|libbeamng.print| key: instantAfterFireCoef, value: 1.15
+4579.64826|I|libbeamng.print| key: initExhaustSound, value: function: 0x0278db3fefe8
+4579.64827|I|libbeamng.print| key: cumulativeInertia, value: 0.0014397190655032
+4579.64828|I|libbeamng.print| key: updateFixedStep, value: function: 0x0278db3feb98
+4579.64828|I|libbeamng.print| key: lastOutputTorque, value: 34.816513401078
+4579.64829|I|libbeamng.print| key: setExhaustSoundNodes, value: function: 0x0278db3ff018
+4579.64830|I|libbeamng.print| key: spentEnergyNitrousOxide, value: 0
+4579.64831|I|libbeamng.print| key: nitrousOxideInjection, value: table: 0x0278e229e150
+4579.64833|I|libbeamng.print| key: setTempRevLimiter, value: function: 0x0278db3fe358
+4579.64834|I|libbeamng.print| key: thermalsEnabled, value: true
+4579.64835|I|libbeamng.print| key: energyStorage, value: table: 0x0278e1d5fdc0
+4579.64835|I|libbeamng.print| key: requestedThrottle, value: 0
+4579.64837|I|libbeamng.print| key: type, value: combustionEngine
+4579.64837|I|libbeamng.print| key: friction, value: 10
+4579.64838|I|libbeamng.print| key: connectedChildrenCount, value: 1
+4579.64839|I|libbeamng.print| key: setSoundLocation, value: function: 0x0278db402658
+4579.64840|I|libbeamng.print| key: resetSounds, value: function: 0x0278db402748
+4579.64840|I|libbeamng.print| key: revLimiterRPM, value: 7000
+4579.64841|I|libbeamng.print| key: tempRevLimiterMaxAVOvershoot, value: 73.3038285
+4579.64842|I|libbeamng.print| key: inertia, value: 0.14
+4579.64843|I|libbeamng.print| key: fastIgnitionErrorSmoother, value: table: 0x0278e22362c8
+4579.64844|I|libbeamng.print| key: idleStartCoef, value: 1
+4579.64844|I|libbeamng.print| key: sustainedAfterFireFuelDelay, value: table: 0x0278db408000
+4579.64845|I|libbeamng.print| key: calculateInertia, value: function: 0x0278db3fef88
+4579.64846|I|libbeamng.print| key: oilVolume, value: 5
+4579.64847|I|libbeamng.print| key: velocityUpdate, value: function: 0x027891d0d8b8
+4579.64847|I|libbeamng.print| key: canFlood, value: true
+4579.64848|I|libbeamng.print| key: idleAVReadError, value: 0.34056020540998
+4579.64849|I|libbeamng.print| key: engineBlockMaterial, value: aluminum
+4579.64850|I|libbeamng.print| key: scaleFriction, value: function: 0x0278db3f4c50
+4579.64850|I|libbeamng.print| key: instantEngineLoad, value: 0.42818039804081
+4579.64851|I|libbeamng.print| key: maxIdleThrottleOverwrite, value: 0
+4579.64852|I|libbeamng.print| key: torqueData, value: table: 0x0278e22a1768
+4579.64853|I|libbeamng.print| key: hasFuel, value: true
+4579.64853|I|libbeamng.print| key: dynamicFriction, value: 0.0235
+4579.64854|I|libbeamng.print| key: maxTorqueRating, value: 305
+4579.64855|I|libbeamng.print| key: virtualMassAV, value: 0
+4579.64856|I|libbeamng.print| key: idleRPM, value: 750
+4579.64856|I|libbeamng.print| key: starterThrottleKillTimer, value: 0
+4579.64857|I|libbeamng.print| key: maxPhysicalAV, value: 769.69019925
+4579.64858|I|libbeamng.print| key: updateSounds, value: function: 0x0278db3fe0c8
+4579.64859|I|libbeamng.print| key: overRevDamage, value: 0

@@ -1,0 +1,178 @@
+695.61903|I|libbeamng.print| -- dumping input:
+695.61906|I|libbeamng.print| key: state, value: table: 0x013d5e362480
+695.61907|I|libbeamng.print| key: allowedInputSources, value: table: 0x013d1c520038
+695.61908|I|libbeamng.print| key: brake, value: 0
+695.61909|I|libbeamng.print| key: settingsChanged, value: function: 0x013d1c5137f0
+695.61910|I|libbeamng.print| key: throttle, value: 0
+695.61911|I|libbeamng.print| key: updateGFX, value: function: 0x013d1c513350
+695.61911|I|libbeamng.print| key: reset, value: function: 0x013d1c5135d0
+695.61912|I|libbeamng.print| key: initSecondStage, value: function: 0x013d1c5206d8
+695.61913|I|libbeamng.print| key: padAccelerateBrake, value: function: 0x013d1c5137b8
+695.61914|I|libbeamng.print| key: parkingbrake, value: 1
+695.61915|I|libbeamng.print| key: lastFilterType, value: 0
+695.61915|I|libbeamng.print| key: toggleEvent, value: function: 0x013d1c513690
+695.61916|I|libbeamng.print| key: event, value: function: 0x013d1c513618
+695.61917|I|libbeamng.print| key: lastInputs, value: table: 0x013d5edec3e8
+695.61918|I|libbeamng.print| key: kbdSteer, value: function: 0x013d1c5136c8
+695.61919|I|libbeamng.print| key: init, value: function: 0x013d1c520670
+695.61919|I|libbeamng.print| key: setAllowedInputSource, value: function: 0x013d1c5138c0
+695.61920|I|libbeamng.print| key: keys, value: table: 0x013d1c5191b8
+695.61921|I|libbeamng.print| key: clutch, value: 0
+695.61922|I|libbeamng.print| key: steering, value: 0
+695.62068|I|libbeamng.lua.utils| {
+695.62070|I|libbeamng.lua.utils|   allowedInputSources = {},
+695.62070|I|libbeamng.lua.utils|   brake = 0,
+695.62071|I|libbeamng.lua.utils|   clutch = 0,
+695.62072|I|libbeamng.lua.utils|   event = <function 1>,
+695.62072|I|libbeamng.lua.utils|   init = <function 2>,
+695.62073|I|libbeamng.lua.utils|   initSecondStage = <function 3>,
+695.62073|I|libbeamng.lua.utils|   kbdSteer = <function 4>,
+695.62074|I|libbeamng.lua.utils|   keys = {
+695.62075|I|libbeamng.lua.utils|     <metatable> = {
+695.62075|I|libbeamng.lua.utils|       __index = <function 5>
+695.62076|I|libbeamng.lua.utils|     }
+695.62076|I|libbeamng.lua.utils|   },
+695.62077|I|libbeamng.lua.utils|   lastFilterType = 0,
+695.62078|I|libbeamng.lua.utils|   lastInputs = {
+695.62078|I|libbeamng.lua.utils|     local = {
+695.62079|I|libbeamng.lua.utils|       parkingbrake = 1
+695.62079|I|libbeamng.lua.utils|     }
+695.62080|I|libbeamng.lua.utils|   },
+695.62081|I|libbeamng.lua.utils|   padAccelerateBrake = <function 6>,
+695.62081|I|libbeamng.lua.utils|   parkingbrake = 1,
+695.62082|I|libbeamng.lua.utils|   reset = <function 7>,
+695.62082|I|libbeamng.lua.utils|   setAllowedInputSource = <function 8>,
+695.62083|I|libbeamng.lua.utils|   settingsChanged = <function 9>,
+695.62084|I|libbeamng.lua.utils|   state = {
+695.62084|I|libbeamng.lua.utils|     brake = {
+695.62085|I|libbeamng.lua.utils|       filter = 0,
+695.62085|I|libbeamng.lua.utils|       maxLimit = 1,
+695.62086|I|libbeamng.lua.utils|       minLimit = 0,
+695.62087|I|libbeamng.lua.utils|       smootherKBD = {
+695.62087|I|libbeamng.lua.utils|         [false] = 3,
+695.62090|I|libbeamng.lua.utils|         [true] = 3,
+695.62090|I|libbeamng.lua.utils|         _startingValue = 0,
+695.62094|I|libbeamng.lua.utils|         autoCenterRate = 1000,
+695.62095|I|libbeamng.lua.utils|         getUncapped = <function 10>,
+695.62096|I|libbeamng.lua.utils|         state = 0,
+695.62096|I|libbeamng.lua.utils|         <metatable> = <1>{
+695.62097|I|libbeamng.lua.utils|           __index = <table 1>,
+695.62097|I|libbeamng.lua.utils|           get = <function 11>,
+695.62098|I|libbeamng.lua.utils|           getCapped = <function 12>,
+695.62099|I|libbeamng.lua.utils|           getUncapped = <function 11>,
+695.62099|I|libbeamng.lua.utils|           getUncappedAutoCenter = <function 10>,
+695.62100|I|libbeamng.lua.utils|           getWithRate = <function 13>,
+695.62100|I|libbeamng.lua.utils|           getWithRateCapped = <function 14>,
+695.62101|I|libbeamng.lua.utils|           getWithRateUncapped = <function 13>,
+695.62105|I|libbeamng.lua.utils|           reset = <function 15>,
+695.62105|I|libbeamng.lua.utils|           set = <function 16>,
+695.62106|I|libbeamng.lua.utils|           value = <function 17>
+695.62106|I|libbeamng.lua.utils|         }
+695.62107|I|libbeamng.lua.utils|       },
+695.62108|I|libbeamng.lua.utils|       smootherPAD = {
+695.62108|I|libbeamng.lua.utils|         [false] = 100,
+695.62109|I|libbeamng.lua.utils|         [true] = 100,
+695.62109|I|libbeamng.lua.utils|         _startingValue = 0,
+695.62110|I|libbeamng.lua.utils|         autoCenterRate = 100,
+695.62111|I|libbeamng.lua.utils|         state = 0,
+695.62111|I|libbeamng.lua.utils|         <metatable> = <table 1>
+695.62112|I|libbeamng.lua.utils|       },
+695.62112|I|libbeamng.lua.utils|       val = 0
+695.62113|I|libbeamng.lua.utils|     },
+695.62114|I|libbeamng.lua.utils|     clutch = {
+695.62114|I|libbeamng.lua.utils|       filter = 0,
+695.62115|I|libbeamng.lua.utils|       maxLimit = 1,
+695.62115|I|libbeamng.lua.utils|       minLimit = 0,
+695.62116|I|libbeamng.lua.utils|       smootherKBD = {
+695.62117|I|libbeamng.lua.utils|         [false] = 10,
+695.62117|I|libbeamng.lua.utils|         [true] = 20,
+695.62118|I|libbeamng.lua.utils|         _startingValue = 0,
+695.62118|I|libbeamng.lua.utils|         autoCenterRate = 20,
+695.62119|I|libbeamng.lua.utils|         getUncapped = <function 10>,
+695.62120|I|libbeamng.lua.utils|         state = 0,
+695.62120|I|libbeamng.lua.utils|         <metatable> = <table 1>
+695.62121|I|libbeamng.lua.utils|       },
+695.62121|I|libbeamng.lua.utils|       smootherPAD = {
+695.62122|I|libbeamng.lua.utils|         [false] = 10,
+695.62123|I|libbeamng.lua.utils|         [true] = 10,
+695.62123|I|libbeamng.lua.utils|         _startingValue = 0,
+695.62124|I|libbeamng.lua.utils|         autoCenterRate = 10,
+695.62125|I|libbeamng.lua.utils|         state = 0,
+695.62125|I|libbeamng.lua.utils|         <metatable> = <table 1>
+695.62126|I|libbeamng.lua.utils|       },
+695.62126|I|libbeamng.lua.utils|       val = 0
+695.62127|I|libbeamng.lua.utils|     },
+695.62128|I|libbeamng.lua.utils|     parkingbrake = {
+695.62128|I|libbeamng.lua.utils|       filter = 2,
+695.62129|I|libbeamng.lua.utils|       maxLimit = 1,
+695.62129|I|libbeamng.lua.utils|       minLimit = 0,
+695.62130|I|libbeamng.lua.utils|       smootherKBD = {
+695.62131|I|libbeamng.lua.utils|         [false] = 10,
+695.62131|I|libbeamng.lua.utils|         [true] = 10,
+695.62132|I|libbeamng.lua.utils|         _startingValue = 0,
+695.62132|I|libbeamng.lua.utils|         autoCenterRate = 10,
+695.62133|I|libbeamng.lua.utils|         state = 0,
+695.62133|I|libbeamng.lua.utils|         <metatable> = <table 1>
+695.62134|I|libbeamng.lua.utils|       },
+695.62135|I|libbeamng.lua.utils|       smootherPAD = {
+695.62135|I|libbeamng.lua.utils|         [false] = 10,
+695.62136|I|libbeamng.lua.utils|         [true] = 10,
+695.62137|I|libbeamng.lua.utils|         _startingValue = 0,
+695.62137|I|libbeamng.lua.utils|         autoCenterRate = 10,
+695.62138|I|libbeamng.lua.utils|         state = 0,
+695.62138|I|libbeamng.lua.utils|         <metatable> = <table 1>
+695.62139|I|libbeamng.lua.utils|       },
+695.62140|I|libbeamng.lua.utils|       source = "local",
+695.62140|I|libbeamng.lua.utils|       val = 1
+695.62141|I|libbeamng.lua.utils|     },
+695.62141|I|libbeamng.lua.utils|     steering = {
+695.62142|I|libbeamng.lua.utils|       filter = 0,
+695.62143|I|libbeamng.lua.utils|       maxLimit = 1,
+695.62143|I|libbeamng.lua.utils|       minLimit = -1,
+695.62144|I|libbeamng.lua.utils|       smootherKBD = {
+695.62144|I|libbeamng.lua.utils|         [false] = 1,
+695.62145|I|libbeamng.lua.utils|         [true] = 1,
+695.62146|I|libbeamng.lua.utils|         _startingValue = 0,
+695.62146|I|libbeamng.lua.utils|         autoCenterRate = 1,
+695.62147|I|libbeamng.lua.utils|         state = 0,
+695.62148|I|libbeamng.lua.utils|         <metatable> = <table 1>
+695.62148|I|libbeamng.lua.utils|       },
+695.62149|I|libbeamng.lua.utils|       smootherPAD = {
+695.62150|I|libbeamng.lua.utils|         [false] = 1,
+695.62151|I|libbeamng.lua.utils|         [true] = 1,
+695.62152|I|libbeamng.lua.utils|         _startingValue = 0,
+695.62152|I|libbeamng.lua.utils|         autoCenterRate = 1,
+695.62153|I|libbeamng.lua.utils|         state = 0,
+695.62153|I|libbeamng.lua.utils|         <metatable> = <table 1>
+695.62154|I|libbeamng.lua.utils|       },
+695.62155|I|libbeamng.lua.utils|       val = 0
+695.62156|I|libbeamng.lua.utils|     },
+695.62156|I|libbeamng.lua.utils|     throttle = {
+695.62157|I|libbeamng.lua.utils|       filter = 0,
+695.62157|I|libbeamng.lua.utils|       maxLimit = 1,
+695.62158|I|libbeamng.lua.utils|       minLimit = 0,
+695.62159|I|libbeamng.lua.utils|       smootherKBD = {
+695.62159|I|libbeamng.lua.utils|         [false] = 3,
+695.62160|I|libbeamng.lua.utils|         [true] = 3,
+695.62160|I|libbeamng.lua.utils|         _startingValue = 0,
+695.62161|I|libbeamng.lua.utils|         autoCenterRate = 1000,
+695.62161|I|libbeamng.lua.utils|         getUncapped = <function 10>,
+695.62162|I|libbeamng.lua.utils|         state = 0,
+695.62163|I|libbeamng.lua.utils|         <metatable> = <table 1>
+695.62163|I|libbeamng.lua.utils|       },
+695.62164|I|libbeamng.lua.utils|       smootherPAD = {
+695.62164|I|libbeamng.lua.utils|         [false] = 100,
+695.62165|I|libbeamng.lua.utils|         [true] = 100,
+695.62166|I|libbeamng.lua.utils|         _startingValue = 0,
+695.62166|I|libbeamng.lua.utils|         autoCenterRate = 100,
+695.62167|I|libbeamng.lua.utils|         state = 0,
+695.62167|I|libbeamng.lua.utils|         <metatable> = <table 1>
+695.62168|I|libbeamng.lua.utils|       },
+695.62169|I|libbeamng.lua.utils|       val = 0
+695.62169|I|libbeamng.lua.utils|     }
+695.62170|I|libbeamng.lua.utils|   },
+695.62170|I|libbeamng.lua.utils|   steering = 0,
+695.62171|I|libbeamng.lua.utils|   throttle = 0,
+695.62172|I|libbeamng.lua.utils|   toggleEvent = <function 18>,
+695.62172|I|libbeamng.lua.utils|   updateGFX = <function 19>
+695.62173|I|libbeamng.lua.utils| }
