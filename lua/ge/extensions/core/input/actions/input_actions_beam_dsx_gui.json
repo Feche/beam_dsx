@@ -1,3 +1,0 @@
-{
-    "toggle_beam_dsx_gui":{"cat":"debug", "order": 128, "ctx": "tlua", "onDown"  :"extensions.core_beam__dsx__gui.toggle()", "actionMap": "Global", "title": "Toggle BeamDSX GUI", "desc": "Toggles BeamDSX GUI on/off"}
-}
