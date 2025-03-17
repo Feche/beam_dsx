@@ -8,7 +8,7 @@
 695.61911|I|libbeamng.print| key: reset, value: function: 0x013d1c5135d0
 695.61912|I|libbeamng.print| key: initSecondStage, value: function: 0x013d1c5206d8
 695.61913|I|libbeamng.print| key: padAccelerateBrake, value: function: 0x013d1c5137b8
-695.61914|I|libbeamng.print| key: parkingbrake, value: 1
+695.61914|I|libbeamng.print| key: parkingBrake, value: 1
 695.61915|I|libbeamng.print| key: lastFilterType, value: 0
 695.61915|I|libbeamng.print| key: toggleEvent, value: function: 0x013d1c513690
 695.61916|I|libbeamng.print| key: event, value: function: 0x013d1c513618
@@ -35,11 +35,11 @@
 695.62077|I|libbeamng.lua.utils|   lastFilterType = 0,
 695.62078|I|libbeamng.lua.utils|   lastInputs = {
 695.62078|I|libbeamng.lua.utils|     local = {
-695.62079|I|libbeamng.lua.utils|       parkingbrake = 1
+695.62079|I|libbeamng.lua.utils|       parkingBrake = 1
 695.62079|I|libbeamng.lua.utils|     }
 695.62080|I|libbeamng.lua.utils|   },
 695.62081|I|libbeamng.lua.utils|   padAccelerateBrake = <function 6>,
-695.62081|I|libbeamng.lua.utils|   parkingbrake = 1,
+695.62081|I|libbeamng.lua.utils|   parkingBrake = 1,
 695.62082|I|libbeamng.lua.utils|   reset = <function 7>,
 695.62082|I|libbeamng.lua.utils|   setAllowedInputSource = <function 8>,
 695.62083|I|libbeamng.lua.utils|   settingsChanged = <function 9>,
@@ -102,7 +102,7 @@
 695.62126|I|libbeamng.lua.utils|       },
 695.62126|I|libbeamng.lua.utils|       val = 0
 695.62127|I|libbeamng.lua.utils|     },
-695.62128|I|libbeamng.lua.utils|     parkingbrake = {
+695.62128|I|libbeamng.lua.utils|     parkingBrake = {
 695.62128|I|libbeamng.lua.utils|       filter = 2,
 695.62129|I|libbeamng.lua.utils|       maxLimit = 1,
 695.62129|I|libbeamng.lua.utils|       minLimit = 0,

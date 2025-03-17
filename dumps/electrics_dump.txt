@@ -83,7 +83,7 @@
  98.67544|I|libbeamng.print| maxrpm: 5600
  98.67545|I|libbeamng.print| idlerpm: 750
  98.67545|I|libbeamng.print| maxGearIndex: 4
- 98.67546|I|libbeamng.print| parkingbrake: 1
+ 98.67546|I|libbeamng.print| parkingBrake: 1
  98.67547|I|libbeamng.print| minGearIndex: -1
  98.67547|I|libbeamng.print| steering_input: 0
  98.67548|I|libbeamng.print| gearIndex: 0
@@ -199,7 +199,7 @@
 5252.56411|I|libbeamng.print| key: maxrpm, value: 8600
 5252.56412|I|libbeamng.print| key: clutchRatio, value: 1
 5252.56413|I|libbeamng.print| key: turnsignal, value: 0
-5252.56413|I|libbeamng.print| key: parkingbrake, value: 1
+5252.56413|I|libbeamng.print| key: parkingBrake, value: 1
 5252.56414|I|libbeamng.print| key: spoilerF, value: 0
 5252.56415|I|libbeamng.print| key: steering_input, value: 0
 5252.56416|I|libbeamng.print| key: escActive, value: false

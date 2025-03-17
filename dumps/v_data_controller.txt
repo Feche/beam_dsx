@@ -997,7 +997,7 @@
  32.51460|I|libbeamng.lua.utils|     },
  32.51460|I|libbeamng.lua.utils|     displayData = {
  32.51461|I|libbeamng.lua.utils|       customModules = { { "moduleName", "property" }, { "environmentData", "time" }, { "environmentData", "temperatureEnv" }, { "accelerationData", "accelerationSmooth" }, { "dynamicRedlineData" }, { "tireData", "pressures" }, { "tireData", "temperatures" }, { "combustionEngineData", "remainingRange" }, { "combustionEngineData", "fuelConsumption" } },
- 32.51462|I|libbeamng.lua.utils|       electrics = { "gear", "fuel", "watertemp", "wheelspeed", "rpmTacho", "lowfuel", "signal_L", "signal_R", "parkingbrake", "checkengine", "engineRunning", "lowpressure", "lights", "turboBoost", "oiltemp", "escActive", "tcsActive", "odometer", "trip" }
+ 32.51462|I|libbeamng.lua.utils|       electrics = { "gear", "fuel", "watertemp", "wheelspeed", "rpmTacho", "lowfuel", "signal_L", "signal_R", "parkingBrake", "checkengine", "engineRunning", "lowpressure", "lights", "turboBoost", "oiltemp", "escActive", "tcsActive", "odometer", "trip" }
  32.51463|I|libbeamng.lua.utils|     },
  32.51465|I|libbeamng.lua.utils|     fileName = "gauges/genericGauges",
  32.51466|I|libbeamng.lua.utils|     globalSkin = "blackroof",
