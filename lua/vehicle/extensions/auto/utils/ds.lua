@@ -1,6 +1,12 @@
+-- This Source Code Form is subject to the terms of the bCDDL, v. 1.1.
+-- If a copy of the bCDDL was not distributed with this
+-- file, You can obtain one at http://beamng.com/bCDDL-1.1.txt
+-- Code author: Feche
+
 local udp = require("vehicle.extensions.auto.utils.udp")
-local settings = require("vehicle.extensions.auto.beam_dsx_settings")
 local tick = require("vehicle.extensions.auto.utils.tick")
+
+local controllerIndex = 0 -- DualSenseX controller index, default: 0
 
 return
 {
@@ -36,32 +42,6 @@ return
         feedback = 21,
         vibration = 23,
         slopeFeedback = 24,
-
-        safeValues =
-        {
-            customTriggerValue =
-            {
-                max = 255,
-            },
-            vibration =
-            {
-                maxPos = 9,
-                maxHz = 40,
-                maxAmplitude = 8,
-            },
-            feedback =
-            {
-                maxPos = 9,
-                maxForce = 8,
-            },
-            slopeFeedback =
-            {
-                minPos = 8,
-                maxPos = 8,
-                minForce = 8,
-                maxForce = 8,
-            },
-        },
     },
     micLed =
     {
@@ -112,7 +92,7 @@ return
             duration = 0,
             tick = 0,
         },
-        lastCommand = "",
+        --lastCommand = "",
     },
     debug = 
     {
@@ -147,20 +127,14 @@ return
             buffer = buffer.. "," ..math.floor(args[i])
         end
 
-        buffer = string.format("{\"instructions\":[{\"type\":%d,\"parameters\":[%d%s]}]}", type, settings.contollerIndex, buffer)
+        buffer = string.format("{\"instructions\":[{\"type\":%d,\"parameters\":[%d%s]}]}", type, controllerIndex, buffer)
             
         self.commands[trigger].priority = priority
         self.commands[trigger].duration = tick:tickRateToMs(gt)
         self.commands[trigger].tick = t
-        
-        -- do not send repeated data
-        if(self.commands[trigger].lastCommand == buffer) then
-            --return
-        end
+        --self.commands[trigger].lastCommand = buffer
 
-        self.commands[trigger].lastCommand = buffer
-
-        -- save current rgb color
+        -- save current lightBar color
         if(trigger == self.trigger.rgbUpdate) then
             for i = 1, 4 do
                 self.commands[trigger].color[i] = args[i]
@@ -184,13 +158,6 @@ return
         self:sendDsx(0, 0, self.type.micLed, self.micLed.off)
 
         self.debug.send = false
-    end,
-    safeValue = function(self, type, subtype)
-        if type and subtype and self.mode.safeValues[type] and self.mode.safeValues[type][subtype] then
-            return self.mode.safeValues[type][subtype]
-        else
-            return 0
-        end
     end,
     getColor = function(self)
         return self.commands[self.trigger.rgbUpdate].color

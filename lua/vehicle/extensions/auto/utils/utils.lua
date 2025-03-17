@@ -1,23 +1,23 @@
+-- This Source Code Form is subject to the terms of the bCDDL, v. 1.1.
+-- If a copy of the bCDDL was not distributed with this
+-- file, You can obtain one at http://beamng.com/bCDDL-1.1.txt
+-- Code author: Feche
+
 local tick = require("vehicle.extensions.auto.utils.tick")
 
 local function lerp(a, b, t)
+    t = t < 0 and 0 or t
+    t = t > 1 and 1 or t
     return a + (b - a) * t
 end
 
-local function safeValue(input, max)
-    max = max or 1000
-    return math.max(1, math.min(max, input))
-end
-
 local function lerpRgb2(color1, color2, t)
-    t = t < 0 and 0 or t
-    t = t > 1 and 1 or t
-
-    return { 
-        lerp(safeValue(color1[1], 255), safeValue(color2[1], 255), t),
-        lerp(safeValue(color1[2], 255), safeValue(color2[2], 255), t),
-        lerp(safeValue(color1[3], 255), safeValue(color2[3], 255), t),
-        lerp(safeValue(color1[4], 255), safeValue(color2[4], 255), t)
+    return 
+    { 
+        lerp(color1[1], color2[1], t),
+        lerp(color1[2], color2[2], t),
+        lerp(color1[3], color2[3], t),
+        lerp(color1[4], color2[4], t)
     }
 end
 
@@ -31,19 +31,19 @@ local function lerpRgb3(color1, color2, color3, t)
         t = segment
 
         return {
-            lerp(safeValue(color1[1], 255), safeValue(color2[1], 255), t),
-            lerp(safeValue(color1[2], 255), safeValue(color2[2], 255), t),
-            lerp(safeValue(color1[3], 255), safeValue(color2[3], 255), t),
-            lerp(safeValue(color1[4], 255), safeValue(color2[4], 255), t)
+            lerp(color1[1], color2[1], t),
+            lerp(color1[2], color2[2], t),
+            lerp(color1[3], color2[3], t),
+            lerp(color1[4], color2[4], t)
         }
     else
         t = segment - 1
 
         return {
-            lerp(safeValue(color2[1], 255), safeValue(color3[1], 255), t),
-            lerp(safeValue(color2[2], 255), safeValue(color3[2], 255), t),
-            lerp(safeValue(color2[3], 255), safeValue(color3[3], 255), t),
-            lerp(safeValue(color2[4], 255), safeValue(color3[4], 255), t)
+            lerp(color2[1], color3[1], t),
+            lerp(color2[2], color3[2], t),
+            lerp(color2[3], color3[3], t),
+            lerp(color2[4], color3[4], t)
         }
     end
 end
@@ -82,7 +82,7 @@ local function getMaxAvailableRpm()
 end
 
 local function isEngineOn()
-    return (electrics.values.engineRunning == 0) and false or true
+    return (electrics.values.engineRunning == 1)
 end
 
 local function isWheelSlip()
@@ -124,28 +124,75 @@ local function getAbsCoef()
     return (absCoef / 4)
 end
 
---[[local function isShifting()
-    return electrics.values.isShifting or false
-end]]
-
-local function dumpTable(table)
-    if(type(table) == "table") then
-        local f = 0
-
-        for key, value in pairs(table) do
-            local isFunction = tostring(value):find("function")
-
-            if(not isFunction) then
-                print("key: " ..tostring(key).. ", value: " ..tostring(value))
-            else
-                f = f + 1
+local function dumpex(t)
+    if(type(t) == "userdata") then
+        local meta = getmetatable(t)
+        if meta then
+            for k, v in pairs(meta) do
+                print(k, v)
             end
         end
-
-        print("-- " ..f.. " function(s)")
-    else
-        print("value: " ..tostring(table))
+        return
+    elseif(type(t) ~= "table") then
+        return print(type(t).. ": " ..tostring(t))
     end
+
+    local f, v = {} 
+    
+    for key, value in pairs(t) do 
+        value = tostring(value)
+        if value:find("function") then 
+            table.insert(f, key.. ": " ..value) 
+        else 
+            table.insert(v, key.. ": " ..value) 
+        end
+    end 
+
+    print("-- variables: ") 
+    table.sort(v)
+    for i = 1, #v do 
+        print(v[i]) 
+    end 
+    print("-- total variables: " ..#v)
+
+    print("-- functions:") 
+    table.sort(f)
+    for i = 1, #f do 
+        print(f[i]) 
+    end 
+    print("-- total functions: " ..#f)
+end
+
+local function isElectric()
+    local devices = powertrain.getDevices()
+
+    if(devices.frontMotor or devices.rearMotor) then
+        return true
+    end
+
+    return false
+end
+
+local function isInReverse()
+    return (electrics.values.reverse == 1) and true or false
+end
+
+local function isBrakeThrottleInverted()
+    return (electrics.values.gearboxMode == "arcade" and isInReverse() == true)
+end
+
+local function isAtRevLimiter(random)
+    local engine = powertrain.getDevice("mainEngine")
+
+    if(engine and engine.revLimiterActive) then
+        if(random == true or engine.revLimiterActiveTimer == nil) then
+            return (math.random() > 0.5) and 1 or 0
+        else
+            return engine.revLimiterActiveTimer / engine.revLimiterCutTime
+        end
+    end
+
+    return 0
 end
 
 -- Some of the code here has been extracted from adaptiveBrakeLights.lua since BeamNG 
@@ -189,75 +236,32 @@ local function isEmergencyBraking()
 
     return false
 end
+--
 
-local function isElectric()
-    local devices = powertrain.getDevices()
-
-    if(devices.frontMotor or devices.rearMotor) then
-        return true
-    end
-
-    return false
-end
-
-local function isInReverse()
-    return (electrics.values.reverse == 1) and true or false
-end
-
-local function isBrakeThrottleInverted()
-    return (electrics.values.gearboxMode == "arcade" and isInReverse() == true)
-end
-
-local function isAtRevLimiter(random)
-    local engine = powertrain.getDevice("mainEngine")
-
-    if(engine and engine.revLimiterActive) then
-        if(random == true or engine.revLimiterActiveTimer == nil) then
-            return (math.random() > 0.5) and 1 or 0
-        else
-            return engine.revLimiterActiveTimer / engine.revLimiterCutTime
-        end
-    end
-
-    return 0
-end
-
---[[local function isShootingFlames()
-    local engine = powertrain.getDevice("mainEngine")
-
-    --print("revLimiterAV: " ..engine.revLimiterAV)
-
-    return false
-end]]
-
-local M = {}
-
-M.lerp = lerp
-M.lerpRgb2 = lerpRgb2
-M.lerpRgb3 = lerpRgb3
-M.safeValue = safeValue
-M.dumpTable = dumpTable
-
-M.isWheelMissing = isWheelMissing
-M.isWheelSlip = isWheelSlip
-M.isEngineOn = isEngineOn
---M.isShifting = isShifting
-M.isEmergencyBraking = isEmergencyBraking
-M.isElectric = isElectric
-M.isBrakeThrottleInverted = isBrakeThrottleInverted
-M.isAtRevLimiter = isAtRevLimiter
---M.isShootingFlames = isShootingFlames
-M.isInReverse = isInReverse
-
-M.getAirSpeed = getAirSpeed
-M.getWheelSpeed = getWheelSpeed
-M.getThrottle = getThrottle
-M.getBrake = getBrake
-M.getRpm = getRpm
-M.getIdleRpm = getIdleRpm
-M.getMaxRpm = getMaxRpm
-M.getMaxAvailableRpm = getMaxAvailableRpm
-M.getGear = getGear
-M.getAbsCoef = getAbsCoef
-
-return M
+return
+{
+    lerp = lerp,
+    lerpRgb2 = lerpRgb2,
+    lerpRgb3 = lerpRgb3,
+    dumpTable = dumpTable,
+    
+    isWheelMissing = isWheelMissing,
+    isWheelSlip = isWheelSlip,
+    isEngineOn = isEngineOn,
+    isEmergencyBraking = isEmergencyBraking,
+    isElectric = isElectric,
+    isBrakeThrottleInverted = isBrakeThrottleInverted,
+    isAtRevLimiter = isAtRevLimiter,
+    isInReverse = isInReverse,
+    
+    getAirSpeed = getAirSpeed,
+    getWheelSpeed = getWheelSpeed,
+    getThrottle = getThrottle,
+    getBrake = getBrake,
+    getRpm = getRpm,
+    getIdleRpm = getIdleRpm,
+    getMaxRpm = getMaxRpm,
+    getMaxAvailableRpm = getMaxAvailableRpm,
+    getGear = getGear,
+    getAbsCoef = getAbsCoef,
+}
