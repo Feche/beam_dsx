@@ -12,12 +12,9 @@ local port = 6969
 return
 {
     startUdp = function()
-        udp = socket.udp()
-
-        if(udp) then
-            --print("[beam_dsx] VE: udp socket ready - sending data to '" ..ip.. ":" ..port.. "'")
-        else
-            print("[beam_dsx] VE: udp socket error. (" ..tostring(udp).. ")")
+        if(not udp) then
+            udp = socket.udp()
+            log("I", "startUdp", "[beam_dsx] VE: udp socket ready - sending data to '" ..ip.. ":" ..port.. "'")
         end
     end,
     send = function(buffer)
@@ -29,7 +26,7 @@ return
     end,
     shutdown = function()
         udp:close()
-        print("[beam_dsx] VE: shutting down udp socket ..")
+        log("I", "shutdown", "[beam_dsx] VE: shutting down udp socket ..")
     end,
     ready = function() 
         return udp 

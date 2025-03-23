@@ -48,6 +48,47 @@ local function lerpRgb3(color1, color2, color3, t)
     end
 end
 
+local function dumpex(t)
+    if(type(t) == "userdata") then
+        local meta = getmetatable(t)
+        if meta then
+            for k, v in pairs(meta) do
+                print(k, v)
+            end
+        end
+        return
+    elseif(type(t) ~= "table") then
+        return print(type(t).. ": " ..tostring(t))
+    end
+
+    local f = {}
+    local v = {}
+    
+    for key, value in pairs(t) do 
+        value = tostring(value)
+        if value:find("function") then 
+            table.insert(f, tostring(key).. ": " ..tostring(value)) 
+        else 
+            table.insert(v, tostring(key).. ": " ..tostring(value)) 
+        end
+    end 
+
+    print("-- variables: ") 
+    table.sort(v)
+    for i = 1, #v do 
+        print(v[i]) 
+    end 
+    print("-- total variables: " ..#v)
+
+    print("-- functions:") 
+    table.sort(f)
+    for i = 1, #f do 
+        print(f[i]) 
+    end 
+    print("-- total functions: " ..#f)
+end
+
+
 local function getAirSpeed()
     return (electrics.values.airspeed or 0) * 3.6
 end
@@ -85,11 +126,17 @@ local function isEngineOn()
     return (electrics.values.engineRunning == 1)
 end
 
+local function areHazardsEnabled()
+    return (electrics.values.hazard_enabled == 1)
+end
+
 local function isWheelSlip()
     local isWheelSlip = 0
 
     for i = 0, wheels.wheelRotatorCount - 1 do
-        isWheelSlip = math.max(isWheelSlip, wheels.wheelRotators[i].lastSlip)
+        if(wheels.wheelRotators[i].isPropulsed == true) then
+            isWheelSlip = isWheelSlip + wheels.wheelRotators[i].lastSlip
+        end
     end
 
     return isWheelSlip
@@ -122,45 +169,6 @@ local function getAbsCoef()
     end
 
     return (absCoef / 4)
-end
-
-local function dumpex(t)
-    if(type(t) == "userdata") then
-        local meta = getmetatable(t)
-        if meta then
-            for k, v in pairs(meta) do
-                print(k, v)
-            end
-        end
-        return
-    elseif(type(t) ~= "table") then
-        return print(type(t).. ": " ..tostring(t))
-    end
-
-    local f, v = {} 
-    
-    for key, value in pairs(t) do 
-        value = tostring(value)
-        if value:find("function") then 
-            table.insert(f, key.. ": " ..value) 
-        else 
-            table.insert(v, key.. ": " ..value) 
-        end
-    end 
-
-    print("-- variables: ") 
-    table.sort(v)
-    for i = 1, #v do 
-        print(v[i]) 
-    end 
-    print("-- total variables: " ..#v)
-
-    print("-- functions:") 
-    table.sort(f)
-    for i = 1, #f do 
-        print(f[i]) 
-    end 
-    print("-- total functions: " ..#f)
 end
 
 local function isElectric()
@@ -209,32 +217,44 @@ local function boolToNumber(bool)
     return bool
 end
 
+local blinkPulse = 1
+local absBlinkOffTimer = 0
 local absBlinkTimer = 0
+local absBlinkTime = 0.1
+local absBlinkOffTime = 0.1
 local absActiveSmoother = newTemporalSmoothing(2, 2)
 
-local function isEmergencyBraking()
-    local lights = electrics.values.brakelights
+local function isEmergencyBraking(force)
     local brake = utils.isBrakeThrottleInverted() and utils.getThrottle() or utils.getBrake()
-    local adaptiveBrakeLights = (controller.getAllControllers().adaptiveBrakeLights) and true or false
+    local adaptiveBrakeLights = force and true or ((controller.getAllControllers().adaptiveBrakeLights) and true or false)
 
     if(adaptiveBrakeLights == false or brake == 0) then
-        return false
+        return 1
     end
 
     local dt = tick:getDt()
     local absActiveCoef = boolToNumber(electrics.values.absActive) or 0
     local absActive = absActiveSmoother:getUncapped(absActiveCoef, dt)
 
-    absBlinkTimer = absBlinkTimer + dt * absActive
+    if blinkPulse > 0 then
+        absBlinkTimer = absBlinkTimer + dt * absActive
 
-    -- 0.1 is the default BeamNG value for emergency stop blinking
-    if absBlinkTimer > 0.1 then
-        if(lights == 0) then
-            return true
+        if absBlinkTimer > absBlinkTime then
+            absBlinkTimer = 0
+            blinkPulse = 0
         end
     end
 
-    return false
+    if blinkPulse <= 0 then
+        absBlinkOffTimer = absBlinkOffTimer + dt
+
+        if absBlinkOffTimer > absBlinkOffTime then
+            absBlinkOffTimer = 0
+            blinkPulse = 1
+        end
+    end
+
+    return blinkPulse
 end
 --
 
@@ -243,7 +263,7 @@ return
     lerp = lerp,
     lerpRgb2 = lerpRgb2,
     lerpRgb3 = lerpRgb3,
-    dumpTable = dumpTable,
+    dumpex = dumpex,
     
     isWheelMissing = isWheelMissing,
     isWheelSlip = isWheelSlip,
@@ -253,6 +273,7 @@ return
     isBrakeThrottleInverted = isBrakeThrottleInverted,
     isAtRevLimiter = isAtRevLimiter,
     isInReverse = isInReverse,
+    areHazardsEnabled = areHazardsEnabled,
     
     getAirSpeed = getAirSpeed,
     getWheelSpeed = getWheelSpeed,

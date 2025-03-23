@@ -3,9 +3,9 @@
     "cat": "debug",
     "order": 128,
     "ctx": "tlua",
-    "onDown": "extensions.core_beam__dsx.toggleUI()",
+    "onDown": "extensions.beam__dsx.toggle()",
     "actionMap": "Global",
-    "title": "Toggle BeamDSX GUI",
-    "desc": "Keybind for BeamDSX GUI"
+    "title": "Toggle Beam DSX graphics interface",
+    "desc": "Toggles Beam DSX graphics interface on or off"
   }
 }

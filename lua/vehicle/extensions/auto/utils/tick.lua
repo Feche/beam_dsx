@@ -21,10 +21,10 @@ return
 		return 16 -- milliseconds -- the rate at which commands sent to DualSenseX, default value targets 60fps, default: 16, min: 8, max: 33
 	end,
 	msToTickRate = function(self, ms)
-		return ms / self.getTickRate()
+		return ms / self:getTickRate()
 	end,
 	tickRateToMs = function(self, rate)
-		return self.getTickRate() * rate
+		return self:getTickRate() * rate
 	end,
 	getCurrTick = function(self)
 		return self.currTick

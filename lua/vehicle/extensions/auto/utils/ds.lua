@@ -92,13 +92,11 @@ return
             duration = 0,
             tick = 0,
         },
-        --lastCommand = "",
     },
     debug = 
     {
         send = false,
     },
-    -- tickRateToMs = tick:tickRateToMs, -- TODO: test
     -- Functions
     sendDsx = function(self, priority, gt, type, ...)
         local args = { ... }
@@ -132,7 +130,6 @@ return
         self.commands[trigger].priority = priority
         self.commands[trigger].duration = tick:tickRateToMs(gt)
         self.commands[trigger].tick = t
-        --self.commands[trigger].lastCommand = buffer
 
         -- save current lightBar color
         if(trigger == self.trigger.rgbUpdate) then
@@ -148,7 +145,7 @@ return
         end
     end,
     resetController = function(self)
-        print("[beam_dsx] VE: resetting controller ..")
+        log("I", "resetController", "[beam_dsx] VE: resetting controller ..")
         self.debug.send = true
 
         self:sendDsx(0, 0, self.type.triggerUpdate, self.trigger.left, self.mode.off)
@@ -185,7 +182,7 @@ return
                         submode = "vibrateResistance"
                     end
 
-                    print("[beam_dsx] send: (" ..trigger.. " -> " ..type.. " -> " ..mode.. " -> " ..submode.. ") " ..buffer)
+                    log("I", "debugCommand", "[beam_dsx] send: (" ..trigger.. " -> " ..type.. " -> " ..mode.. " -> " ..submode.. ") " ..buffer)
                 else
                     if(mode == self.mode.off) then
                         mode = "off"
@@ -197,20 +194,20 @@ return
                         mode = "slopeFeedback"
                     end
 
-                    print("[beam_dsx] send: (" ..trigger.. " -> " ..type.. " -> " ..mode.. ") " ..buffer)
+                    log("I", "debugCommand", "[beam_dsx] send: (" ..trigger.. " -> " ..type.. " -> " ..mode.. ") " ..buffer)
                 end
             -- rgbUpdate
             elseif(data.type == self.type.rgbUpdate) then
-                print("[beam_dsx] send: (rgbUpdate) " ..buffer)
+                log("I", "debugCommand", "[beam_dsx] send: (rgbUpdate) " ..buffer)
             -- micLed
             elseif(data.type == self.type.micLed) then
-                print("[beam_dsx] send: (micLed) " ..buffer)
+                log("I", "debugCommand", "[beam_dsx] send: (micLed) " ..buffer)
             -- playerLed
             elseif(data.type == self.type.playerLed) then
-                print("[beam_dsx] send: (playerLed) " ..buffer)
+                log("I", "debugCommand", "[beam_dsx] send: (playerLed) " ..buffer)
             -- unknown
             else
-                print("[beam_dsx] send: (unknown) " ..buffer)
+                log("I", "debugCommand", "[beam_dsx] send: (unknown) " ..buffer)
             end
         end
     end

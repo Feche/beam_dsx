@@ -1,1 +1,1 @@
-registerCoreModule('core/beam_dsx')
+setExtensionUnloadMode("beam__dsx", "manual")
