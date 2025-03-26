@@ -2,9 +2,12 @@
 -- If a copy of the bCDDL was not distributed with this
 -- file, You can obtain one at http://beamng.com/bCDDL-1.1.txt
 -- Code author: Feche
+-- GE beam_dsx.lua
 
-local profiles = require("ge.extensions.beam_dsx_profiles")
-local text = require("ge.extensions.beam_dsx_text")
+local profiles = require("ge.extensions.utils.profiles")
+local utils = require("ge.extensions.utils.utils")
+local text = require("ge.extensions.utils.lang")
+local ds = require("common.ds")
 local ffi = require("ffi")
 
 local version = "1.0"
@@ -12,47 +15,42 @@ local lang = {}
 local im = ui_imgui
 local tick = 0
 local settings = nil
+local allowedVersions = { ["0.34"] = true }
 
-local ui =
+local beam_dsx =
 {
+    disabled = true,
     deactivateMod = nil,
+    modEnable = true,
     main = 
     {
         show = im.BoolPtr(false),
         closed = true,
         tabSet = false,
         preventCreateProfileFromOpeningTick = 0,
-        profileRenameName = ""
+        profileRenameName = "",
+        profileVehicle = "",
     },
     createProfile =
     {
         show = im.BoolPtr(false),
         newProfileName = nil,
-        str = "",
     },
     constraints =
     {
         main =
         {
-            width = 500,
-            height = 700,
+            width = 510,
+            height = 850,
             flags = im.WindowFlags_AlwaysAutoResize,
-            offsetWidth = 230,
+            offsetWidth = 206,
         },
         createProfile = 
         {
-            width = 230,
-            height = 180,
+            width = 220,
+            height = 116,
             flags = im.WindowFlags_AlwaysAutoResize,
         },
-    },
-    -- Message box
-    message =
-    {
-        progress = 0,
-        tick = 0,
-        str = nil,
-        duration = 0,
     },
     -- Functions
     toggle = function(self, change)
@@ -64,19 +62,13 @@ local ui =
             settings = profiles:getProfileSettings()
 
             self.main.profileRenameName = im.ArrayChar(32, profiles:getProfileName())
+            self.main.profileVehicle = im.ArrayChar(32, profiles:getProfileVehicle())
             self.main.closed = false
-            self.message.duration = 0
         else
             self.main.closed = true
         end
     end,
-    showMessage = function(self, str, duration)
-        self.message.progress = 0
-        self.message.tick = tick
-        self.message.str = str and str.. "." or nil
-        self.message.duration = (duration or 3)
-    end,
-    checkEnableBeamMp = function(self)
+    toggleBeamMpHook = function(self)
         if(self.deactivateMod == nil) then
             self.deactivateMod = _G["core_modmanager"].deactivateMod
         end
@@ -92,232 +84,276 @@ local ui =
                 return self.deactivateMod(name)
             end
 
-            log("i", "checkEnableBeamMp", "[beam_dsx] GE: mod allowed to run on BeamMp servers")
+            log("i", "toggleBeamMpHook", "[beam_dsx] GE: mod allowed to run on BeamMp servers")
         else
             _G["core_modmanager"].deactivateMod = self.deactivateMod
 
-            log("W", "checkEnableBeamMp", "[beam_dsx] GE: mod disabled to run on BeamMp servers")
+            log("W", "toggleBeamMpHook", "[beam_dsx] GE: mod disabled to run on BeamMp servers")
         end
     end,
-    checkRenameProfile = function(self)
-        local profileName = ffi.string(ui.main.profileRenameName)
+    showMessage = function(self, str, duration)
+        guihooks.message(str, duration or 3, tostring(tick))
+    end,
+    mailboxToVE = function(self, code, vehicle)
+        if(not self.modEnable) then
+            log("W", "mailboxToVE", "[beam_dsx] GE: mod is disabled")
+            return
+        end
+
+        local playerVehicleId = vehicle and vehicle or be:getPlayerVehicleID(0)
+
+        if(not playerVehicleId) then
+            return
+        end
+
+        local policeMode = 0
+
+        if(gameplay_police) then
+            local policeData = gameplay_police.getPursuitData()
+
+            policeMode = policeData and policeData.mode or 0
+        end
+
+        local data =
+        {
+            code = code,
+            playerVehicleId = playerVehicleId,
+            tick = tick,
+            policeMode = policeMode,
+            path = profiles:getPath()
+        }
+
+        be:sendToMailbox("beam_dsx_mailboxToVE", jsonEncode(data))
+        
+        log("I", "mailboxToVE", "[beam_dsx] GE: sending mailbox to VE '" ..code.. "' ..")
+    end,
+    onRenameProfile = function(self)
+        local profileName = profiles:getProfileName()
+        local newProfileName = ffi.string(self.main.profileRenameName)
+
+        if(profileName == newProfileName) then
+            return true
+        end
+
+        local isValid = self:isValidName(newProfileName)
         local tooltip = lang.strings
 
+        if(isValid == 0) then
+            self:showMessage(tooltip.profileNameEmptyError)
+        elseif(isValid == 1) then
+            self:showMessage(tooltip.profileNameInvalidError)
+        elseif(isValid == 2) then
+            self:showMessage(string.format(tooltip.profileAlreadyExistError, newProfileName))
+        else
+            profiles:setProfileName(newProfileName)
+            return true
+        end
+
+        return false
+    end,
+    onCreateProfile = function(self)
+        local profileName = ffi.string(self.createProfile.newProfileName)
+        local isValid = self:isValidName(profileName)
+        local tooltip = lang.strings
+
+        if(isValid == 0) then
+            return self:showMessage(tooltip.profileNameEmptyError)
+        elseif(isValid == 1) then
+            return self:showMessage(tooltip.profileNameInvalidError)
+        elseif(isValid == 2) then
+            return self:showMessage(string.format(tooltip.profileAlreadyExistError, profileName))
+        end
+
+        profiles:loadProfiles()
+        profiles:createProfile(profileName, profiles:getDefaultSettings())
+
+        self:showCreateProfile(false)
+        self:showMessage(string.format(tooltip.profileCreateOk, profileName))
+    end,
+    onProfileVehicleChange = function(self)
+        local profilePerVehicleStr = ffi.string(self.main.profileVehicle)
+        local vehicles = {}
+
+        -- Get vehicle list
+        for veh in string.gmatch(profilePerVehicleStr, "%s*([^,]+)%s*") do
+            table.insert(vehicles, veh)
+        end
+
+        for i = 1, #vehicles do
+            -- Returns vehicle profile
+            if(profiles:getVehicleProfile(vehicles[i], true) ~= 0) then
+                self:showMessage(string.format(lang.strings.profileVehicleIsInAnotherProfile, vehicles[i]))
+                return false
+            end
+        end
+
+        profiles:setProfileVehicle(profilePerVehicleStr)
+        return true
+    end, 
+    onDeleteProfile = function(self)
+        local tooltip = lang.strings
+        local profileName = profiles:getProfileName()
+
+        if(profiles:getTotalProfiles() - 1 == 0) then
+            return self:showMessage(string.format(tooltip.deleteProfileError, profileName), 5)
+        end
+
+        self:showMessage(string.format(tooltip.deleteProfileNotification, profileName), 5)
+        profiles:deleteProfile(profiles:getActiveProfileID())
+    end,
+    onTabChange = function(self, profileID, auto)
+        local profileName = profiles:getProfileName(profileID)
+        local tooltip = lang.strings
+
+        profiles:setActiveProfile(profileID)
+        self:showMessage(not auto and string.format(tooltip.switchProfile, profileName) or string.format(tooltip.autoSwitchProfile, profileName), auto and 6)
+
+        settings = profiles:getProfileSettings()
+
+        self.main.tabSet = false
+        self.main.profileRenameName = im.ArrayChar(32, profileName)
+        self.main.profileVehicle = im.ArrayChar(32, profiles:getProfileVehicle())
+
+        self:mailboxToVE("profile_change")
+        --self:showMessage(string.format(tooltip.profileActive, profileName), 5)
+    end,
+    isValidName = function(self, name)
         -- Check if profile name is valid
-        if(#profileName == 0) then
-            return ui:showMessage(tooltip.profileNameEmptyError)
+        if(#name == 0) then
+            return 0
         end
 
         -- Check if profile name is valid
-        if(profileName == "-" or profileName == "+") then
-            return ui:showMessage(tooltip.profileNameInvalidError)
+        if(name == "-" or name == "+") then
+            return 1
         end
 
         -- Check if profile name already exists
         local p = profiles:getProfiles()
 
         for i = 1, #p do
-            if(p[i].name == profileName) then
-                return ui:showMessage(string.format(tooltip.profileAlreadyExistError, profileName))
+            if(p[i].name == name) then
+                return 2
             end
         end
     end,
-    mailboxToVE = function(self, code)
-        local playerVehicleId = be:getPlayerVehicleID(0)
+    showCreateProfile = function(self, show)
+        self.createProfile.show[0] = show
 
-        if(code == "mod_enable_disable") then
-            be:sendToMailbox("mailboxToVE", jsonEncode({ code = code, playerVehicleId = playerVehicleId, tick = tick }))
-        else
-            be:sendToMailbox("mailboxToVE", jsonEncode({ code = code, playerVehicleId = playerVehicleId, path = profiles:getPath(), tick = tick }))
+        if(show) then
+            self.createProfile.newProfileName = im.ArrayChar(32, "")
         end
-        
-        log("I", "mailboxToVE", "[beam_dsx] GE: sending mailbox to VE '" ..code.. "' ..")
+    end,
+    onSaveProfile = function(self)
+        -- Checks if profile name already exists
+        if(not self:onRenameProfile()) then
+            return
+        end
+
+        -- Checks if the vehicle has already set another profile
+        if(not self:onProfileVehicleChange()) then
+            return
+        end
+
+        local tooltip = lang.strings
+
+        profiles:saveProfiles()
+        self:mailboxToVE("save")
+        self:showMessage(string.format(tooltip.saveProfileOk, profiles:getProfileName()))
+
+        local enable = profiles:isProfilesEnabled()
+
+        if(enable == false and self.modEnable == true) then
+            self:mailboxToVE("mod_disable")
+            self.modEnable = false
+            ds:resetController()
+        elseif(enable == true and self.modEnable == false) then
+            self.modEnable = true
+            self:mailboxToVE("mod_enable")
+        end
+    end,
+    onVehicleUpdate = function(self, id)
+        if(id ~= be:getPlayerVehicleID(0)) then
+            --log("I", "onVehicleUpdate", "[beam_dsx] GE: '" ..utils.getVehicleName(id).. "' is not the player vehicle ..")
+            return
+        end
+
+        local vehName = utils.getVehicleName(id)
+
+        if(vehName == "unicycle" or id == -1) then
+            self:mailboxToVE("vehicle_invalid")
+            ds:resetController()
+        else
+            local profile = profiles:getVehicleProfile(vehName)
+
+            if(profile > 0) then
+                self:onTabChange(profile, true)
+
+                log("I", "onVehicleSwitched", "[beam_dsx] GE: found profile '" ..profiles:getProfileName().. "' for vehicle '" ..vehName.. "'")
+            else
+                self:mailboxToVE("vehicle_reset_or_switch", id)
+            end
+        end
+    end,
+    gameVersionCheck = function(self)
+        local version = string.format("%0.4s", beamng_version)
+        if(allowedVersions[version]) then
+            return { status = true, version = version }
+        end
+        return { status = false, version = version }
     end,
 }
 
 -- Beam DSX events
-local function updateConfig()
-    local obj = be:getPlayerVehicle(0)
+local function renderTabs()
+	if im.BeginTabBar("Profiles") then
+        local totalProfiles = profiles:getTotalProfiles()
 
-    if not obj then
-        return
-    end
-
-    if(profiles:isProfilesEnabled() == false) then
-        obj:queueLuaCommand('updateConfig(nil)') 
-    else
-        obj:queueLuaCommand('updateConfig("' ..profiles:getPath().. '")')
-    end
-end
-
-local function showCreateProfile(show)
-    ui.createProfile.show[0] = show
-
-    if(show) then
-        ui.createProfile.str = ""
-        ui.createProfile.newProfileName = im.ArrayChar(32, "")
-    end
-end
-
-local function checkCreateProfile()
-    local profileName = ffi.string(ui.createProfile.newProfileName)
-    local tooltip = lang.strings
-
-    -- Check if profile name is valid
-    if(#profileName == 0) then
-        ui.createProfile.str = tooltip.profileNameEmptyError
-        return
-    end
-
-    -- Check if profile name is valid
-    if(profileName == "-" or profileName == "+") then
-        ui.createProfile.str = tooltip.profileNameInvalidError
-        return
-    end
-
-    -- Check if profile name already exists
-    local p = profiles:getProfiles()
-
-    for i = 1, #p do
-        if(p[i].name == profileName) then
-            ui.createProfile.str = string.format(tooltip.profileAlreadyExistError, profileName)
-            return
-        end
-    end
-
-    -- Everything ok
-    profiles:loadProfiles()
-    profiles:createProfile(profileName, profiles:getDefaultSettings())
-
-    showCreateProfile(false)
-    ui:showMessage(string.format(tooltip.profileCreateOk, profileName))
-end
-
-local function renderCreateProfile()
-    if(not ui.createProfile.show[0]) then
-        return
-    end
-
-    local height = #ui.createProfile.str > 0 and ui.constraints.createProfile.height or ui.constraints.createProfile.height - 25
-    local tooltip = lang.strings
-
-    im.SetNextWindowSizeConstraints(im.ImVec2(ui.constraints.createProfile.width, height), im.ImVec2(ui.constraints.createProfile.width, height))
-    im.Begin(tooltip.profileCreateTitle, ui.createProfile.show, ui.constraints.createProfile.flags)
-
-    im.PushTextWrapPos(0.0)
-    im.TextColored(im.ImVec4(1, 1, 1, 0.6), tooltip.profileCreateName)
-    im.PopTextWrapPos()
-    
-    im.PushItemWidth(185)
-
-    if im.InputText("##profileCreateNew", ui.createProfile.newProfileName, 32, im.InputTextFlags_EnterReturnsTrue) then
-        checkCreateProfile()
-    end
-
-    im.Spacing()
-
-    if im.Button(tooltip.profileCreateButton1) then
-        checkCreateProfile()
-    end
-
-    im.SameLine()
-
-    if im.Button(tooltip.profileCreateButton2) then
-        showCreateProfile(false)
-    end
-
-    -- Show error message
-    if(#ui.createProfile.str > 0) then
-        im.Spacing()
-        im.Separator()
-        im.Spacing()
-        im.PushTextWrapPos(0.0)
-        im.TextColored(im.ImVec4(1, 1, 1, 0.6), ui.createProfile.str)
-        im.PopTextWrapPos()
-    end
-end
-
-local function renderButtons()
-    if(not settings) then
-        return
-    end
-
-    local tooltip = lang.strings
-    local profileName = profiles:getProfileName()
-
-    im.Separator()
-    im.Spacing()
-
-    -- Save profile
-    if im.Button(tooltip.saveProfile) then
-        local newProfileName = ffi.string(ui.main.profileRenameName)
-
-        if(profileName ~= newProfileName) then
-            profiles:setProfileName(newProfileName)
-        end
-
-        profiles:saveProfiles()
-        ui:mailboxToVE("save")
-        ui:showMessage(string.format(tooltip.saveProfileOk, profileName))
-    end
-
-    if im.IsItemHovered() then
-        im.BeginTooltip()
-        im.Text(tooltip.saveProfileHovered)
-        im.EndTooltip()
-    end
-
-    im.SameLine()
-
-    -- Delete profile
-    if im.Button(tooltip.deleteProfile) then
-        if(profiles:getTotalProfiles() - 1 == 0) then
-            ui:showMessage(string.format(tooltip.deleteProfileError, profileName), 5)
+        if(totalProfiles == 0) then
             return
         end
 
-        profiles:deleteProfile(profiles:getActiveProfileID())
+        local tooltip = lang.strings
+
+        for i = 1, totalProfiles do
+            local activeProfile = profiles:getActiveProfileID()
+            local profileName = profiles:getProfileName(i)
+            local tabFlags = im.TabItemFlags_None
+
+            if(beam_dsx.main.tabSet == false) then
+                if(activeProfile == i) then
+                    tabFlags = im.TabItemFlags_SetSelected
+                    beam_dsx.main.tabSet = true
+                end
+            end
+
+            if im.BeginTabItem(profileName, nil, tabFlags) then
+                if(activeProfile ~= i and beam_dsx.main.tabSet) then
+                    beam_dsx:onTabChange(i)
+                end
+                im.EndTabItem()
+            end
+        end
+
+        if im.BeginTabItem("+", nil, im.TabItemFlags_None) then
+            local maxProfiles = profiles:getMaxProfiles()
+            local totalProfiles = profiles:getTotalProfiles()
+
+            if(maxProfiles >= totalProfiles + 1) then
+                -- Prevents from showing 'showCreateProfile' when user deletes a profile and last selected tab was '+'
+                if(tick - beam_dsx.main.preventCreateProfileFromOpeningTick > 0.5) then
+                    beam_dsx:showCreateProfile(true)
+                end
+            else
+                beam_dsx:showMessage(string.format(tooltip.profileCreateMaxError, totalProfiles, maxProfiles))
+            end
+
+            beam_dsx.main.tabSet = false
+            im.EndTabItem()
+        end
     end
 
-    if im.IsItemHovered() then
-        im.BeginTooltip()
-        im.Text(string.format(tooltip.deleteProfileHover, profileName))
-        im.EndTooltip()
-    end
-
-    im.SameLine()
-
-    -- Restore defaults to profile
-    if im.Button(tooltip.restoreProfile) then
-        profiles:setProfileSettings(profiles:getDefaultSettings())
-        settings = profiles:getProfileSettings()
-
-        ui:showMessage(string.format(tooltip.restoreProfileOk, profileName, tooltip.saveProfile), 10)
-    end
-
-    if im.IsItemHovered() then
-        im.BeginTooltip()
-        im.Text(string.format(tooltip.restoreProfileHover, profileName))
-        im.EndTooltip()
-    end
-
-    im.SameLine()
-
-    im.SetCursorPosX(im.GetWindowWidth() - 30)
-
-    -- Change language
-    if im.Button(tooltip.changeLanguage) then
-        text:switchLanguage()
-
-        -- Update current language
-        lang = text:getText()
-    end
-
-    if im.IsItemHovered() then
-        im.BeginTooltip()
-        im.Text(tooltip.changeLanguageHover)
-        im.EndTooltip()
-    end
+    im.EndTabBar()
 end
 
 local function renderProfileSettings()
@@ -328,7 +364,7 @@ local function renderProfileSettings()
     local setting = nil
     local tooltip = nil
 
-    im.BeginChild1("TriggerSettings", im.ImVec2(ui.constraints.main.width - 20, ui.constraints.main.height - ui.constraints.main.offsetWidth, ui.constraints.main.flags))
+    im.BeginChild1("TriggerSettings", im.ImVec2(beam_dsx.constraints.main.width - 20, beam_dsx.constraints.main.height - beam_dsx.constraints.main.offsetWidth, beam_dsx.constraints.main.flags))
 
     -- Throttle trigger
     if im.TreeNode1(lang.titles[1]) then
@@ -365,6 +401,8 @@ local function renderProfileSettings()
                 if im.TreeNode1(tooltip.titles[1]) then
                     local enable = im.BoolPtr(setting.enable)
 
+                    im.Spacing()
+
                     if im.Checkbox(lang.general.enable, enable) then
                         setting.enable = enable[0]
 
@@ -372,6 +410,8 @@ local function renderProfileSettings()
                             settings.throttle.rigidity.constant.enable = false
                         end
                     end
+
+                    im.Spacing()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
@@ -381,6 +421,7 @@ local function renderProfileSettings()
 
                     if(setting.enable == true) then
                         im.Separator()
+                        im.Spacing()
 
                         -- minForce
                         im.Text(tooltip.bySpeed.titles[1])
@@ -405,6 +446,8 @@ local function renderProfileSettings()
                             im.EndTooltip()
                         end
 
+                        im.Spacing()
+
                         -- maxForce
                         im.Text(tooltip.bySpeed.titles[2])
 
@@ -428,6 +471,8 @@ local function renderProfileSettings()
                             im.EndTooltip()
                         end
 
+                        im.Spacing()
+
                         -- maxForceAt
                         im.Text(tooltip.bySpeed.titles[3])
 
@@ -445,6 +490,9 @@ local function renderProfileSettings()
                             im.EndTooltip()
                         end
 
+                        im.Spacing()
+                        im.Spacing()
+
                         -- Inverted
                         local inverted = im.BoolPtr(setting.inverted)
 
@@ -452,7 +500,8 @@ local function renderProfileSettings()
                             setting.inverted = inverted[0]
                         end
 
-                        im.Separator()
+                        im.Spacing()
+                        im.Spacing()
                     end
 
                     im.TreePop()
@@ -464,6 +513,8 @@ local function renderProfileSettings()
                 if im.TreeNode1(tooltip.titles[2]) then
                     local enable = im.BoolPtr(setting.enable)
 
+                    im.Spacing()
+
                     if im.Checkbox(lang.general.enable, enable) then
                         setting.enable = enable[0]
 
@@ -471,6 +522,8 @@ local function renderProfileSettings()
                             settings.throttle.rigidity.bySpeed.enable = false
                         end
                     end
+
+                    im.Spacing()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
@@ -480,6 +533,7 @@ local function renderProfileSettings()
 
                     if(setting.enable == true) then
                         im.Separator()
+                        im.Spacing()
 
                         -- minForce
                         im.Text(tooltip.constant.titles[1])
@@ -498,6 +552,8 @@ local function renderProfileSettings()
                             im.EndTooltip()
                         end
 
+                        im.Spacing()
+
                         -- maxForce
                         im.Text(tooltip.constant.titles[2])
 
@@ -515,7 +571,8 @@ local function renderProfileSettings()
                             im.EndTooltip()
                         end
 
-                        im.Separator()
+                        im.Spacing()
+                        im.Spacing()
                     end
 
                     im.TreePop()
@@ -531,9 +588,13 @@ local function renderProfileSettings()
             if im.TreeNode1(lang.throttle.titles[2]) then
                 local enable = im.BoolPtr(setting.enable)
 
+                im.Spacing()
+
                 if im.Checkbox(lang.general.enable, enable) then
                     setting.enable = enable[0]
                 end
+
+                im.Spacing()
 
                 if im.IsItemHovered() then
                     im.BeginTooltip()
@@ -543,6 +604,7 @@ local function renderProfileSettings()
 
                 if(setting.enable == true) then
                     im.Separator()
+                    im.Spacing()
 
                     -- Tolerance
                     im.Text(tooltip.titles[1])
@@ -561,6 +623,8 @@ local function renderProfileSettings()
                         im.EndTooltip()
                     end
 
+                    im.Spacing()
+
                     -- maxForceAt 
                     im.Text(tooltip.titles[2])
 
@@ -578,6 +642,8 @@ local function renderProfileSettings()
                         im.EndTooltip()
                     end
 
+                    im.Spacing()
+
                     -- minHz 
                     im.Text(tooltip.titles[3])
 
@@ -585,7 +651,7 @@ local function renderProfileSettings()
 
                     local minHz  = im.FloatPtr(setting.minHz)
 
-                    if im.SliderFloat("hz##8", minHz, 0, 255, "%.0f") then
+                    if im.SliderFloat("hz##8", minHz, 0, 40, "%.0f") then
                         setting.minHz = minHz[0]
                     end
                 
@@ -595,6 +661,8 @@ local function renderProfileSettings()
                         im.EndTooltip()
                     end
 
+                    im.Spacing()
+
                     -- maxHz 
                     im.Text(tooltip.titles[4])
 
@@ -602,7 +670,7 @@ local function renderProfileSettings()
 
                     local maxHz  = im.FloatPtr(setting.maxHz)
 
-                    if im.SliderFloat("hz##9", maxHz, 0, 255, "%.0f") then
+                    if im.SliderFloat("hz##9", maxHz, 0, 40, "%.0f") then
                         setting.maxHz = maxHz[0]
                     end
 
@@ -611,6 +679,8 @@ local function renderProfileSettings()
                         im.Text(lang.general.maxHz)
                         im.EndTooltip()
                     end
+
+                    im.Spacing()
 
                     -- minAmplitude  
                     im.Text(tooltip.titles[5])
@@ -646,7 +716,8 @@ local function renderProfileSettings()
                         im.EndTooltip()
                     end
 
-                    im.Separator()
+                    im.Spacing()
+                    im.Spacing()
                 end
 
                 im.TreePop()
@@ -659,9 +730,13 @@ local function renderProfileSettings()
             if im.TreeNode1(lang.throttle.titles[3]) then
                 local enable = im.BoolPtr(setting.enable)
 
+                im.Spacing()
+
                 if im.Checkbox(lang.general.enable, enable) then
                     setting.enable = enable[0]
                 end
+
+                im.Spacing()
 
                 if im.IsItemHovered() then
                     im.BeginTooltip()
@@ -671,6 +746,7 @@ local function renderProfileSettings()
 
                 if(setting.enable) then
                     im.Separator()
+                    im.Spacing()
 
                     -- maxHz 
                     im.Text(tooltip.titles[1])
@@ -689,6 +765,8 @@ local function renderProfileSettings()
                         im.EndTooltip()
                     end
 
+                    im.Spacing()
+
                     -- maxForce  
                     im.Text(tooltip.titles[2])
 
@@ -705,6 +783,8 @@ local function renderProfileSettings()
                         im.Text(lang.general.maxForce)
                         im.EndTooltip()
                     end
+
+                    im.Spacing()
 
                     -- timeOn  
                     im.Text(tooltip.titles[3])
@@ -723,7 +803,8 @@ local function renderProfileSettings()
                         im.EndTooltip()
                     end
 
-                    im.Separator()
+                    im.Spacing()
+                    im.Spacing()
                 end
 
                 im.TreePop()
@@ -736,9 +817,13 @@ local function renderProfileSettings()
             if im.TreeNode1(lang.throttle.titles[4]) then
                 local enable = im.BoolPtr(setting.enable)
 
+                im.Spacing()
+
                 if im.Checkbox(lang.general.enable, enable) then
                     setting.enable = enable[0]
                 end
+
+                im.Spacing()
 
                 if im.IsItemHovered() then
                     im.BeginTooltip()
@@ -748,6 +833,7 @@ local function renderProfileSettings()
 
                 if(setting.enable == true) then
                     im.Separator()
+                    im.Spacing()
 
                     -- minHz 
                     im.Text(tooltip.titles[1])
@@ -766,6 +852,8 @@ local function renderProfileSettings()
                         im.EndTooltip()
                     end
 
+                    im.Spacing()
+
                     -- maxHz 
                     im.Text(tooltip.titles[2])
 
@@ -782,6 +870,8 @@ local function renderProfileSettings()
                         im.Text(lang.general.maxHz)
                         im.EndTooltip()
                     end
+
+                    im.Spacing()
 
                     -- maxForce  
                     im.Text(tooltip.titles[3])
@@ -800,6 +890,8 @@ local function renderProfileSettings()
                         im.EndTooltip()
                     end
 
+                    im.Spacing()
+
                     -- timeOn  
                     im.Text(tooltip.titles[4])
 
@@ -816,6 +908,134 @@ local function renderProfileSettings()
                         im.Text(tooltip.timeOn)
                         im.EndTooltip()
                     end
+
+                    im.Spacing()
+                    im.Spacing()
+                end
+
+                im.TreePop()
+            end
+
+            -- Red line
+            setting = settings.throttle.redLine
+            tooltip = lang.throttle.redLine
+
+            if im.TreeNode1(lang.throttle.titles[5]) then
+                local enable = im.BoolPtr(setting.enable)
+
+                im.Spacing()
+
+                if im.Checkbox(lang.general.enable, enable) then
+                    setting.enable = enable[0]
+                end
+
+                im.Spacing()
+
+                if im.IsItemHovered() then
+                    im.BeginTooltip()
+                    im.Text(tooltip.enable)
+                    im.EndTooltip()
+                end
+
+                if(setting.enable == true) then
+                    im.Separator()
+                    im.Spacing()
+
+                    -- startAt  
+                    im.Text(tooltip.titles[1])
+
+                    im.PushItemWidth(128)
+
+                    local startAt = im.FloatPtr(setting.startAt)
+
+                    if im.SliderFloat("%##800", startAt, 1, 100, "%.0f") then
+                        setting.startAt  = startAt[0]
+                    end
+
+                    if im.IsItemHovered() then
+                        im.BeginTooltip()
+                        im.Text(tooltip.startAt)
+                        im.EndTooltip()
+                    end
+
+                    im.Spacing()
+
+                    -- bounces  
+                    im.Text(tooltip.titles[2])
+
+                    im.PushItemWidth(128)
+
+                    local bounces = im.FloatPtr(setting.bounces)
+
+                    if im.SliderFloat("##801", bounces, 0, 8, "%.0f") then
+                        setting.bounces  = bounces[0]
+                    end
+
+                    if im.IsItemHovered() then
+                        im.BeginTooltip()
+                        im.Text(tooltip.bounces)
+                        im.EndTooltip()
+                    end
+
+                    im.Spacing()
+
+                    -- minHz 
+                    im.Text(tooltip.titles[3])
+
+                    im.PushItemWidth(128)
+
+                    local minHz  = im.FloatPtr(setting.minHz)
+
+                    if im.SliderFloat("hz##802", minHz, 1, 255, "%.0f") then
+                        setting.minHz = minHz[0]
+                    end
+
+                    if im.IsItemHovered() then
+                        im.BeginTooltip()
+                        im.Text(lang.general.minHz)
+                        im.EndTooltip()
+                    end
+
+                    im.Spacing()
+
+                    -- maxHz 
+                    im.Text(tooltip.titles[4])
+
+                    im.PushItemWidth(128)
+
+                    local maxHz  = im.FloatPtr(setting.maxHz)
+
+                    if im.SliderFloat("hz##803", maxHz, 1, 255, "%.0f") then
+                        setting.maxHz = maxHz[0]
+                    end
+
+                    if im.IsItemHovered() then
+                        im.BeginTooltip()
+                        im.Text(lang.general.maxHz)
+                        im.EndTooltip()
+                    end
+
+                    im.Spacing()
+
+                    -- vibrationForce  
+                    im.Text(tooltip.titles[5])
+
+                    im.PushItemWidth(128)
+
+                    local vibrationForce = im.FloatPtr(setting.vibrationForce)
+
+                    if im.SliderFloat("##805", vibrationForce, 1, 3, "%.0f") then
+                        setting.vibrationForce  = vibrationForce[0]
+                    end
+
+                    if im.IsItemHovered() then
+                        im.BeginTooltip()
+                        im.Text(lang.general.vibrationForce)
+                        im.EndTooltip()
+                    end
+
+                    im.Spacing()
+                    im.Spacing()
                 end
 
                 im.TreePop()
@@ -835,7 +1055,19 @@ local function renderProfileSettings()
             end
 
             im.Spacing()
-            im.Separator()
+
+            -- Engine on
+            setting = settings.throttle.engineOn
+            tooltip = lang.throttle
+
+            local enable = im.BoolPtr(setting.enable)
+
+            if im.Checkbox(tooltip.engineOn, enable) then
+                setting.enable = enable[0]
+            end
+
+            im.Spacing()
+            im.Spacing()
         end
 
         im.TreePop()
@@ -875,6 +1107,8 @@ local function renderProfileSettings()
                 if im.TreeNode1(lang.general.rigidity.titles[1]) then
                     local enable = im.BoolPtr(setting.enable)
 
+                    im.Spacing()
+
                     if im.Checkbox(lang.general.enable, enable) then
                         setting.enable = enable[0]
 
@@ -882,6 +1116,8 @@ local function renderProfileSettings()
                             settings.brake.rigidity.constant.enable = false
                         end
                     end
+
+                    im.Spacing()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
@@ -891,6 +1127,7 @@ local function renderProfileSettings()
 
                     if(setting.enable == true) then
                         im.Separator()
+                        im.Spacing()
 
                         -- minForce
                         im.Text(tooltip.bySpeed.titles[1])
@@ -915,6 +1152,8 @@ local function renderProfileSettings()
                             im.EndTooltip()
                         end
 
+                        im.Spacing()
+
                         -- maxForce
                         im.Text(tooltip.bySpeed.titles[2])
 
@@ -938,6 +1177,8 @@ local function renderProfileSettings()
                             im.EndTooltip()
                         end
 
+                        im.Spacing()
+
                         -- maxForceAt
                         im.Text(tooltip.bySpeed.titles[3])
 
@@ -955,6 +1196,9 @@ local function renderProfileSettings()
                             im.EndTooltip()
                         end
 
+                        im.Spacing()
+                        im.Spacing()
+
                         -- Inverted
                         local inverted = im.BoolPtr(setting.inverted)
 
@@ -962,7 +1206,8 @@ local function renderProfileSettings()
                             setting.inverted = inverted[0]
                         end
 
-                        im.Separator()
+                        im.Spacing()
+                        im.Spacing()
                     end
 
                     im.TreePop()
@@ -974,6 +1219,8 @@ local function renderProfileSettings()
                 if im.TreeNode1(tooltip.titles[2]) then
                     local enable = im.BoolPtr(setting.enable)
 
+                    im.Spacing()
+
                     if im.Checkbox(lang.general.enable, enable) then
                         setting.enable = enable[0]
 
@@ -981,6 +1228,8 @@ local function renderProfileSettings()
                             settings.brake.rigidity.bySpeed.enable = false
                         end
                     end
+
+                    im.Spacing()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
@@ -990,6 +1239,7 @@ local function renderProfileSettings()
 
                     if(setting.enable == true) then
                         im.Separator()
+                        im.Spacing()
 
                         -- minForce
                         im.Text(tooltip.constant.titles[1])
@@ -1008,6 +1258,8 @@ local function renderProfileSettings()
                             im.EndTooltip()
                         end
 
+                        im.Spacing()
+
                         -- maxForce
                         im.Text(tooltip.constant.titles[2])
 
@@ -1025,7 +1277,8 @@ local function renderProfileSettings()
                             im.EndTooltip()
                         end
 
-                        im.Separator()
+                        im.Spacing()
+                        im.Spacing()
                     end
 
                     im.TreePop()
@@ -1041,9 +1294,13 @@ local function renderProfileSettings()
             if im.TreeNode1(lang.brake.titles[2]) then
                 local enable = im.BoolPtr(setting.enable)
 
+                im.Spacing()
+
                 if im.Checkbox(lang.general.enable, enable) then
                     setting.enable = enable[0]
                 end
+
+                im.Spacing()
 
                 if im.IsItemHovered() then
                     im.BeginTooltip()
@@ -1053,6 +1310,7 @@ local function renderProfileSettings()
 
                 if(setting.enable == true) then
                     im.Separator()
+                    im.Spacing()
 
                     -- minHz 
                     im.Text(tooltip.titles[1])
@@ -1071,6 +1329,8 @@ local function renderProfileSettings()
                         im.EndTooltip()
                     end
 
+                    im.Spacing()
+
                     -- maxHz 
                     im.Text(tooltip.titles[2])
 
@@ -1088,6 +1348,8 @@ local function renderProfileSettings()
                         im.EndTooltip()
                     end
 
+                    im.Spacing()
+
                     -- minAmplitude  
                     im.Text(tooltip.titles[3])
                     im.PushItemWidth(128)
@@ -1103,6 +1365,8 @@ local function renderProfileSettings()
                         im.Text(lang.general.minAmplitude)
                         im.EndTooltip()
                     end
+
+                    im.Spacing()
 
                     -- maxAmplitude  
                     im.Text(tooltip.titles[4])
@@ -1120,11 +1384,13 @@ local function renderProfileSettings()
                         im.EndTooltip()
                     end
 
+                    im.Spacing()
                 end
 
                 im.TreePop()
             end
 
+            im.Spacing()
             im.Separator()
             im.Spacing()
 
@@ -1149,7 +1415,7 @@ local function renderProfileSettings()
             end
 
             im.Spacing()
-            im.Separator()
+            im.Spacing()
         end
 
         im.TreePop()
@@ -1179,639 +1445,1002 @@ local function renderProfileSettings()
         if(setting.enable) then
             im.Separator()
 
-            -- Hazard lights
-            setting = settings.lightBar.hazardLights
-            tooltip = lang.lightBar.hazardLights
+            if im.TreeNode1("Lightbar") then
+                -- Emergency braking
+                setting = settings.lightBar.emergencyBraking
+                tooltip = lang.lightBar.emergencyBraking
 
-            if im.TreeNode1(lang.lightBar.titles[1]) then
-                local enable = im.BoolPtr(setting.enable)
+                if im.TreeNode1(lang.lightBar.titles[4]) then
+                    local enable = im.BoolPtr(setting.enable)
 
-                if im.Checkbox(lang.general.enable, enable) then
-                    setting.enable = enable[0]
-                end
-
-                if im.IsItemHovered() then
-                    im.BeginTooltip()
-                    im.Text(tooltip.enable)
-                    im.EndTooltip()
-                end
-
-                if(setting.enable == true) then
-                    im.Separator()
-
-                    local r, g, b
-
-                    -- colorOn
-                    im.Text(tooltip.titles[1])
-
-                    r = im.FloatPtr(setting.colorOn[1])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("R##22", r, 0, 255, "%.0f") then
-                        setting.colorOn[1] = r[0]
-                    end
-
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOn)
-                        im.EndTooltip()
-                    end
-
-                    g = im.FloatPtr(setting.colorOn[2])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("G##23", g, 0, 255, "%.0f") then
-                        setting.colorOn[2] = g[0]
-                    end
-
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOn)
-                        im.EndTooltip()
-                    end
-
-                    b = im.FloatPtr(setting.colorOn[3])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("B##24", b, 0, 255, "%.0f") then
-                        setting.colorOn[3] = b[0]
-                    end
-
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOn)
-                        im.EndTooltip()
-                    end
-
-                    im.Separator()
-
-                    -- colorOff
-                    im.Text(tooltip.titles[2])
-
-                    r = im.FloatPtr(setting.colorOff[1])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("R##25", r, 0, 255, "%.0f") then
-                        setting.colorOff[1] = r[0]
-                    end
-
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOff)
-                        im.EndTooltip()
-                    end
-
-                    g = im.FloatPtr(setting.colorOff[2])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("G##26", g, 0, 255, "%.0f") then
-                        setting.colorOff[2] = g[0]
-                    end
-
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOff)
-                        im.EndTooltip()
-                    end
-
-                    b = im.FloatPtr(setting.colorOff[3])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("B##27", b, 0, 255, "%.0f") then
-                        setting.colorOff[3] = b[0]
-                    end
-
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOff)
-                        im.EndTooltip()
-                    end
-
-                    im.Separator()
-                end
-
-                im.TreePop()
-            end
-
-            -- Low fuel
-            setting = settings.lightBar.lowFuel
-            tooltip = lang.lightBar.lowFuel
-
-            if im.TreeNode1(lang.lightBar.titles[2]) then
-                local enable = im.BoolPtr(setting.enable)
-
-                if im.Checkbox(lang.general.enable, enable) then
-                    setting.enable = enable[0]
-                end
-
-                if im.IsItemHovered() then
-                    im.BeginTooltip()
-                    im.Text(tooltip.enable)
-                    im.EndTooltip()
-                end
-
-                if(setting.enable == true) then
-                    im.Separator()
-
-                    -- timeOn
-                    im.Text(tooltip.titles[1])
-
-                    local timeOn = im.FloatPtr(setting.timeOn)
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("ms##28", timeOn, 0, 5000, "%.0f") then
-                        setting.timeOn = timeOn[0]
-                    end
-                
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(lang.general.micLed.timeOn)
-                        im.EndTooltip()
-                    end
-
-                    -- timeOff
-                    im.Text(tooltip.titles[2])
-
-                    local timeOff = im.FloatPtr(setting.timeOff)
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("ms##29", timeOff, 0, 5000, "%.0f") then
-                        setting.timeOff = timeOff[0]
-                    end
-                
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(lang.general.micLed.timeOff)
-                        im.EndTooltip()
-                    end
-
-                    im.Separator()
-                end
-
-                im.TreePop()
-            end
-
-            -- Parking brake
-            setting = settings.lightBar.parkingBrake
-            tooltip = lang.lightBar.parkingBrake
-
-            if im.TreeNode1(lang.lightBar.titles[3]) then
-                local enable = im.BoolPtr(setting.enable)
-
-                if im.Checkbox(lang.general.enable, enable) then
-                    setting.enable = enable[0]
-                end
-
-                if im.IsItemHovered() then
-                    im.BeginTooltip()
-                    im.Text(tooltip.enable) 
-                    im.EndTooltip()
-                end
-
-                if(setting.enable == true) then
-                    im.Separator()
-
-                    -- timeOn
-                    im.Text(tooltip.titles[1])
-
-                    local timeOn = im.FloatPtr(setting.timeOn)
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("ms##29", timeOn, 0, 5000, "%.0f") then
-                        setting.timeOn = timeOn[0]
-                    end
-                
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(lang.general.micLed.timeOn)
-                        im.EndTooltip()
-                    end
-
-                    -- timeOff
-                    im.Text(tooltip.titles[2])
-
-                    local timeOff = im.FloatPtr(setting.timeOff)
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("ms##30", timeOff, 0, 5000, "%.0f") then
-                        setting.timeOff = timeOff[0]
-                    end
-                
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(lang.general.micLed.timeOff)
-                        im.EndTooltip()
-                    end
-
-                    im.Separator()
-                end
-
-                im.TreePop()
-            end
-
-            -- Emergency braking
-            setting = settings.lightBar.emergencyBraking
-            tooltip = lang.lightBar.emergencyBraking
-
-            if im.TreeNode1(lang.lightBar.titles[4]) then
-                local enable = im.BoolPtr(setting.enable)
-
-                if im.Checkbox(lang.general.enable, enable) then
-                    setting.enable = enable[0]
-                end
-
-                if im.IsItemHovered() then
-                    im.BeginTooltip()
-                    im.Text(tooltip.enable)
-                    im.EndTooltip()
-                end
-
-                if(setting.enable == true) then
-                    im.Separator()
-
-                    local r, g, b
-
-                    -- colorOn
-                    im.Text(tooltip.titles[1])
-
-                    r = im.FloatPtr(setting.colorOn[1])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("R##31", r, 0, 255, "%.0f") then
-                        setting.colorOn[1] = r[0]
-                    end
-
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOn)
-                        im.EndTooltip()
-                    end
-
-                    g = im.FloatPtr(setting.colorOn[2])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("G##32", g, 0, 255, "%.0f") then
-                        setting.colorOn[2] = g[0]
-                    end
-
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOn)
-                        im.EndTooltip()
-                    end
-
-                    b = im.FloatPtr(setting.colorOn[3])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("B##33", b, 0, 255, "%.0f") then
-                        setting.colorOn[3] = b[0]
-                    end
-
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOn)
-                        im.EndTooltip()
-                    end
-
-                    im.Separator()
-
-                    -- colorOff
-                    im.Text(tooltip.titles[2])
-
-                    r = im.FloatPtr(setting.colorOff[1])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("R##34", r, 0, 255, "%.0f") then
-                        setting.colorOff[1] = r[0]
-                    end
-
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOff)
-                        im.EndTooltip()
-                    end
-
-                    g = im.FloatPtr(setting.colorOff[2])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("G##35", g, 0, 255, "%.0f") then
-                        setting.colorOff[2] = g[0]
-                    end
-
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOff)
-                        im.EndTooltip()
-                    end
-
-                    b = im.FloatPtr(setting.colorOff[3])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("B##36", b, 0, 255, "%.0f") then
-                        setting.colorOff[3] = b[0]
-                    end
-
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOff)
-                        im.EndTooltip()
-                    end
-
-                    im.Separator()
                     im.Spacing()
 
-                    -- alwaysBlink
-                    local enable = im.BoolPtr(setting.alwaysBlink)
-
-                    if im.Checkbox(tooltip.alwaysBlink, enable) then
-                        setting.alwaysBlink = enable[0]
+                    if im.Checkbox(lang.general.enable, enable) then
+                        setting.enable = enable[0]
                     end
+
+                    im.Spacing()
+
+                    if im.IsItemHovered() then
+                        im.BeginTooltip()
+                        im.Text(tooltip.enable)
+                        im.EndTooltip()
+                    end
+
+                    if(setting.enable) then
+                        im.Separator()
+                        im.Spacing()
+
+                        local r, g, b
+
+                        -- colorOn R
+                        im.Text(tooltip.titles[1])
+
+                        r = im.FloatPtr(setting.colorOn[1])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("R##31", r, 0, 255, "%.0f") then
+                            setting.colorOn[1] = r[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOn G
+                        g = im.FloatPtr(setting.colorOn[2])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("G##32", g, 0, 255, "%.0f") then
+                            setting.colorOn[2] = g[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOn B
+                        b = im.FloatPtr(setting.colorOn[3])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("B##33", b, 0, 255, "%.0f") then
+                            setting.colorOn[3] = b[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOff R
+                        im.Text(tooltip.titles[2])
+
+                        r = im.FloatPtr(setting.colorOff[1])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("R##34", r, 0, 255, "%.0f") then
+                            setting.colorOff[1] = r[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOff)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOff G
+                        g = im.FloatPtr(setting.colorOff[2])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("G##35", g, 0, 255, "%.0f") then
+                            setting.colorOff[2] = g[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOff)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOff B
+                        b = im.FloatPtr(setting.colorOff[3])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("B##36", b, 0, 255, "%.0f") then
+                            setting.colorOff[3] = b[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOff)
+                            im.EndTooltip()
+                        end
+                        
+                        im.Spacing()
+                        im.Separator()
+                        im.Spacing()
+
+                        -- alwaysBlink - checkbox
+                        local enable = im.BoolPtr(setting.alwaysBlink)
+
+                        if im.Checkbox(tooltip.alwaysBlink, enable) then
+                            setting.alwaysBlink = enable[0]
+                        end
+
+                        im.Spacing()
+                        im.Spacing()
+                    end
+
+                    im.TreePop()
                 end
+
+                -- Hazard lights
+                setting = settings.lightBar.hazardLights
+                tooltip = lang.lightBar.hazardLights
+
+                if im.TreeNode1(lang.lightBar.titles[1]) then
+                    local enable = im.BoolPtr(setting.enable)
+
+                    im.Spacing()
+
+                    if im.Checkbox(lang.general.enable, enable) then
+                        setting.enable = enable[0]
+                    end
+
+                    im.Spacing()
+
+                    if im.IsItemHovered() then
+                        im.BeginTooltip()
+                        im.Text(tooltip.enable)
+                        im.EndTooltip()
+                    end
+
+                    if(setting.enable == true) then
+                        im.Separator()
+                        im.Spacing()
+
+                        local r, g, b
+
+                        -- colorOn R
+                        im.Text(tooltip.titles[1])
+
+                        r = im.FloatPtr(setting.colorOn[1])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("R##22", r, 0, 255, "%.0f") then
+                            setting.colorOn[1] = r[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOn G
+                        g = im.FloatPtr(setting.colorOn[2])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("G##23", g, 0, 255, "%.0f") then
+                            setting.colorOn[2] = g[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOn B
+                        b = im.FloatPtr(setting.colorOn[3])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("B##24", b, 0, 255, "%.0f") then
+                            setting.colorOn[3] = b[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOff R
+                        im.Text(tooltip.titles[2])
+
+                        r = im.FloatPtr(setting.colorOff[1])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("R##25", r, 0, 255, "%.0f") then
+                            setting.colorOff[1] = r[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOff)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOff G
+                        g = im.FloatPtr(setting.colorOff[2])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("G##26", g, 0, 255, "%.0f") then
+                            setting.colorOff[2] = g[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOff)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOff B
+                        b = im.FloatPtr(setting.colorOff[3])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("B##27", b, 0, 255, "%.0f") then
+                            setting.colorOff[3] = b[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOff)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+                        im.Spacing()
+                    end
+
+                    im.TreePop()
+                end
+
+                -- Reverse
+                setting = settings.lightBar.reverse
+                tooltip = lang.lightBar.reverse
+
+                if im.TreeNode1(lang.lightBar.titles[7]) then
+                    local enable = im.BoolPtr(setting.enable)
+
+                    im.Spacing()
+
+                    if im.Checkbox(lang.general.enable, enable) then
+                        setting.enable = enable[0]
+                    end
+
+                    im.Spacing()
+
+                    if im.IsItemHovered() then
+                        im.BeginTooltip()
+                        im.Text(tooltip.enable)
+                        im.EndTooltip()
+                    end
+
+                    if(setting.enable == true) then
+                        im.Separator()
+                        im.Spacing()
+
+                        local r, g, b
+
+                        -- colorOn R
+                        im.Text(tooltip.titles[1])
+
+                        r = im.FloatPtr(setting.colorOn[1])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("R##47", r, 0, 255, "%.0f") then
+                            setting.colorOn[1] = r[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOn G
+                        g = im.FloatPtr(setting.colorOn[2])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("G##48", g, 0, 255, "%.0f") then
+                            setting.colorOn[2] = g[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOn B
+                        b = im.FloatPtr(setting.colorOn[3])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("B##49", b, 0, 255, "%.0f") then
+                            setting.colorOn[3] = b[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+                        im.Spacing()
+                    end
+
+                    im.TreePop()
+                end
+
+                -- Tachometer
+                setting = settings.lightBar.tachometer
+                tooltip = lang.lightBar.tachometer
+
+                if im.TreeNode1(lang.lightBar.titles[5]) then
+                    local enable = im.BoolPtr(setting.enable)
+
+                    im.Spacing()
+
+                    if im.Checkbox(lang.general.enable, enable) then
+                        setting.enable = enable[0]
+                    end
+
+                    im.Spacing()
+
+                    if im.IsItemHovered() then
+                        im.BeginTooltip()
+                        im.Text(tooltip.enable)
+                        im.EndTooltip()
+                    end
+
+                    if(setting.enable == true) then
+                        im.Separator()
+                        im.Spacing()
+
+                        local r, g, b
+
+                        -- colorLow R
+                        im.Text(tooltip.titles[1])
+
+                        r = im.FloatPtr(setting.colorLow[1])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("R##37", r, 0, 255, "%.0f") then
+                            setting.colorLow[1] = r[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorLow)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorLow G
+                        g = im.FloatPtr(setting.colorLow[2])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("G##38", g, 0, 255, "%.0f") then
+                            setting.colorLow[2] = g[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorLow)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorLow B
+                        b = im.FloatPtr(setting.colorLow[3])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("B##39", b, 0, 255, "%.0f") then
+                            setting.colorLow[3] = b[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorLow)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorMed R
+                        im.Text(tooltip.titles[2])
+
+                        r = im.FloatPtr(setting.colorMed[1])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("R##40", r, 0, 255, "%.0f") then
+                            setting.colorMed[1] = r[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorMed)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorMed G
+                        g = im.FloatPtr(setting.colorMed[2])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("G##41", g, 0, 255, "%.0f") then
+                            setting.colorMed[2] = g[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorMed)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorMed B
+                        b = im.FloatPtr(setting.colorMed[3])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("B##42", b, 0, 255, "%.0f") then
+                            setting.colorMed[3] = b[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorMed)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorHi R
+                        im.Text(tooltip.titles[3])
+
+                        r = im.FloatPtr(setting.colorHi[1])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("R##43", r, 0, 255, "%.0f") then
+                            setting.colorHi[1] = r[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorHi)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorHi G
+                        g = im.FloatPtr(setting.colorHi[2])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("G##44", g, 0, 255, "%.0f") then
+                            setting.colorHi[2] = g[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorHi)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorHi B
+                        b = im.FloatPtr(setting.colorHi[3])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("B##45", b, 0, 255, "%.0f") then
+                            setting.colorHi[3] = b[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorHi)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+                    end
+
+                    im.TreePop()
+                end
+
+                -- Vehicle damage
+                setting = settings.lightBar.vehicleDamage
+                tooltip = lang.lightBar.vehicleDamage
+
+                if im.TreeNode1(lang.lightBar.titles[8]) then
+                    local enable = im.BoolPtr(setting.enable)
+
+                    im.Spacing()
+
+                    if im.Checkbox(lang.general.enable, enable) then
+                        setting.enable = enable[0]
+                    end
+
+                    im.Spacing()
+
+                    if im.IsItemHovered() then
+                        im.BeginTooltip()
+                        im.Text(tooltip.enable)
+                        im.EndTooltip()
+                    end
+
+                    if(setting.enable == true) then
+                        im.Separator()
+                        im.Spacing()
+
+                        local r, g, b
+
+                        -- timeOn
+                        im.Text(tooltip.titles[1])
+
+                        local timeOn = im.FloatPtr(setting.timeOn)
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("ms##900", timeOn, 500, 10000, "%.0f") then
+                            setting.timeOn = timeOn[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.timeOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- blinkSpeed
+                        im.Text(tooltip.titles[2])
+
+                        local blinkSpeed = im.FloatPtr(setting.blinkSpeed)
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("##901", blinkSpeed, 2, 10, "%.0f") then
+                            setting.blinkSpeed = blinkSpeed[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.blinkSpeed)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOn
+                        im.Text(tooltip.titles[3])
+
+                        -- colorOn R
+                        r = im.FloatPtr(setting.colorOn[1])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("R##902", r, 0, 255, "%.0f") then
+                            setting.colorOn[1] = r[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOn G
+                        g = im.FloatPtr(setting.colorOn[2])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("G##903", g, 0, 255, "%.0f") then
+                            setting.colorOn[2] = g[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOn B
+                        b = im.FloatPtr(setting.colorOn[3])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("B##904", b, 0, 255, "%.0f") then
+                            setting.colorOn[3] = b[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOff
+                        im.Text(tooltip.titles[4])
+
+                        -- colorOff R
+                        r = im.FloatPtr(setting.colorOff[1])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("R##905", r, 0, 255, "%.0f") then
+                            setting.colorOff[1] = r[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOff)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOff G
+                        g = im.FloatPtr(setting.colorOff[2])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("G##906", g, 0, 255, "%.0f") then
+                            setting.colorOff[2] = g[0]
+                        end
+
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOff)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- colorOff B
+                        b = im.FloatPtr(setting.colorOff[3])
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("B##907", b, 0, 255, "%.0f") then
+                            setting.colorOff[3] = b[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.colorOff)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+                    end
+
+                    im.TreePop()
+                end
+
+                -- Drive mode switch
+                setting = settings.lightBar.driveMode
+                tooltip = lang.lightBar.driveMode
+
+                if im.TreeNode1(lang.lightBar.titles[9]) then
+                    local enable = im.BoolPtr(setting.enable)
+
+                    im.Spacing()
+
+                    if im.Checkbox(lang.general.enable, enable) then
+                        setting.enable = enable[0]
+                    end
+
+                    im.Spacing()
+
+                    if im.IsItemHovered() then
+                        im.BeginTooltip()
+                        im.Text(tooltip.enable)
+                        im.EndTooltip()
+                    end
+
+                    if(setting.enable == true) then
+                        im.Separator()
+                        im.Spacing()
+
+                        local r, g, b
+
+                        -- blinkTime
+                        im.Text(tooltip.titles[1])
+
+                        local blinkTime = im.FloatPtr(setting.blinkTime)
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("ms##600", blinkTime, 500, 10000, "%.0f") then
+                            setting.blinkTime = blinkTime[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(tooltip.blinkTime)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+                    end
+
+                    im.TreePop()
+                end
+
+                im.Spacing()
+                im.Separator()
+                im.Spacing()
+
+                -- Police chase
+                setting = settings.lightBar.policeChase
+                tooltip = lang.lightBar.policeChase
+
+                local enable = im.BoolPtr(setting.enable)
+
+                if im.Checkbox(tooltip.enable, enable) then
+                    setting.enable = enable[0]
+                end
+
+                im.Spacing()
+                im.Spacing()
 
                 im.TreePop()
             end
 
-            -- Tachometer
-            setting = settings.lightBar.tachometer
-            tooltip = lang.lightBar.tachometer
+            if im.TreeNode1("Microphone LED") then
+                -- Low fuel
+                setting = settings.lightBar.lowFuel
+                tooltip = lang.lightBar.lowFuel
 
-            if im.TreeNode1(lang.lightBar.titles[5]) then
+                if im.TreeNode1(lang.lightBar.titles[2]) then
+                    local enable = im.BoolPtr(setting.enable)
+
+                    im.Spacing()
+
+                    if im.Checkbox(lang.general.enable, enable) then
+                        setting.enable = enable[0]
+                    end
+
+                    im.Spacing()
+
+                    if im.IsItemHovered() then
+                        im.BeginTooltip()
+                        im.Text(tooltip.enable)
+                        im.EndTooltip()
+                    end
+
+                    if(setting.enable == true) then
+                        im.Separator()
+                        im.Spacing()
+
+                        -- timeOn
+                        im.Text(tooltip.titles[1])
+
+                        local timeOn = im.FloatPtr(setting.timeOn)
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("ms##28", timeOn, 0, 5000, "%.0f") then
+                            setting.timeOn = timeOn[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(lang.general.micLed.timeOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- timeOff
+                        im.Text(tooltip.titles[2])
+
+                        local timeOff = im.FloatPtr(setting.timeOff)
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("ms##29", timeOff, 0, 5000, "%.0f") then
+                            setting.timeOff = timeOff[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(lang.general.micLed.timeOff)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+                        im.Spacing()
+                    end
+
+                    im.TreePop()
+                end
+
+                -- Parking brake
+                setting = settings.lightBar.parkingBrake
+                tooltip = lang.lightBar.parkingBrake
+
+                if im.TreeNode1(lang.lightBar.titles[3]) then
+                    local enable = im.BoolPtr(setting.enable)
+
+                    im.Spacing()
+
+                    if im.Checkbox(lang.general.enable, enable) then
+                        setting.enable = enable[0]
+                    end
+
+                    im.Spacing()
+
+                    if im.IsItemHovered() then
+                        im.BeginTooltip()
+                        im.Text(tooltip.enable) 
+                        im.EndTooltip()
+                    end
+
+                    if(setting.enable == true) then
+                        im.Separator()
+                        im.Spacing()
+
+                        -- timeOn
+                        im.Text(tooltip.titles[1])
+
+                        local timeOn = im.FloatPtr(setting.timeOn)
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("ms##29", timeOn, 0, 5000, "%.0f") then
+                            setting.timeOn = timeOn[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(lang.general.micLed.timeOn)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+
+                        -- timeOff
+                        im.Text(tooltip.titles[2])
+
+                        local timeOff = im.FloatPtr(setting.timeOff)
+
+                        im.PushItemWidth(128)
+
+                        if im.SliderFloat("ms##30", timeOff, 0, 5000, "%.0f") then
+                            setting.timeOff = timeOff[0]
+                        end
+                
+                        if im.IsItemHovered() then
+                            im.BeginTooltip()
+                            im.Text(lang.general.micLed.timeOff)
+                            im.EndTooltip()
+                        end
+
+                        im.Spacing()
+                    end
+
+                    im.TreePop()
+                end
+
+                im.Spacing()
+                im.Separator()
+                im.Spacing()
+
+                -- Traction Control System (TCS)
+                setting = settings.lightBar.tcs
+                tooltip = lang.lightBar.tcs
+
                 local enable = im.BoolPtr(setting.enable)
 
-                if im.Checkbox(lang.general.enable, enable) then
+                if im.Checkbox(tooltip.enable, enable) then
                     setting.enable = enable[0]
                 end
 
-                if im.IsItemHovered() then
-                    im.BeginTooltip()
-                    im.Text(tooltip.enable)
-                    im.EndTooltip()
-                end
-
-                if(setting.enable == true) then
-                    im.Separator()
-
-                    local r, g, b
-
-                    -- colorLow
-                    im.Text(tooltip.titles[1])
-
-                    r = im.FloatPtr(setting.colorLow[1])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("R##37", r, 0, 255, "%.0f") then
-                        setting.colorLow[1] = r[0]
-                    end
-                
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorLow)
-                        im.EndTooltip()
-                    end
-
-                    g = im.FloatPtr(setting.colorLow[2])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("G##38", g, 0, 255, "%.0f") then
-                        setting.colorLow[2] = g[0]
-                    end
-                
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorLow)
-                        im.EndTooltip()
-                    end
-
-                    b = im.FloatPtr(setting.colorLow[3])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("B##39", b, 0, 255, "%.0f") then
-                        setting.colorLow[3] = b[0]
-                    end
-                
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorLow)
-                        im.EndTooltip()
-                    end
-
-                    im.Separator()
-
-                    -- colorMed
-                    im.Text(tooltip.titles[2])
-
-                    r = im.FloatPtr(setting.colorMed[1])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("R##40", r, 0, 255, "%.0f") then
-                        setting.colorMed[1] = r[0]
-                    end
-
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorMed)
-                        im.EndTooltip()
-                    end
-
-                    g = im.FloatPtr(setting.colorMed[2])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("G##41", g, 0, 255, "%.0f") then
-                        setting.colorMed[2] = g[0]
-                    end
-
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorMed)
-                        im.EndTooltip()
-                    end
-
-                    b = im.FloatPtr(setting.colorMed[3])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("B##42", b, 0, 255, "%.0f") then
-                        setting.colorMed[3] = b[0]
-                    end
-                
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorMed)
-                        im.EndTooltip()
-                    end
-
-                    im.Separator()
-
-                    -- colorHi
-                    im.Text(tooltip.titles[3])
-
-                    r = im.FloatPtr(setting.colorHi[1])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("R##43", r, 0, 255, "%.0f") then
-                        setting.colorHi[1] = r[0]
-                    end
-                
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorHi)
-                        im.EndTooltip()
-                    end
-
-                    g = im.FloatPtr(setting.colorHi[2])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("G##44", g, 0, 255, "%.0f") then
-                        setting.colorHi[2] = g[0]
-                    end
-                
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorHi)
-                        im.EndTooltip()
-                    end
-
-                    b = im.FloatPtr(setting.colorHi[3])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("B##45", b, 0, 255, "%.0f") then
-                        setting.colorHi[3] = b[0]
-                    end
-                
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorHi)
-                        im.EndTooltip()
-                    end
-
-                    im.Separator()
-                end
+                im.Spacing()
+                im.Spacing()
 
                 im.TreePop()
             end
 
-            -- Reverse
-            setting = settings.lightBar.reverse
-            tooltip = lang.lightBar.reverse
+            if im.TreeNode1("Player LED") then
+                im.Spacing()
+                im.Spacing()
 
-            if im.TreeNode1(lang.lightBar.titles[7]) then
+                -- Electronic Stability Control (ESC)
+                setting = settings.lightBar.esc
+                tooltip = lang.lightBar.esc
+
                 local enable = im.BoolPtr(setting.enable)
 
-                if im.Checkbox(lang.general.enable, enable) then
+                if im.Checkbox(tooltip.enable, enable) then
                     setting.enable = enable[0]
                 end
-
-                if im.IsItemHovered() then
-                    im.BeginTooltip()
-                    im.Text(tooltip.enable)
-                    im.EndTooltip()
-                end
-
-                if(setting.enable == true) then
-                    im.Separator()
-
-                    local r, g, b
-
-                    -- colorOn
-                    im.Text(tooltip.titles[1])
-
-                    r = im.FloatPtr(setting.colorOn[1])
-
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("R##47", r, 0, 255, "%.0f") then
-                        setting.colorOn[1] = r[0]
-                    end
                 
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOn)
-                        im.EndTooltip()
-                    end
+                im.Spacing()
 
-                    g = im.FloatPtr(setting.colorOn[2])
+                -- Police stars
+                setting = settings.lightBar.policeStars
+                tooltip = lang.lightBar.policeStars
 
-                    im.PushItemWidth(128)
+                local enable = im.BoolPtr(setting.enable)
 
-                    if im.SliderFloat("G##48", g, 0, 255, "%.0f") then
-                        setting.colorOn[2] = g[0]
-                    end
-                
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOn)
-                        im.EndTooltip()
-                    end
+                if im.Checkbox(tooltip.enable, enable) then
+                    setting.enable = enable[0]
+                end 
 
-                    b = im.FloatPtr(setting.colorOn[3])
+                im.Spacing()
 
-                    im.PushItemWidth(128)
-
-                    if im.SliderFloat("B##49", b, 0, 255, "%.0f") then
-                        setting.colorOn[3] = b[0]
-                    end
-                
-                    if im.IsItemHovered() then
-                        im.BeginTooltip()
-                        im.Text(tooltip.colorOn)
-                        im.EndTooltip()
-                    end
-                end
+                im.TreePop()
             end
-            
-            im.Separator()
-            im.Spacing()
-
-            -- Traction Control System (TCS)
-            setting = settings.lightBar.tcs
-            tooltip = lang.lightBar.tcs
-
-            local enable = im.BoolPtr(setting.enable)
-
-            if im.Checkbox(tooltip.enable, enable) then
-                setting.enable = enable[0]
-            end
-
-            im.Spacing()
-
-            -- Electronic Stability Control (ESC)
-            setting = settings.lightBar.esc
-            tooltip = lang.lightBar.esc
-
-            local enable = im.BoolPtr(setting.enable)
-
-            if im.Checkbox(tooltip.enable, enable) then
-                setting.enable = enable[0]
-            end
-
-            im.Spacing()
-            im.Separator()
-
-            im.TreePop()
         end
 
         im.TreePop()
@@ -1823,22 +2452,21 @@ local function renderProfileSettings()
 
     -- Profile settings
     if im.TreeNode1(string.format(lang.titles[4], profiles:getProfileName())) then
-        setting = settings.lightBar
         tooltip = lang.profile
 
         -- Profile name
         if im.TreeNode1(tooltip.titles[1]) then
             tooltip = lang.profile.rename
 
-            --im.Text(tooltip.titles[1])
+            im.Text(tooltip.titles[1])
 
-            im.Spacing()
+            --im.Separator()
             --im.Separator()
             im.Spacing()
 
             im.PushItemWidth(185)
 
-            if im.InputText("##profileRenameName", ui.main.profileRenameName, 32, im.InputTextFlags_EnterReturnsTrue) then
+            if im.InputText("##profileRenameName", beam_dsx.main.profileRenameName, 32, im.InputTextFlags_EnterReturnsTrue) then
                 
             end
 
@@ -1932,7 +2560,7 @@ local function renderProfileSettings()
             -- brightness
             im.Text(tooltip.titles[1])
 
-            im.Spacing()
+            --im.Spacing()
             --im.Separator()
             im.Spacing()
 
@@ -1957,88 +2585,64 @@ local function renderProfileSettings()
             im.TreePop()
         end
 
+        -- Profile based on vehicle
+        tooltip = lang.profile
+
+        if im.TreeNode1(tooltip.titles[4]) then
+            tooltip = lang.profile.perVehicle
+
+            local enable = im.BoolPtr(not (ffi.string(beam_dsx.main.profileVehicle) == ""))
+
+            im.Spacing()
+
+            if im.Checkbox(lang.general.enable, enable) then
+               if(enable[0]) then
+                    beam_dsx.main.profileVehicle = im.ArrayChar(32, utils.getVehicleName())
+               else
+                    beam_dsx.main.profileVehicle = im.ArrayChar(32, "")
+               end
+            end
+
+            im.Spacing()
+
+            if im.IsItemHovered() then
+                im.BeginTooltip()
+                im.Text(tooltip.enableHover)
+                im.EndTooltip()
+            end
+
+            if(enable[0]) then
+                im.PushTextWrapPos(0.0)
+                im.Text(tooltip.titles[1])
+                im.PopTextWrapPos()
+
+                im.Spacing()
+                --im.Separator()
+                im.Spacing()
+
+                im.PushItemWidth(185)
+
+                if im.InputText("##profileVehicle", beam_dsx.main.profileVehicle, 32, im.InputTextFlags_EnterReturnsTrue) then
+                
+                end
+
+                if im.IsItemHovered() then
+                    im.BeginTooltip()
+                    im.Text(lang.profile.hover, lang.strings.saveProfile)
+                    im.EndTooltip()
+                end
+
+                im.Spacing()
+                im.Separator()
+            end
+
+            im.TreePop()
+        end
+
         im.TreePop()
     end
 
     im.EndChild()
-end
-
-local function renderTabs()
-	if im.BeginTabBar("Profiles") then
-        local totalProfiles = profiles:getTotalProfiles()
-
-        if(totalProfiles == 0) then
-            return
-        end
-
-        local tooltip = lang.strings
-
-        for i = 1, totalProfiles do
-            local activeProfile = profiles:getActiveProfileID()
-            local profileName = profiles:getProfileName(i)
-            local tabFlags = im.TabItemFlags_None
-
-            if(ui.main.tabSet == false) then
-                if(activeProfile == i) then
-                    tabFlags = im.TabItemFlags_SetSelected
-                    ui.main.tabSet = true
-                end
-            end
-
-            if im.BeginTabItem(profileName, nil, tabFlags) then
-                if(activeProfile ~= i and ui.main.tabSet) then
-                    profiles:setActiveProfile(i)
-
-                    settings = profiles:getProfileSettings()
-                    ui.main.tabSet = false
-
-                    ui:mailboxToVE("profile_change")
-
-                    ui.main.profileRenameName = im.ArrayChar(32, profileName)
-
-                    ui:showMessage(string.format(tooltip.profileActive, profileName), 5)
-                end
-                im.EndTabItem()
-            end
-        end
-
-        if im.BeginTabItem("+", nil, im.TabItemFlags_None) then
-            local maxProfiles = profiles:getMaxProfiles()
-            local totalProfiles = profiles:getTotalProfiles()
-
-            if(maxProfiles >= totalProfiles + 1) then
-                -- Prevents from showing 'showCreateProfile' when user deletes a profile and last selected tab was '+'
-                if(tick - ui.main.preventCreateProfileFromOpeningTick > 0.5) then
-                    showCreateProfile(true)
-                end
-            else
-                ui:showMessage(string.format(tooltip.profileCreateMaxError, totalProfiles, maxProfiles))
-            end
-
-            ui.main.tabSet = false
-            im.EndTabItem()
-        end
-    end
-
-    im.EndTabBar()
-end
-
-local function renderNotificationMessage()
-    im.Separator()
-
-    local elapsed = tick - ui.message.tick
-    local fadeTime = 0.25
-
-    if(elapsed < ui.message.duration) then
-        ui.message.progress = (elapsed <= fadeTime) and (elapsed / fadeTime) or (elapsed >= ui.message.duration - fadeTime) and (1 - (elapsed - (ui.message.duration - fadeTime)) / fadeTime) or ui.message.progress
-        ui.message.progress = ui.message.progress > 1 and 1 or ui.message.progress
-        ui.message.progress = ui.message.progress < 0 and 0 or ui.message.progress
-
-        im.TextColored(im.ImVec4(1, 1, 1, 1 * ui.message.progress), ui.message.str or "")
-        return
-    end
-
-    im.TextColored(im.ImVec4(1, 1, 1, 0.9), string.format(lang.strings.activeProfile, profiles:getProfileName()))
 end
 
 local function renderModSettings()
@@ -2051,7 +2655,6 @@ local function renderModSettings()
 
     if im.Checkbox(tooltip.modEnable, enable) then
         profiles:setProfilesEnabled(enable[0])
-        ui:mailboxToVE("mod_enable_disable")
     end
 
     if im.IsItemHovered() then
@@ -2065,7 +2668,7 @@ local function renderModSettings()
 
     if im.Checkbox(tooltip.allowBeamMp, enable) then
         profiles:setBeamMpAllowed(enable[0])
-        ui:checkEnableBeamMp()
+        beam_dsx:toggleBeamMpHook()
     end
 
     if im.IsItemHovered() then
@@ -2077,17 +2680,92 @@ local function renderModSettings()
     im.Spacing()
 end
 
+local function renderButtons()
+    if(not settings) then
+        return
+    end
+
+    local tooltip = lang.strings
+    local profileName = profiles:getProfileName()
+
+    im.Separator()
+    im.Spacing()
+
+    -- Save profile
+    if im.Button(tooltip.saveProfile) then
+        beam_dsx:onSaveProfile()
+    end
+
+    if im.IsItemHovered() then
+        im.BeginTooltip()
+        im.Text(tooltip.saveProfileHovered)
+        im.EndTooltip()
+    end
+
+    im.SameLine()
+
+    -- Delete profile
+    if im.Button(tooltip.deleteProfile) then
+        beam_dsx:onDeleteProfile()
+    end
+
+    if im.IsItemHovered() then
+        im.BeginTooltip()
+        im.Text(string.format(tooltip.deleteProfileHover, profileName))
+        im.EndTooltip()
+    end
+
+    im.SameLine()
+
+    -- Restore defaults to profile
+    if im.Button(tooltip.restoreProfile) then
+        profiles:setProfileSettings(profiles:getDefaultSettings())
+        settings = profiles:getProfileSettings()
+
+        beam_dsx:showMessage(string.format(tooltip.restoreProfileOk, profileName, tooltip.saveProfile), 10)
+    end
+
+    if im.IsItemHovered() then
+        im.BeginTooltip()
+        im.Text(string.format(tooltip.restoreProfileHover, profileName))
+        im.EndTooltip()
+    end
+
+    im.SameLine()
+
+    -- Active profile text
+    im.Text(lang.strings.activeProfile, profiles:getProfileName())
+
+    im.SameLine()
+
+    im.SetCursorPosX(im.GetWindowWidth() - 30)
+
+    -- Change language
+    if im.Button(tooltip.changeLanguage) then
+        text:switchLanguage()
+
+        -- Update current language
+        lang = text:getText()
+    end
+
+    if im.IsItemHovered() then
+        im.BeginTooltip()
+        im.Text(tooltip.changeLanguageHover)
+        im.EndTooltip()
+    end
+end
+
 local function renderMainWindow()
     -- Prevents from showing 'showCreateProfile' when user deletes a profile and last selected tab was '+'
     if(profiles:getProfileName() == "-") then
         profiles:setActiveProfile(1)
-        ui.main.preventCreateProfileFromOpeningTick = tick
+        beam_dsx.main.preventCreateProfileFromOpeningTick = tick
     end
 
     im.SetNextWindowBgAlpha(0.95)  
 
-    im.SetNextWindowSizeConstraints(im.ImVec2(ui.constraints.main.width, ui.constraints.main.height), im.ImVec2(ui.constraints.main.width, ui.constraints.main.height))
-    im.Begin("BeamDSX v" ..version.. " - by Feche", ui.main.show, ui.constraints.main.flags)
+    im.SetNextWindowSizeConstraints(im.ImVec2(beam_dsx.constraints.main.width, beam_dsx.constraints.main.height), im.ImVec2(beam_dsx.constraints.main.width, beam_dsx.constraints.main.height))
+    im.Begin("BeamDSX v" ..version.. " - by Feche", beam_dsx.main.show, beam_dsx.constraints.main.flags)
 
     im.TextColored(im.ImVec4(1, 1, 1, 0.6), lang.strings.welcomeMessage)
     im.Separator()
@@ -2103,27 +2781,64 @@ local function renderMainWindow()
     -- Mod settings
     renderModSettings()
 
-    -- Draws UI text message notification
-    renderNotificationMessage()
-
     -- Buttons
     renderButtons()
 end
 
+local function renderCreateProfileWindow()
+    if(not beam_dsx.createProfile.show[0]) then
+        return
+    end
+
+    local tooltip = lang.strings
+
+    im.SetNextWindowSizeConstraints(im.ImVec2(beam_dsx.constraints.createProfile.width, beam_dsx.constraints.createProfile.height), im.ImVec2(beam_dsx.constraints.createProfile.width, beam_dsx.constraints.createProfile.height))
+    im.Begin(tooltip.profileCreateTitle, beam_dsx.createProfile.show, beam_dsx.constraints.createProfile.flags)
+
+    im.PushTextWrapPos(0.0)
+    im.TextColored(im.ImVec4(1, 1, 1, 0.6), tooltip.profileCreateName)
+    im.PopTextWrapPos()
+    
+    im.PushItemWidth(185)
+
+    -- Player hits enter
+    if im.InputText("##profileCreateNew", beam_dsx.createProfile.newProfileName, 32, im.InputTextFlags_EnterReturnsTrue) then
+        beam_dsx:onCreateProfile()
+    end
+
+    im.Spacing()
+
+    -- Player clicks 'create' button
+    if im.Button(tooltip.profileCreateButton1) then
+        beam_dsx:onCreateProfile()
+    end
+
+    im.SameLine()
+
+    -- Player clicks 'cancel' button
+    if im.Button(tooltip.profileCreateButton2) then
+        beam_dsx:showCreateProfile(false)
+    end
+end
+
 -- BeamNG events
 local function onUpdate(dt)
+    if(beam_dsx.disabled) then
+        return
+    end
+
     tick = tick + dt
 
     -- Detects if user exits menu via X close button
-    if(ui.main.show[0] == false) then
-        if(ui.main.closed == false) then
-            ui:toggle(false)
+    if(beam_dsx.main.show[0] == false) then
+        if(beam_dsx.main.closed == false) then
+            beam_dsx:toggle(false)
         end
         return
     end
 
     -- Create profile UI
-    renderCreateProfile()
+    renderCreateProfileWindow()
 
     -- Main window
     renderMainWindow()
@@ -2131,7 +2846,16 @@ local function onUpdate(dt)
     im.End()
 end
 
-local function onExtensionLoaded()
+local function onExtensionLoaded() 
+    local v = beam_dsx:gameVersionCheck()
+
+    if(v.status == false) then
+        guihooks.trigger("toastrMsg", { type = "error", title = "Beam DSX", msg = "Beam DSX v" ..version.. " is incompatible with game version '" ..v.version.. "', check console for more info." })
+        return log("E", "onExtensionLoaded", "[beam_dsx] GE: mod is incompatible with version '" ..v.version.. "', please check if a compatible game version exists, mod disabled.")
+    end
+
+    log("I", "onExtensionLoaded", "[beam_dsx] GE: mod is compatible with version '" ..v.version.. "'")
+
     -- Load user settings
     profiles:init()
     -- Init GUI text
@@ -2147,7 +2871,9 @@ local function onExtensionLoaded()
         settings = profiles:getProfileSettings()
     end
     
-    ui:checkEnableBeamMp()
+    beam_dsx.modEnable = profiles:isProfilesEnabled()
+    beam_dsx:toggleBeamMpHook()
+    beam_dsx.disabled = false
 
     log("I", "onExtensionLoaded", "[beam_dsx] GE: extension loaded, active profile: '" ..profiles:getProfileName().. "'")
 end
@@ -2156,22 +2882,28 @@ local function onExtensionUnloaded()
 	log("I", "onExtensionUnloaded", "[beam_dsx] GE: extension unloaded")
 end
 
-local function onVehicleSwitched(id)
-    local playerVehicleId = be:getPlayerVehicleID(0)
+local function onClientEndMission()
+    log("I", "onClientEndMission", "[beam_dsx] GE: player quit, disabling controller ..")
 
-    if(vehicleId == playerVehicleId) then
-        log("I", "onVehicleSwitched", "[beam_dsx] GE: player switched vehicle, signaling VE ..")
-        ui:mailboxToVE("vehicle_switch")
-    end
+    ds:resetController()
+end
+
+local function onVehicleSwitched(oldId, newId, player)
+    beam_dsx:onVehicleUpdate(newId)
 end
 
 local function onVehicleResetted(vehicleId)
+    beam_dsx:onVehicleUpdate(vehicleId)
+end
+
+local function onPursuitModeUpdate(targetId, mode)
     local playerVehicleId = be:getPlayerVehicleID(0)
 
-    if(vehicleId == playerVehicleId) then
-        log("I", "onVehicleResetted", "[beam_dsx] GE: player vehicle resetted, signaling VE ..")
-        ui:mailboxToVE("vehicle_reset")
+    if(playerVehicleId ~= targetId) then
+        return
     end
+
+    beam_dsx:mailboxToVE("police_chase_update")    
 end
 
 return
@@ -2180,8 +2912,10 @@ return
 
     onExtensionLoaded = onExtensionLoaded,
     onExtensionUnloaded = onExtensionUnloaded,
+    onClientEndMission = onClientEndMission,
     onVehicleResetted = onVehicleResetted,
+    onVehicleSwitched = onVehicleSwitched,
     onUpdate = onUpdate,
-    toggle = function() ui:toggle() end,
-    dumpex = profiles.dumpex
+    toggle = function() beam_dsx:toggle() end,
+    onPursuitModeUpdate = onPursuitModeUpdate,
 }
