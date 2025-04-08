@@ -3,12 +3,17 @@
 -- file, You can obtain one at http://beamng.com/bCDDL-1.1.txt
 -- Code author: Feche
 
--- TODO: testing!!
+-- TODO: testing | color picker | close gui windows on exit/car move
 
-local defaultsettings = require("ge.extensions.utils.settings")
+local defaultSettings = require("ge.extensions.utils.default_settings")
 local utils = require("ge.extensions.utils.utils")
+local common = require("common.common")
+local udp = require("common.udp")
+local ds = require("common.ds")
+
+local log = common.log
 local defaultPath = "settings/beam_dsx/profiles.json"
-local forceAlwaysDefaultSettings = false
+local forceAlwaysDefaultSettings = true
 
 return
 {
@@ -17,11 +22,16 @@ return
 	max = 8, -- max profiles
     active = 1, -- active profile
 	path = defaultPath,
-    temp = nil,
+    fontSize = 1,
+    ip = "127.0.0.1",
+    port = 6969,
     enableOnBeamMPServers = false,
+    controllerIndex = 0,
+    closeOnVehicleMove = true,
+    temp = nil,
 	-- Functions
 	init = function(self)
-        self.path = utils.get_path(defaultPath)
+        self.path = common.get_path(defaultPath)
 
         local s = jsonReadFile(self.path)
 
@@ -31,18 +41,15 @@ return
             s = jsonReadFile(self.path)
         end
 
-		self.max = s.max
-		self.active = s.active
-		self.profiles = s.profiles
-        self.enableOnBeamMPServers = s.enableOnBeamMPServers
-        self.enable = s.enable
+		common.table_merge(self, s)
 
         if(not self.profiles[self.active]) then
             self.active = 1
+            self:saveProfiles()
         end
 
-		log("I", "init", "[beam_dsx] GE: " ..#self.profiles.. " profiles loaded (" ..self.path.. ")")
-        --log("I", "init", "[beam_dsx] GE: (max: " ..self.max.. ", active: " ..self.active.. ", total: " ..(#self.profiles).. ")")
+		log("I", "init", "%d profiles loaded (%s)", #self.profiles, self.path)
+        --log("I", "init", "(max: " ..self.max.. ", active: " ..self.active.. ", total: " ..(#self.profiles).. ")")
 	end,
 	loadProfiles = function(self)
         local s = jsonReadFile(self.path)
@@ -54,19 +61,19 @@ return
 		self.profiles = s.profiles
 	end,
     saveProfiles = function(self)
-		jsonWriteFile(self.path, utils.deep_copy_safe(self, "temp"), true)
+		jsonWriteFile(self.path, common.deep_copy_safe(self, "temp"), true)
 	end,
 	createProfile = function(self, name, settings, color)
-		table.insert(self.profiles, { name = name, vehicle = "", settings = settings, color = color or ({ math.random() * 255, math.random() * 255, math.random() * 255 }) })
+		table.insert(self.profiles, { name = name, vehicle = "", settings = settings, color = color or ({ math.random() * 255, math.random() * 255, math.random() * 255, 255 }) })
 
         self:saveProfiles()
 
-        log("I", "createProfile", "[beam_dsx] GE: created profile " ..name.. " (id: " ..#self.profiles.. ")")
+        log("I", "createProfile", "created profile '%s' (id: %d)", name, #self.profiles)
 	end,
     createDefaultProfile = function(self)
-        local defaults = utils.deep_copy_safe(defaultsettings)
+        local defaults = common.deep_copy_safe(defaultSettings)
 
-        self:createProfile("Normal", utils.deep_copy_safe(defaults), { 128, 56, 255, 255 })
+        self:createProfile("Normal", common.deep_copy_safe(defaults), { 128, 56, 255, 255 })
 
         defaults.throttle.rigidity.bySpeed.minForce = 40
         defaults.throttle.rigidity.bySpeed.maxForce = 120
@@ -90,17 +97,17 @@ return
         defaults.brake.abs.minAmplitude = 2
         defaults.brake.abs.maxAmplitude = 4
 
-        self:createProfile("Stronger", utils.deep_copy_safe(defaults), { 255, 12, 23, 255 })
+        self:createProfile("Stronger", common.deep_copy_safe(defaults), { 255, 12, 23, 255 })
         self:saveProfiles()
 
-        log("I", "createDefaultProfile", "[beam_dsx] GE: creating default profiles ..")
+        log("I", "createDefaultProfile", "creating default profiles ..")
     end,
     deleteProfile = function(self, index)
         if(not index) then
             return
         end
 
-        log("I", "deleteProfile", "[beam_dsx] GE: deleting profile " ..self.profiles[index].name.. " (id: " ..index.. ")")
+        log("I", "deleteProfile", "deleting profile '%s' (id: %d)", self.profiles[index].name, index)
 
         table.remove(self.profiles, index)
         self:saveProfiles()
@@ -116,16 +123,15 @@ return
         end
 
         self.active = index
-        self:loadProfiles() -- actually reloads config file
 
-        log("I", "setActiveProfile", "[beam_dsx] GE: switching active profile to '" ..(self:getProfileName() or "-").. "' (id: " ..self.active.. ")")
+        log("I", "setActiveProfile", "switching active profile to '%s' (id: %d)", self:getProfileName(), self.active)
 
         -- Update active profile in config file
         local s = jsonReadFile(self.path)
 
         if(s) then
             s.active = self.active
-            jsonWriteFile(self.path, utils.deep_copy_safe(s), true)
+            jsonWriteFile(self.path, common.deep_copy_safe(s), true)
         end
     end,
     setProfileSettings = function(self, settings, index)
@@ -135,7 +141,7 @@ return
             return
         end
 
-        self.profiles[index].settings = utils.deep_copy_safe(settings)
+        self.profiles[index].settings = common.deep_copy_safe(settings)
     end,
     setProfileColor = function(self, color)
         if(not color) then
@@ -149,8 +155,7 @@ return
             return
         end
 
-        log("I", "setProfileName", "[beam_dsx] GE: renaming profile '" ..self.profiles[self.active].name.. "' to '" ..name.. "' ..")
-
+        log("I", "setProfileName", "renaming profile '%s' to '%s' ..", self.profiles[self.active].name, name)
         self.profiles[self.active].name = name
     end,
     setProfileBrightness = function(self, a)
@@ -160,7 +165,7 @@ return
 
         self.profiles[self.active].color[4] = a
 
-        log("I", "setProfileBrightness", "[beam_dsx] GE: lightbar brightness set to " ..tostring(a))
+        log("I", "setProfileBrightness", "lightbar brightness set to %d", a)
     end,
     setProfileVehicle = function(self, vehicle)
         if(not self.profiles[self.active]) then
@@ -177,11 +182,46 @@ return
 
         if(s) then
             s.enableOnBeamMPServers = self.enableOnBeamMPServers
-            jsonWriteFile(self.path, utils.deep_copy_safe(s), true)
+            jsonWriteFile(self.path, common.deep_copy_safe(s), true)
         end
     end,
     setProfilesEnabled = function(self, value)
         self.enable = value
+
+        -- Update enable in config file
+        local s = jsonReadFile(self.path)
+
+        if(s) then
+            s.enable = self.enable
+            jsonWriteFile(self.path, common.deep_copy_safe(s), true)
+        end
+    end,
+    setFontSize = function(self, size)
+        self.fontSize = size
+
+        -- Update fontSize in config file
+        local s = jsonReadFile(self.path)
+
+        if(s) then
+            s.fontSize = self.fontSize
+            jsonWriteFile(self.path, common.deep_copy_safe(s), true)
+        end
+    end,
+    setUDPAddress = function(self, ip, port)
+        self.ip = ip
+        self.port = port
+
+        utils.saveJsonValue(self.path, "ip", ip)
+        utils.saveJsonValue(self.path, "port", port)
+
+        ds:setUDPAddress(self.ip, self.port, "GE")
+    end,
+    setControllerIndex = function(self, index)
+        self.controllerIndex = index
+
+        utils.saveJsonValue(self.path, "controllerIndex", index)
+
+        ds:setControllerIndex(index, "GE")
     end,
     --
     -- get
@@ -199,7 +239,7 @@ return
 		return #self.profiles
 	end,
     getDefaultSettings = function(self)
-        return utils.deep_copy_safe(defaultsettings)
+        return common.deep_copy_safe(defaultSettings)
     end,
     getMaxProfiles = function(self)
         return self.max
@@ -258,6 +298,18 @@ return
         end
 
         return self.profiles[self.active].color[4] or 255
+    end,
+    getFontSize = function(self)
+        return self.fontSize
+    end,
+    getUDPIp = function(self)
+        return self.ip
+    end,
+    getUDPPort = function(self)
+        return self.port
+    end,
+    getControllerIndex = function(self)
+        return self.controllerIndex
     end,
     isBeamMpAllowed = function(self)
         return self.enableOnBeamMPServers

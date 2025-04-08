@@ -13,69 +13,42 @@ local function getVehicleName(vehID)
     return "Unknown"
 end
 
-local function deep_copy_safe(t, skip)
-    skip = skip and skip or ""
-    if(type(t) == "table") then
-        local copy = {}
-        for key, value in pairs(t) do
-            if(type(value) ~= "function" and key ~= skip) then
-                copy[key] = (type(value) == "table") and deep_copy_safe(value) or value
-            end
-        end
-        return copy
+local function getAirSpeed()
+    local playerVehicle = be:getPlayerVehicle(0)
+    if(playerVehicle) then
+        local vel = playerVehicle:getVelocity()
+        return vec3(vel):length() * 3.6
     end
-    return false
+    return 0
 end
 
-local function get_path(path)
-    local s = jsonReadFile(path)
-    return s and s.path or path
-end
-
-function dumpex(t)
-    if(type(t) == "userdata") then
-        local meta = getmetatable(t)
-        if meta then
-            for k, v in pairs(meta) do
-                print(k, v)
-            end
-        end
+local function saveJsonValue(file, key, value)
+    if(not key or not value or not file) then
         return
-    elseif(type(t) ~= "table") then
-        return print(type(t).. ": " ..tostring(t))
     end
 
-    local f = {}
-    local v = {}
-    
-    for key, value in pairs(t) do 
-        value = tostring(value)
-        if value:find("function") then 
-            table.insert(f, tostring(key).. ": " ..tostring(value)) 
-        else 
-            table.insert(v, tostring(key).. ": " ..tostring(value)) 
-        end
-    end 
+    local s = jsonReadFile(file)
 
-    print("-- variables: ") 
-    table.sort(v)
-    for i = 1, #v do 
-       print(v[i]) 
-    end 
-    print("-- total variables: " ..#v)
+    if(not s or (type(s) == "table" and not s[key])) then
+        return
+    end
 
-    print("-- functions:") 
-    table.sort(f)
-    for i = 1, #f do 
-        print(f[i]) 
-    end 
-    print("-- total functions: " ..#f)
+    s[key] = value
+    jsonWriteFile(file, s, true)
+end
+
+local function isIPv4(ip)
+    local oct1, oct2, oct3, oct4 = ip:match("^(%d+)%.(%d+)%.(%d+)%.(%d+)$")
+    if not (oct1 and oct2 and oct3 and oct4) then 
+        return false 
+    end
+    return tonumber(oct1) <= 255 and tonumber(oct2) <= 255 and tonumber(oct3) <= 255 and tonumber(oct4) <= 255
 end
 
 return
 {
     getVehicleName = getVehicleName,
-    dumpex = dumpex,
-    deep_copy_safe = deep_copy_safe,
-    get_path = get_path,
+    getAirSpeed = getAirSpeed,
+    isIPv4 = isIPv4,
+    saveJsonValue = saveJsonValue,
 }
