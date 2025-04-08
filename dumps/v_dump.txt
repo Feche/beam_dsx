@@ -8,7 +8,7 @@
 1592.39518|I|libbeamng.lua.utils| "/vehicles/scintilla/"
 
 1649.22243|I|libbeamng.print| -- dumping v.loadVehicleStage2:
-1649.22247|I|libbeamng.print| [beam_dsx] VE: dumpTable: not a table (function)
+1649.22247|I|libbeamng.print| [beam_dsx]  dumpTable: not a table (function)
 
 1413.26799|I|libbeamng.print| -- dumping v.data:
 1413.26803|I|libbeamng.print| key: actionCategories, value: table: 0x018749838280
