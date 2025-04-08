@@ -3,9 +3,9 @@
     "cat": "debug",
     "order": 128,
     "ctx": "tlua",
-    "onDown": "extensions.beam__dsx.toggle()",
+    "onDown": "extensions.beam__dsx.toggleMainWindow()",
     "actionMap": "Global",
-    "title": "Toggle Beam DSX graphics interface",
-    "desc": "Toggles Beam DSX graphics interface on or off"
+    "title": "Toggle Beam DSX GUI",
+    "desc": "Toggles Beam DSX GUI interface"
   }
 }
