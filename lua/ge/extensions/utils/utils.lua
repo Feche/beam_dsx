@@ -23,13 +23,13 @@ local function getAirSpeed()
 end
 
 local function saveJsonValue(file, key, value)
-    if(not key or not value or not file) then
+    if(not key or value == nil or not file) then
         return
     end
 
     local s = jsonReadFile(file)
 
-    if(not s or (type(s) == "table" and not s[key])) then
+    if(not s or (type(s) == "table" and s[key] == nil)) then        
         return
     end
 
