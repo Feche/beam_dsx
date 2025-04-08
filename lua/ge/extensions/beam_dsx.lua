@@ -4,30 +4,46 @@
 -- Code author: Feche
 -- GE beam_dsx.lua
 
+local common = require("common.common")
+local tick = require("common.tick")
+local ds = require("common.ds")
+
 local profiles = require("ge.extensions.utils.profiles")
 local utils = require("ge.extensions.utils.utils")
-local text = require("ge.extensions.utils.lang")
-local ds = require("common.ds")
+local text = require("ge.extensions.utils.languagues")
+
 local ffi = require("ffi")
 
-local version = "1.0"
-local lang = {}
+local log = common.log
 local im = ui_imgui
-local tick = 0
+
+local version = "1.0"
 local settings = nil
-local allowedVersions = { ["0.34"] = true }
+
+local languagues = {}
+local modStates =
+{
+    enabled = 0,
+    disabled = 1,
+    version_fail_send_toast_msg = 2,
+    version_fail = 3,
+}
+
+local allowedVersions = 
+{ 
+    ["0.34"] = true,
+    ["0.35"] = true,
+}
 
 local beam_dsx =
 {
-    disabled = true,
     deactivateMod = nil,
-    modEnable = true,
+    status = modStates.enabled,
     main = 
     {
         show = im.BoolPtr(false),
-        closed = true,
         tabSet = false,
-        preventCreateProfileFromOpeningTick = 0,
+        uiTabsTick = 0,
         profileRenameName = "",
         profileVehicle = "",
     },
@@ -36,36 +52,72 @@ local beam_dsx =
         show = im.BoolPtr(false),
         newProfileName = nil,
     },
+    settings =
+    {
+        show = im.BoolPtr(false),
+        statusTick = -1,
+        status = nil,
+        udpIP = "",
+        udpPort = "",
+        controllerIndex = "",
+    },
     constraints =
     {
         main =
         {
             width = 510,
-            height = 850,
+            height = 900,
             flags = im.WindowFlags_AlwaysAutoResize,
-            offsetWidth = 206,
+            offsetWidth = 146,
         },
         createProfile = 
         {
             width = 220,
-            height = 116,
+            height = 122,
+            flags = im.WindowFlags_AlwaysAutoResize,
+        },
+        settings =
+        {
+            width = 300,
+            height = 150,
             flags = im.WindowFlags_AlwaysAutoResize,
         },
     },
+    tabs = {},
     -- Functions
-    toggle = function(self, change)
-        if(change == nil) then
-            self.main.show[0] = (not self.main.show[0]) 
-        end
+    toggleMainWindow = function(self)
+        self.main.show[0] = not self.main.show[0]
 
         if(self.main.show[0]) then
+            profiles:loadProfiles()
             settings = profiles:getProfileSettings()
 
             self.main.profileRenameName = im.ArrayChar(32, profiles:getProfileName())
             self.main.profileVehicle = im.ArrayChar(32, profiles:getProfileVehicle())
-            self.main.closed = false
         else
-            self.main.closed = true
+            self:hideAllWindows()
+        end
+    end,
+    toggleSettingsWindow = function(self)
+        self.settings.show[0] = not self.settings.show[0]
+
+        if(self.settings.show[0]) then
+            self.main.statusTick = -1
+
+            self.settings.udpIP = im.ArrayChar(32, profiles:getUDPIp())
+            self.settings.udpPort = im.ArrayChar(8, tostring(profiles:getUDPPort()))
+            self.settings.controllerIndex = im.ArrayChar(8, tostring(profiles:getControllerIndex()))
+        end
+    end,
+    toggleCreateProfileWindow = function(self, force)
+        self.createProfile.show[0] = not self.createProfile.show[0]
+
+        if(force ~= nil) then
+            self.createProfile.show[0] = force
+        end
+
+        if(self.createProfile.show[0]) then
+            self.createProfile.newProfileName = im.ArrayChar(32, "")
         end
     end,
     toggleBeamMpHook = function(self)
@@ -78,26 +130,25 @@ local beam_dsx =
         if(enableOnBeamMp == true) then
             _G["core_modmanager"].deactivateMod = function(name)
                 if debug.getinfo(2, "S").short_src:find("MPModManager.lua") and name:find("beam_dsx") then 
-                    return log("W", "deactivateMod", "[beam_dsx] GE: BeamMp tried to disable mod, avoiding ..")
+                    return log("W", "deactivateMod", "BeamMp tried to disable mod, avoiding ..")
                 end
 
                 return self.deactivateMod(name)
             end
 
-            log("i", "toggleBeamMpHook", "[beam_dsx] GE: mod allowed to run on BeamMp servers")
+            log("i", "toggleBeamMpHook", "mod allowed to run on BeamMp servers")
         else
             _G["core_modmanager"].deactivateMod = self.deactivateMod
 
-            log("W", "toggleBeamMpHook", "[beam_dsx] GE: mod disabled to run on BeamMp servers")
+            log("W", "toggleBeamMpHook", "mod disabled to run on BeamMp servers")
         end
     end,
     showMessage = function(self, str, duration)
-        guihooks.message(str, duration or 3, tostring(tick))
+        guihooks.message(str, duration or 3, tostring(tick:getTick()))
     end,
     mailboxToVE = function(self, code, vehicle)
-        if(not self.modEnable) then
-            log("W", "mailboxToVE", "[beam_dsx] GE: mod is disabled")
-            return
+        if(self.status == modStates.disabled) then
+            return log("W", "mailboxToVE", "mod is disabled")
         end
 
         local playerVehicleId = vehicle and vehicle or be:getPlayerVehicleID(0)
@@ -118,104 +169,21 @@ local beam_dsx =
         {
             code = code,
             playerVehicleId = playerVehicleId,
-            tick = tick,
+            tick = tick:getTick(),
             policeMode = policeMode,
-            path = profiles:getPath()
+            path = profiles:getPath(),
         }
 
         be:sendToMailbox("beam_dsx_mailboxToVE", jsonEncode(data))
         
-        log("I", "mailboxToVE", "[beam_dsx] GE: sending mailbox to VE '" ..code.. "' ..")
+        log("I", "mailboxToVE", "sending mailbox to VE '%s' ..", code)
     end,
-    onRenameProfile = function(self)
-        local profileName = profiles:getProfileName()
-        local newProfileName = ffi.string(self.main.profileRenameName)
-
-        if(profileName == newProfileName) then
-            return true
+    gameVersionCheck = function(self)
+        local version = string.format("%0.4s", beamng_version)
+        if(allowedVersions[version]) then
+            return { status = true, version = version }
         end
-
-        local isValid = self:isValidName(newProfileName)
-        local tooltip = lang.strings
-
-        if(isValid == 0) then
-            self:showMessage(tooltip.profileNameEmptyError)
-        elseif(isValid == 1) then
-            self:showMessage(tooltip.profileNameInvalidError)
-        elseif(isValid == 2) then
-            self:showMessage(string.format(tooltip.profileAlreadyExistError, newProfileName))
-        else
-            profiles:setProfileName(newProfileName)
-            return true
-        end
-
-        return false
-    end,
-    onCreateProfile = function(self)
-        local profileName = ffi.string(self.createProfile.newProfileName)
-        local isValid = self:isValidName(profileName)
-        local tooltip = lang.strings
-
-        if(isValid == 0) then
-            return self:showMessage(tooltip.profileNameEmptyError)
-        elseif(isValid == 1) then
-            return self:showMessage(tooltip.profileNameInvalidError)
-        elseif(isValid == 2) then
-            return self:showMessage(string.format(tooltip.profileAlreadyExistError, profileName))
-        end
-
-        profiles:loadProfiles()
-        profiles:createProfile(profileName, profiles:getDefaultSettings())
-
-        self:showCreateProfile(false)
-        self:showMessage(string.format(tooltip.profileCreateOk, profileName))
-    end,
-    onProfileVehicleChange = function(self)
-        local profilePerVehicleStr = ffi.string(self.main.profileVehicle)
-        local vehicles = {}
-
-        -- Get vehicle list
-        for veh in string.gmatch(profilePerVehicleStr, "%s*([^,]+)%s*") do
-            table.insert(vehicles, veh)
-        end
-
-        for i = 1, #vehicles do
-            -- Returns vehicle profile
-            if(profiles:getVehicleProfile(vehicles[i], true) ~= 0) then
-                self:showMessage(string.format(lang.strings.profileVehicleIsInAnotherProfile, vehicles[i]))
-                return false
-            end
-        end
-
-        profiles:setProfileVehicle(profilePerVehicleStr)
-        return true
-    end, 
-    onDeleteProfile = function(self)
-        local tooltip = lang.strings
-        local profileName = profiles:getProfileName()
-
-        if(profiles:getTotalProfiles() - 1 == 0) then
-            return self:showMessage(string.format(tooltip.deleteProfileError, profileName), 5)
-        end
-
-        self:showMessage(string.format(tooltip.deleteProfileNotification, profileName), 5)
-        profiles:deleteProfile(profiles:getActiveProfileID())
-    end,
-    onTabChange = function(self, profileID, auto)
-        local profileName = profiles:getProfileName(profileID)
-        local tooltip = lang.strings
-
-        profiles:setActiveProfile(profileID)
-        self:showMessage(not auto and string.format(tooltip.switchProfile, profileName) or string.format(tooltip.autoSwitchProfile, profileName), auto and 6)
-
-        settings = profiles:getProfileSettings()
-
-        self.main.tabSet = false
-        self.main.profileRenameName = im.ArrayChar(32, profileName)
-        self.main.profileVehicle = im.ArrayChar(32, profiles:getProfileVehicle())
-
-        self:mailboxToVE("profile_change")
-        --self:showMessage(string.format(tooltip.profileActive, profileName), 5)
+        return { status = false, version = version }
     end,
     isValidName = function(self, name)
         -- Check if profile name is valid
@@ -237,12 +205,122 @@ local beam_dsx =
             end
         end
     end,
-    showCreateProfile = function(self, show)
-        self.createProfile.show[0] = show
+    getModState = function(self)
+        return self.state
+    end,
+    hideAllWindows = function(self)
+        self.main.show[0] = false
+        self.settings.show[0] = false
+        self.createProfile.show[0] = false
+    end,
+    ---
+    --set
+    ---
+    setFontSize = function(self, newSize)
+        newSize = math.min(1.5, math.max(0.8, newSize))
+        profiles:setFontSize(newSize)
+        self:onFontSizeChange(newSize)
+    end,
+    setModState = function(self, state)
+        self.state = state
+    end,
+    ---
+    -- on
+    ---
+    onRenameProfile = function(self)
+        local profileName = profiles:getProfileName()
+        local newProfileName = ffi.string(self.main.profileRenameName)
 
-        if(show) then
-            self.createProfile.newProfileName = im.ArrayChar(32, "")
+        if(profileName == newProfileName) then
+            return true
         end
+
+        local isValid = self:isValidName(newProfileName)
+        local tooltip = languagues.strings
+
+        if(isValid == 0) then
+            self:showMessage(tooltip.profileNameEmptyError)
+        elseif(isValid == 1) then
+            self:showMessage(tooltip.profileNameInvalidError)
+        elseif(isValid == 2) then
+            self:showMessage(string.format(tooltip.profileAlreadyExistError, newProfileName))
+        else
+            profiles:setProfileName(newProfileName)
+            return true
+        end
+
+        return false
+    end,
+    onCreateProfile = function(self)
+        local profileName = ffi.string(self.createProfile.newProfileName)
+        local isValid = self:isValidName(profileName)
+        local tooltip = languagues.strings
+
+        if(isValid == 0) then
+            return self:showMessage(tooltip.profileNameEmptyError)
+        elseif(isValid == 1) then
+            return self:showMessage(tooltip.profileNameInvalidError)
+        elseif(isValid == 2) then
+            return self:showMessage(string.format(tooltip.profileAlreadyExistError, profileName))
+        end
+
+        profiles:loadProfiles() -- restore settings if player has modified values but not saved them since createProfile saves config file
+        profiles:createProfile(profileName, profiles:getDefaultSettings())
+
+        self:toggleCreateProfileWindow()
+        self:showMessage(string.format(tooltip.profileCreateOk, profileName))
+    end,
+    onProfileVehicleChange = function(self)
+        local profilePerVehicleStr = ffi.string(self.main.profileVehicle)
+        local vehicles = {}
+
+        -- Get vehicle list
+        for veh in string.gmatch(profilePerVehicleStr, "%s*([^,]+)%s*") do
+            table.insert(vehicles, veh)
+        end
+
+        for i = 1, #vehicles do
+            -- Returns vehicle profile
+            if(profiles:getVehicleProfile(vehicles[i], true) ~= 0) then
+                self:showMessage(string.format(languagues.strings.profileVehicleIsInAnotherProfile, vehicles[i]))
+                return false
+            end
+        end
+
+        profiles:setProfileVehicle(profilePerVehicleStr)
+        return true
+    end, 
+    onDeleteProfile = function(self)
+        local tooltip = languagues.strings
+        local profileName = profiles:getProfileName()
+
+        if(profiles:getTotalProfiles() == 1) then
+            return self:showMessage(string.format(tooltip.deleteProfileError, profileName), 5)
+        end
+
+        local profileID = profiles:getActiveProfileID()
+
+        profiles:setActiveProfile(profileID - 1)
+        profiles:deleteProfile(profileID)
+        self:showMessage(string.format(tooltip.deleteProfileNotification, profileName), 5)
+
+        self.main.uiTabsTick = tick:getTick()
+    end,
+    onTabChange = function(self, profileID, automatic)
+        local profileName = profiles:getProfileName(profileID)
+        local tooltip = languagues.strings
+
+        profiles:loadProfiles()
+        profiles:setActiveProfile(profileID)
+        self:showMessage(not automatic and string.format(tooltip.switchProfile, profileName) or string.format(tooltip.autoSwitchProfile, profileName), 6)
+
+        settings = profiles:getProfileSettings()
+
+        self.main.profileRenameName = im.ArrayChar(32, profileName)
+        self.main.profileVehicle = im.ArrayChar(32, profiles:getProfileVehicle())
+
+        self:mailboxToVE("profile_change")
+        --self:showMessage(string.format(tooltip.profileActive, profileName), 5)
     end,
     onSaveProfile = function(self)
         -- Checks if profile name already exists
@@ -255,26 +333,17 @@ local beam_dsx =
             return
         end
 
-        local tooltip = lang.strings
+        local tooltip = languagues.strings
 
         profiles:saveProfiles()
         self:mailboxToVE("save")
         self:showMessage(string.format(tooltip.saveProfileOk, profiles:getProfileName()))
-
-        local enable = profiles:isProfilesEnabled()
-
-        if(enable == false and self.modEnable == true) then
-            self:mailboxToVE("mod_disable")
-            self.modEnable = false
-            ds:resetController()
-        elseif(enable == true and self.modEnable == false) then
-            self.modEnable = true
-            self:mailboxToVE("mod_enable")
-        end
     end,
     onVehicleUpdate = function(self, id)
-        if(id ~= be:getPlayerVehicleID(0)) then
-            --log("I", "onVehicleUpdate", "[beam_dsx] GE: '" ..utils.getVehicleName(id).. "' is not the player vehicle ..")
+        local playerVehicle = be:getPlayerVehicleID(0)
+        id = id and id or playerVehicle
+        if(id ~= playerVehicle) then
+            --log("I", "onVehicleUpdate", "'" ..utils.getVehicleName(id).. "' is not the player vehicle ..")
             return
         end
 
@@ -289,66 +358,105 @@ local beam_dsx =
             if(profile > 0) then
                 self:onTabChange(profile, true)
 
-                log("I", "onVehicleSwitched", "[beam_dsx] GE: found profile '" ..profiles:getProfileName().. "' for vehicle '" ..vehName.. "'")
+                log("I", "onVehicleSwitched", "found profile '%s' for vehicle '%s'", profiles:getProfileName(), vehName)
             else
                 self:mailboxToVE("vehicle_reset_or_switch", id)
             end
         end
     end,
-    gameVersionCheck = function(self)
-        local version = string.format("%0.4s", beamng_version)
-        if(allowedVersions[version]) then
-            return { status = true, version = version }
-        end
-        return { status = false, version = version }
+    onFontSizeChange = function(self, newSize)
+        local main = self.constraints.main
+        local profile = self.constraints.createProfile
+        local settings = self.constraints.settings
+
+        main.width = (newSize / 1) * 510
+        main.height = (newSize / 1) * 900
+        main.offsetWidth = (newSize / 1) * 146
+
+        profile.width = (newSize / 1) * 220
+        profile.height = (newSize / 1) * 122
+
+        settings.width = (newSize / 1) * 320
+        settings.height = (newSize / 1) * 350
     end,
+    onUdpSave = function(self, ip, port)
+        if(not utils.isIPv4(ip)) then
+            return self:showMessage(languagues.strings.settingsNetworkInvalidIp)
+        end
+
+        port = tonumber(port) 
+
+        if(not port or port <= 0 or port > 65535) then 
+            return self:showMessage(languagues.strings.settingsNetworkInvalidPort)
+        end
+
+        self.settings.udpIP = im.ArrayChar(32, ip)
+        self.settings.udpPort = im.ArrayChar(8, tostring(port))
+
+        profiles:setUDPAddress(ip, port)
+
+        self:showMessage(languagues.strings.settingsNetworkSave)
+        self:mailboxToVE("udp_address_change")
+    end,
+    onControllerIndexChange = function(self, controllerIndex)
+        if(not controllerIndex or ds:getDsxDeviceType(controllerIndex + 1) == -1 or not controllerIndex or controllerIndex < 0 or controllerIndex > 8) then
+            return self:showMessage(languagues.strings.settingsControllerIndexInvalid)
+        end
+
+        ds:resetController()
+        profiles:setControllerIndex(controllerIndex)
+        self:showMessage(languagues.strings.settingsControllerIndexSave)
+        self:mailboxToVE("controller_index_change")
+    end,    
 }
 
+--
 -- Beam DSX events
-local function renderTabs()
+--
+local function renderProfileTabs()
 	if im.BeginTabBar("Profiles") then
         local totalProfiles = profiles:getTotalProfiles()
-
-        if(totalProfiles == 0) then
-            return
-        end
-
-        local tooltip = lang.strings
-
+        local tooltip = languagues.strings
+        local tick = tick:getTick()
+        
         for i = 1, totalProfiles do
-            local activeProfile = profiles:getActiveProfileID()
             local profileName = profiles:getProfileName(i)
             local tabFlags = im.TabItemFlags_None
+            local activeProfile = profiles:getActiveProfileID()
 
-            if(beam_dsx.main.tabSet == false) then
-                if(activeProfile == i) then
-                    tabFlags = im.TabItemFlags_SetSelected
-                    beam_dsx.main.tabSet = true
-                end
+            if(activeProfile == i and beam_dsx.main.tabSet == false) then
+                tabFlags = im.TabItemFlags_SetSelected
+                beam_dsx.main.tabSet = true
             end
 
-            if im.BeginTabItem(profileName, nil, tabFlags) then
+            local debug = false
+
+            if im.BeginTabItem(profileName.. (debug and (" (id: " ..i.. ")") or ""), nil, tabFlags) then
                 if(activeProfile ~= i and beam_dsx.main.tabSet) then
-                    beam_dsx:onTabChange(i)
+                    beam_dsx.main.tabSet = false
+
+                    if(tick - beam_dsx.main.uiTabsTick > 100) then
+                        beam_dsx:onTabChange(i)
+                    end
                 end
                 im.EndTabItem()
             end
         end
 
         if im.BeginTabItem("+", nil, im.TabItemFlags_None) then
-            local maxProfiles = profiles:getMaxProfiles()
-            local totalProfiles = profiles:getTotalProfiles()
+            beam_dsx.main.tabSet = false
 
-            if(maxProfiles >= totalProfiles + 1) then
-                -- Prevents from showing 'showCreateProfile' when user deletes a profile and last selected tab was '+'
-                if(tick - beam_dsx.main.preventCreateProfileFromOpeningTick > 0.5) then
-                    beam_dsx:showCreateProfile(true)
+            if(tick - beam_dsx.main.uiTabsTick > 100) then
+                local maxProfiles = profiles:getMaxProfiles()
+                local totalProfiles = profiles:getTotalProfiles()
+
+                if(maxProfiles >= totalProfiles + 1) then
+                    beam_dsx:toggleCreateProfileWindow(true)
+                else
+                    beam_dsx:showMessage(string.format(tooltip.profileCreateMaxError, totalProfiles, maxProfiles))
                 end
-            else
-                beam_dsx:showMessage(string.format(tooltip.profileCreateMaxError, totalProfiles, maxProfiles))
             end
 
-            beam_dsx.main.tabSet = false
             im.EndTabItem()
         end
     end
@@ -367,16 +475,16 @@ local function renderProfileSettings()
     im.BeginChild1("TriggerSettings", im.ImVec2(beam_dsx.constraints.main.width - 20, beam_dsx.constraints.main.height - beam_dsx.constraints.main.offsetWidth, beam_dsx.constraints.main.flags))
 
     -- Throttle trigger
-    if im.TreeNode1(lang.titles[1]) then
+    if im.TreeNode1(languagues.titles[1]) then
         im.Spacing()
 
         -- Disable all haptics
         setting = settings.throttle
-        tooltip = lang.throttle
+        tooltip = languagues.throttle
 
         local enable = im.BoolPtr(setting.enable)
 
-        if im.Checkbox(lang.general.enable, enable) then
+        if im.Checkbox(languagues.general.enable, enable) then
             setting.enable = enable[0]
         end
 
@@ -392,9 +500,9 @@ local function renderProfileSettings()
             im.Separator()
 
             -- Rigidity
-            tooltip = lang.general.rigidity
+            tooltip = languagues.general.rigidity
 
-            if im.TreeNode1(lang.throttle.titles[1]) then
+            if im.TreeNode1(languagues.throttle.titles[1]) then
                 -- By speed
                 setting = settings.throttle.rigidity.bySpeed
 
@@ -403,7 +511,7 @@ local function renderProfileSettings()
 
                     im.Spacing()
 
-                    if im.Checkbox(lang.general.enable, enable) then
+                    if im.Checkbox(languagues.general.enable, enable) then
                         setting.enable = enable[0]
 
                         if(settings.throttle.rigidity.constant.enable == true) then
@@ -515,7 +623,7 @@ local function renderProfileSettings()
 
                     im.Spacing()
 
-                    if im.Checkbox(lang.general.enable, enable) then
+                    if im.Checkbox(languagues.general.enable, enable) then
                         setting.enable = enable[0]
 
                         if(settings.throttle.rigidity.bySpeed.enable == true) then
@@ -548,7 +656,7 @@ local function renderProfileSettings()
 
                         if im.IsItemHovered() then
                             im.BeginTooltip()
-                            im.Text(lang.general.rigidity.constant.minForce)
+                            im.Text(languagues.general.rigidity.constant.minForce)
                             im.EndTooltip()
                         end
 
@@ -567,7 +675,7 @@ local function renderProfileSettings()
 
                         if im.IsItemHovered() then
                             im.BeginTooltip()
-                            im.Text(lang.general.rigidity.constant.maxForce)
+                            im.Text(languagues.general.rigidity.constant.maxForce)
                             im.EndTooltip()
                         end
 
@@ -583,14 +691,14 @@ local function renderProfileSettings()
 
             -- Wheelslip
             setting = settings.throttle.wheelSlip
-            tooltip = lang.throttle.wheelSlip
+            tooltip = languagues.throttle.wheelSlip
 
-            if im.TreeNode1(lang.throttle.titles[2]) then
+            if im.TreeNode1(languagues.throttle.titles[2]) then
                 local enable = im.BoolPtr(setting.enable)
 
                 im.Spacing()
 
-                if im.Checkbox(lang.general.enable, enable) then
+                if im.Checkbox(languagues.general.enable, enable) then
                     setting.enable = enable[0]
                 end
 
@@ -657,7 +765,7 @@ local function renderProfileSettings()
                 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.minHz)
+                        im.Text(languagues.general.minHz)
                         im.EndTooltip()
                     end
 
@@ -676,7 +784,7 @@ local function renderProfileSettings()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.maxHz)
+                        im.Text(languagues.general.maxHz)
                         im.EndTooltip()
                     end
 
@@ -695,7 +803,7 @@ local function renderProfileSettings()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.minAmplitude)
+                        im.Text(languagues.general.minAmplitude)
                         im.EndTooltip()
                     end
 
@@ -712,7 +820,7 @@ local function renderProfileSettings()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.maxAmplitude)
+                        im.Text(languagues.general.maxAmplitude)
                         im.EndTooltip()
                     end
 
@@ -725,14 +833,14 @@ local function renderProfileSettings()
 
             -- Upshift
             setting = settings.throttle.upShift
-            tooltip = lang.throttle.upShift
+            tooltip = languagues.throttle.upShift
 
-            if im.TreeNode1(lang.throttle.titles[3]) then
+            if im.TreeNode1(languagues.throttle.titles[3]) then
                 local enable = im.BoolPtr(setting.enable)
 
                 im.Spacing()
 
-                if im.Checkbox(lang.general.enable, enable) then
+                if im.Checkbox(languagues.general.enable, enable) then
                     setting.enable = enable[0]
                 end
 
@@ -761,7 +869,7 @@ local function renderProfileSettings()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.maxHz)
+                        im.Text(languagues.general.maxHz)
                         im.EndTooltip()
                     end
 
@@ -780,7 +888,7 @@ local function renderProfileSettings()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.maxForce)
+                        im.Text(languagues.general.maxForce)
                         im.EndTooltip()
                     end
 
@@ -812,14 +920,14 @@ local function renderProfileSettings()
 
             -- Rev limit
             setting = settings.throttle.revLimit
-            tooltip = lang.throttle.revLimit
+            tooltip = languagues.throttle.revLimit
 
-            if im.TreeNode1(lang.throttle.titles[4]) then
+            if im.TreeNode1(languagues.throttle.titles[4]) then
                 local enable = im.BoolPtr(setting.enable)
 
                 im.Spacing()
 
-                if im.Checkbox(lang.general.enable, enable) then
+                if im.Checkbox(languagues.general.enable, enable) then
                     setting.enable = enable[0]
                 end
 
@@ -848,7 +956,7 @@ local function renderProfileSettings()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.minHz)
+                        im.Text(languagues.general.minHz)
                         im.EndTooltip()
                     end
 
@@ -867,7 +975,7 @@ local function renderProfileSettings()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.maxHz)
+                        im.Text(languagues.general.maxHz)
                         im.EndTooltip()
                     end
 
@@ -886,7 +994,7 @@ local function renderProfileSettings()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.maxForce)
+                        im.Text(languagues.general.maxForce)
                         im.EndTooltip()
                     end
 
@@ -918,14 +1026,14 @@ local function renderProfileSettings()
 
             -- Red line
             setting = settings.throttle.redLine
-            tooltip = lang.throttle.redLine
+            tooltip = languagues.throttle.redLine
 
-            if im.TreeNode1(lang.throttle.titles[5]) then
+            if im.TreeNode1(languagues.throttle.titles[5]) then
                 local enable = im.BoolPtr(setting.enable)
 
                 im.Spacing()
 
-                if im.Checkbox(lang.general.enable, enable) then
+                if im.Checkbox(languagues.general.enable, enable) then
                     setting.enable = enable[0]
                 end
 
@@ -949,7 +1057,7 @@ local function renderProfileSettings()
                     local startAt = im.FloatPtr(setting.startAt)
 
                     if im.SliderFloat("%##800", startAt, 1, 100, "%.0f") then
-                        setting.startAt  = startAt[0]
+                        setting.startAt = startAt[0]
                     end
 
                     if im.IsItemHovered() then
@@ -957,6 +1065,8 @@ local function renderProfileSettings()
                         im.Text(tooltip.startAt)
                         im.EndTooltip()
                     end
+
+                    --print("startAt: " ..setting.startAt.. ", config startAt: " ..profiles:getProfileSettings().throttle.redLine.startAt)
 
                     im.Spacing()
 
@@ -968,7 +1078,7 @@ local function renderProfileSettings()
                     local bounces = im.FloatPtr(setting.bounces)
 
                     if im.SliderFloat("##801", bounces, 0, 8, "%.0f") then
-                        setting.bounces  = bounces[0]
+                        setting.bounces = bounces[0]
                     end
 
                     if im.IsItemHovered() then
@@ -992,7 +1102,7 @@ local function renderProfileSettings()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.minHz)
+                        im.Text(languagues.general.minHz)
                         im.EndTooltip()
                     end
 
@@ -1011,7 +1121,7 @@ local function renderProfileSettings()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.maxHz)
+                        im.Text(languagues.general.maxHz)
                         im.EndTooltip()
                     end
 
@@ -1030,7 +1140,7 @@ local function renderProfileSettings()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.vibrationForce)
+                        im.Text(languagues.general.vibrationForce)
                         im.EndTooltip()
                     end
 
@@ -1046,7 +1156,7 @@ local function renderProfileSettings()
 
             -- Engine off
             setting = settings.throttle.engineOff
-            tooltip = lang.throttle
+            tooltip = languagues.throttle
 
             local enable = im.BoolPtr(setting.enable)
 
@@ -1058,7 +1168,7 @@ local function renderProfileSettings()
 
             -- Engine on
             setting = settings.throttle.engineOn
-            tooltip = lang.throttle
+            tooltip = languagues.throttle
 
             local enable = im.BoolPtr(setting.enable)
 
@@ -1074,15 +1184,15 @@ local function renderProfileSettings()
     end
 
     -- Brake trigger
-    if im.TreeNode1(lang.titles[2]) then
+    if im.TreeNode1(languagues.titles[2]) then
         setting = settings.brake
-        tooltip = lang.brake
+        tooltip = languagues.brake
 
         local enable = im.BoolPtr(setting.enable)
 
         im.Spacing()
 
-        if im.Checkbox(lang.general.enable, enable) then
+        if im.Checkbox(languagues.general.enable, enable) then
             setting.enable = enable[0]
         end
 
@@ -1098,18 +1208,18 @@ local function renderProfileSettings()
             im.Separator()
 
             -- Rigidity
-            tooltip = lang.general.rigidity
+            tooltip = languagues.general.rigidity
 
-            if im.TreeNode1(lang.brake.titles[1]) then
+            if im.TreeNode1(languagues.brake.titles[1]) then
                 -- bySpeed
                 setting = settings.brake.rigidity.bySpeed
 
-                if im.TreeNode1(lang.general.rigidity.titles[1]) then
+                if im.TreeNode1(languagues.general.rigidity.titles[1]) then
                     local enable = im.BoolPtr(setting.enable)
 
                     im.Spacing()
 
-                    if im.Checkbox(lang.general.enable, enable) then
+                    if im.Checkbox(languagues.general.enable, enable) then
                         setting.enable = enable[0]
 
                         if(settings.brake.rigidity.constant.enable == true) then
@@ -1221,7 +1331,7 @@ local function renderProfileSettings()
 
                     im.Spacing()
 
-                    if im.Checkbox(lang.general.enable, enable) then
+                    if im.Checkbox(languagues.general.enable, enable) then
                         setting.enable = enable[0]
 
                         if(settings.brake.rigidity.bySpeed.enable == true) then
@@ -1254,7 +1364,7 @@ local function renderProfileSettings()
 
                         if im.IsItemHovered() then
                             im.BeginTooltip()
-                            im.Text(lang.general.rigidity.constant.minForce)
+                            im.Text(languagues.general.rigidity.constant.minForce)
                             im.EndTooltip()
                         end
 
@@ -1273,7 +1383,7 @@ local function renderProfileSettings()
 
                         if im.IsItemHovered() then
                             im.BeginTooltip()
-                            im.Text(lang.general.rigidity.constant.maxForce)
+                            im.Text(languagues.general.rigidity.constant.maxForce)
                             im.EndTooltip()
                         end
 
@@ -1289,14 +1399,14 @@ local function renderProfileSettings()
 
             -- ABS
             setting = settings.brake.abs
-            tooltip = lang.brake.abs
+            tooltip = languagues.brake.abs
 
-            if im.TreeNode1(lang.brake.titles[2]) then
+            if im.TreeNode1(languagues.brake.titles[2]) then
                 local enable = im.BoolPtr(setting.enable)
 
                 im.Spacing()
 
-                if im.Checkbox(lang.general.enable, enable) then
+                if im.Checkbox(languagues.general.enable, enable) then
                     setting.enable = enable[0]
                 end
 
@@ -1325,7 +1435,7 @@ local function renderProfileSettings()
 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.minHz)
+                        im.Text(languagues.general.minHz)
                         im.EndTooltip()
                     end
 
@@ -1344,7 +1454,7 @@ local function renderProfileSettings()
                 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.maxHz)
+                        im.Text(languagues.general.maxHz)
                         im.EndTooltip()
                     end
 
@@ -1362,7 +1472,7 @@ local function renderProfileSettings()
                 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.minAmplitude)
+                        im.Text(languagues.general.minAmplitude)
                         im.EndTooltip()
                     end
 
@@ -1380,7 +1490,7 @@ local function renderProfileSettings()
                 
                     if im.IsItemHovered() then
                         im.BeginTooltip()
-                        im.Text(lang.general.maxAmplitude)
+                        im.Text(languagues.general.maxAmplitude)
                         im.EndTooltip()
                     end
 
@@ -1422,15 +1532,15 @@ local function renderProfileSettings()
     end
 
     -- Lightbar and leds
-    if im.TreeNode1(lang.titles[3]) then
+    if im.TreeNode1(languagues.titles[3]) then
         setting = settings.lightBar
-        tooltip = lang.lightBar
+        tooltip = languagues.lightBar
 
         local enable = im.BoolPtr(setting.enable)
 
         im.Spacing()
 
-        if im.Checkbox(lang.general.enable, enable) then
+        if im.Checkbox(languagues.general.enable, enable) then
             setting.enable = enable[0]
         end
 
@@ -1448,14 +1558,14 @@ local function renderProfileSettings()
             if im.TreeNode1("Lightbar") then
                 -- Emergency braking
                 setting = settings.lightBar.emergencyBraking
-                tooltip = lang.lightBar.emergencyBraking
+                tooltip = languagues.lightBar.emergencyBraking
 
-                if im.TreeNode1(lang.lightBar.titles[4]) then
+                if im.TreeNode1(languagues.lightBar.titles[4]) then
                     local enable = im.BoolPtr(setting.enable)
 
                     im.Spacing()
 
-                    if im.Checkbox(lang.general.enable, enable) then
+                    if im.Checkbox(languagues.general.enable, enable) then
                         setting.enable = enable[0]
                     end
 
@@ -1597,14 +1707,14 @@ local function renderProfileSettings()
 
                 -- Hazard lights
                 setting = settings.lightBar.hazardLights
-                tooltip = lang.lightBar.hazardLights
+                tooltip = languagues.lightBar.hazardLights
 
-                if im.TreeNode1(lang.lightBar.titles[1]) then
+                if im.TreeNode1(languagues.lightBar.titles[1]) then
                     local enable = im.BoolPtr(setting.enable)
 
                     im.Spacing()
 
-                    if im.Checkbox(lang.general.enable, enable) then
+                    if im.Checkbox(languagues.general.enable, enable) then
                         setting.enable = enable[0]
                     end
 
@@ -1735,14 +1845,14 @@ local function renderProfileSettings()
 
                 -- Reverse
                 setting = settings.lightBar.reverse
-                tooltip = lang.lightBar.reverse
+                tooltip = languagues.lightBar.reverse
 
-                if im.TreeNode1(lang.lightBar.titles[7]) then
+                if im.TreeNode1(languagues.lightBar.titles[7]) then
                     local enable = im.BoolPtr(setting.enable)
 
                     im.Spacing()
 
-                    if im.Checkbox(lang.general.enable, enable) then
+                    if im.Checkbox(languagues.general.enable, enable) then
                         setting.enable = enable[0]
                     end
 
@@ -1820,14 +1930,14 @@ local function renderProfileSettings()
 
                 -- Tachometer
                 setting = settings.lightBar.tachometer
-                tooltip = lang.lightBar.tachometer
+                tooltip = languagues.lightBar.tachometer
 
-                if im.TreeNode1(lang.lightBar.titles[5]) then
+                if im.TreeNode1(languagues.lightBar.titles[5]) then
                     local enable = im.BoolPtr(setting.enable)
 
                     im.Spacing()
 
-                    if im.Checkbox(lang.general.enable, enable) then
+                    if im.Checkbox(languagues.general.enable, enable) then
                         setting.enable = enable[0]
                     end
 
@@ -2010,14 +2120,14 @@ local function renderProfileSettings()
 
                 -- Vehicle damage
                 setting = settings.lightBar.vehicleDamage
-                tooltip = lang.lightBar.vehicleDamage
+                tooltip = languagues.lightBar.vehicleDamage
 
-                if im.TreeNode1(lang.lightBar.titles[8]) then
+                if im.TreeNode1(languagues.lightBar.titles[8]) then
                     local enable = im.BoolPtr(setting.enable)
 
                     im.Spacing()
 
-                    if im.Checkbox(lang.general.enable, enable) then
+                    if im.Checkbox(languagues.general.enable, enable) then
                         setting.enable = enable[0]
                     end
 
@@ -2187,14 +2297,14 @@ local function renderProfileSettings()
 
                 -- Drive mode switch
                 setting = settings.lightBar.driveMode
-                tooltip = lang.lightBar.driveMode
+                tooltip = languagues.lightBar.driveMode
 
-                if im.TreeNode1(lang.lightBar.titles[9]) then
+                if im.TreeNode1(languagues.lightBar.titles[9]) then
                     local enable = im.BoolPtr(setting.enable)
 
                     im.Spacing()
 
-                    if im.Checkbox(lang.general.enable, enable) then
+                    if im.Checkbox(languagues.general.enable, enable) then
                         setting.enable = enable[0]
                     end
 
@@ -2241,7 +2351,7 @@ local function renderProfileSettings()
 
                 -- Police chase
                 setting = settings.lightBar.policeChase
-                tooltip = lang.lightBar.policeChase
+                tooltip = languagues.lightBar.policeChase
 
                 local enable = im.BoolPtr(setting.enable)
 
@@ -2258,14 +2368,14 @@ local function renderProfileSettings()
             if im.TreeNode1("Microphone LED") then
                 -- Low fuel
                 setting = settings.lightBar.lowFuel
-                tooltip = lang.lightBar.lowFuel
+                tooltip = languagues.lightBar.lowFuel
 
-                if im.TreeNode1(lang.lightBar.titles[2]) then
+                if im.TreeNode1(languagues.lightBar.titles[2]) then
                     local enable = im.BoolPtr(setting.enable)
 
                     im.Spacing()
 
-                    if im.Checkbox(lang.general.enable, enable) then
+                    if im.Checkbox(languagues.general.enable, enable) then
                         setting.enable = enable[0]
                     end
 
@@ -2294,7 +2404,7 @@ local function renderProfileSettings()
                 
                         if im.IsItemHovered() then
                             im.BeginTooltip()
-                            im.Text(lang.general.micLed.timeOn)
+                            im.Text(languagues.general.micLed.timeOn)
                             im.EndTooltip()
                         end
 
@@ -2313,7 +2423,7 @@ local function renderProfileSettings()
                 
                         if im.IsItemHovered() then
                             im.BeginTooltip()
-                            im.Text(lang.general.micLed.timeOff)
+                            im.Text(languagues.general.micLed.timeOff)
                             im.EndTooltip()
                         end
 
@@ -2326,14 +2436,14 @@ local function renderProfileSettings()
 
                 -- Parking brake
                 setting = settings.lightBar.parkingBrake
-                tooltip = lang.lightBar.parkingBrake
+                tooltip = languagues.lightBar.parkingBrake
 
-                if im.TreeNode1(lang.lightBar.titles[3]) then
+                if im.TreeNode1(languagues.lightBar.titles[3]) then
                     local enable = im.BoolPtr(setting.enable)
 
                     im.Spacing()
 
-                    if im.Checkbox(lang.general.enable, enable) then
+                    if im.Checkbox(languagues.general.enable, enable) then
                         setting.enable = enable[0]
                     end
 
@@ -2362,7 +2472,7 @@ local function renderProfileSettings()
                 
                         if im.IsItemHovered() then
                             im.BeginTooltip()
-                            im.Text(lang.general.micLed.timeOn)
+                            im.Text(languagues.general.micLed.timeOn)
                             im.EndTooltip()
                         end
 
@@ -2381,7 +2491,7 @@ local function renderProfileSettings()
                 
                         if im.IsItemHovered() then
                             im.BeginTooltip()
-                            im.Text(lang.general.micLed.timeOff)
+                            im.Text(languagues.general.micLed.timeOff)
                             im.EndTooltip()
                         end
 
@@ -2397,7 +2507,7 @@ local function renderProfileSettings()
 
                 -- Traction Control System (TCS)
                 setting = settings.lightBar.tcs
-                tooltip = lang.lightBar.tcs
+                tooltip = languagues.lightBar.tcs
 
                 local enable = im.BoolPtr(setting.enable)
 
@@ -2417,7 +2527,7 @@ local function renderProfileSettings()
 
                 -- Electronic Stability Control (ESC)
                 setting = settings.lightBar.esc
-                tooltip = lang.lightBar.esc
+                tooltip = languagues.lightBar.esc
 
                 local enable = im.BoolPtr(setting.enable)
 
@@ -2429,7 +2539,7 @@ local function renderProfileSettings()
 
                 -- Police stars
                 setting = settings.lightBar.policeStars
-                tooltip = lang.lightBar.policeStars
+                tooltip = languagues.lightBar.policeStars
 
                 local enable = im.BoolPtr(setting.enable)
 
@@ -2451,17 +2561,14 @@ local function renderProfileSettings()
     im.Spacing()
 
     -- Profile settings
-    if im.TreeNode1(string.format(lang.titles[4], profiles:getProfileName())) then
-        tooltip = lang.profile
+    if im.TreeNode1(string.format(languagues.titles[4], profiles:getProfileName())) then
+        tooltip = languagues.profile
 
         -- Profile name
         if im.TreeNode1(tooltip.titles[1]) then
-            tooltip = lang.profile.rename
+            tooltip = languagues.profile.rename
 
             im.Text(tooltip.titles[1])
-
-            --im.Separator()
-            --im.Separator()
             im.Spacing()
 
             im.PushItemWidth(185)
@@ -2472,7 +2579,7 @@ local function renderProfileSettings()
 
             if im.IsItemHovered() then
                 im.BeginTooltip()
-                im.Text(lang.profile.hover, lang.strings.saveProfile)
+                im.Text(languagues.profile.hover, languagues.strings.save)
                 im.EndTooltip()
             end
 
@@ -2483,10 +2590,10 @@ local function renderProfileSettings()
         end
 
         -- Profile color
-        tooltip = lang.profile
+        tooltip = languagues.profile
 
         if im.TreeNode1(tooltip.titles[2]) then
-            tooltip = lang.profile.color
+            tooltip = languagues.profile.color
 
             local r, g, b
             local profileColor = profiles:getProfileColor()
@@ -2508,7 +2615,7 @@ local function renderProfileSettings()
 
             if im.IsItemHovered() then
                 im.BeginTooltip()
-                im.Text(lang.profile.hover, lang.strings.saveProfile)
+                im.Text(languagues.profile.hover, languagues.strings.save)
                 im.EndTooltip()
             end
 
@@ -2522,7 +2629,7 @@ local function renderProfileSettings()
 
             if im.IsItemHovered() then
                 im.BeginTooltip()
-                im.Text(lang.profile.hover, lang.strings.saveProfile)
+                im.Text(languagues.profile.hover, languagues.strings.save)
                 im.EndTooltip()
             end
 
@@ -2536,7 +2643,7 @@ local function renderProfileSettings()
 
             if im.IsItemHovered() then
                 im.BeginTooltip()
-                im.Text(lang.profile.hover, lang.strings.saveProfile)
+                im.Text(languagues.profile.hover, languagues.strings.save)
                 im.EndTooltip()
             end
 
@@ -2549,10 +2656,10 @@ local function renderProfileSettings()
         end
 
         -- Profile brightness
-        tooltip = lang.profile
+        tooltip = languagues.profile
 
         if im.TreeNode1(tooltip.titles[3]) then
-            tooltip = lang.profile.brightness
+            tooltip = languagues.profile.brightness
 
             local a = nil
             local lightbarBrightness = (profiles:getProfileBrightness() / 255) * 100
@@ -2575,7 +2682,7 @@ local function renderProfileSettings()
 
             if im.IsItemHovered() then
                 im.BeginTooltip()
-                im.Text(lang.profile.hover, lang.strings.saveProfile)
+                im.Text(languagues.profile.hover, languagues.strings.save)
                 im.EndTooltip()
             end
 
@@ -2586,16 +2693,16 @@ local function renderProfileSettings()
         end
 
         -- Profile based on vehicle
-        tooltip = lang.profile
+        tooltip = languagues.profile
 
         if im.TreeNode1(tooltip.titles[4]) then
-            tooltip = lang.profile.perVehicle
+            tooltip = languagues.profile.perVehicle
 
             local enable = im.BoolPtr(not (ffi.string(beam_dsx.main.profileVehicle) == ""))
 
             im.Spacing()
 
-            if im.Checkbox(lang.general.enable, enable) then
+            if im.Checkbox(languagues.general.enable, enable) then
                if(enable[0]) then
                     beam_dsx.main.profileVehicle = im.ArrayChar(32, utils.getVehicleName())
                else
@@ -2628,7 +2735,7 @@ local function renderProfileSettings()
 
                 if im.IsItemHovered() then
                     im.BeginTooltip()
-                    im.Text(lang.profile.hover, lang.strings.saveProfile)
+                    im.Text(languagues.profile.hover, languagues.strings.save)
                     im.EndTooltip()
                 end
 
@@ -2645,54 +2752,18 @@ local function renderProfileSettings()
     im.EndChild()
 end
 
-local function renderModSettings()
-    local tooltip = lang.strings
-
-    im.Spacing()
-
-    -- Disable mod
-    local enable = im.BoolPtr(profiles:isProfilesEnabled())
-
-    if im.Checkbox(tooltip.modEnable, enable) then
-        profiles:setProfilesEnabled(enable[0])
-    end
-
-    if im.IsItemHovered() then
-        im.BeginTooltip()
-        im.Text(tooltip.modEnableHover)
-        im.EndTooltip()
-    end
-
-    -- Allow on BeamMP servers
-    local enable = im.BoolPtr(profiles:isBeamMpAllowed())
-
-    if im.Checkbox(tooltip.allowBeamMp, enable) then
-        profiles:setBeamMpAllowed(enable[0])
-        beam_dsx:toggleBeamMpHook()
-    end
-
-    if im.IsItemHovered() then
-        im.BeginTooltip()
-        im.Text(tooltip.allowBeamMpHover)
-        im.EndTooltip()
-    end
-
-    im.Spacing()
-end
-
 local function renderButtons()
     if(not settings) then
         return
     end
 
-    local tooltip = lang.strings
+    local tooltip = languagues.strings
     local profileName = profiles:getProfileName()
 
-    im.Separator()
     im.Spacing()
 
     -- Save profile
-    if im.Button(tooltip.saveProfile) then
+    if im.Button(tooltip.save) then
         beam_dsx:onSaveProfile()
     end
 
@@ -2722,7 +2793,7 @@ local function renderButtons()
         profiles:setProfileSettings(profiles:getDefaultSettings())
         settings = profiles:getProfileSettings()
 
-        beam_dsx:showMessage(string.format(tooltip.restoreProfileOk, profileName, tooltip.saveProfile), 10)
+        beam_dsx:showMessage(string.format(tooltip.restoreProfileOk, profileName, tooltip.save), 10)
     end
 
     if im.IsItemHovered() then
@@ -2734,55 +2805,55 @@ local function renderButtons()
     im.SameLine()
 
     -- Active profile text
-    im.Text(lang.strings.activeProfile, profiles:getProfileName())
+    im.Text(languagues.strings.activeProfile, profiles:getProfileName())
 
     im.SameLine()
 
     im.SetCursorPosX(im.GetWindowWidth() - 30)
 
-    -- Change language
-    if im.Button(tooltip.changeLanguage) then
-        text:switchLanguage()
-
-        -- Update current language
-        lang = text:getText()
+    -- Settings
+    if im.Button("?") then
+        beam_dsx:toggleSettingsWindow()
     end
 
     if im.IsItemHovered() then
         im.BeginTooltip()
-        im.Text(tooltip.changeLanguageHover)
+        im.Text(tooltip.settingsHover)
         im.EndTooltip()
     end
 end
 
+--
+
 local function renderMainWindow()
-    -- Prevents from showing 'showCreateProfile' when user deletes a profile and last selected tab was '+'
-    if(profiles:getProfileName() == "-") then
-        profiles:setActiveProfile(1)
-        beam_dsx.main.preventCreateProfileFromOpeningTick = tick
+    if(not beam_dsx.main.show[0]) then
+        return
     end
 
     im.SetNextWindowBgAlpha(0.95)  
-
     im.SetNextWindowSizeConstraints(im.ImVec2(beam_dsx.constraints.main.width, beam_dsx.constraints.main.height), im.ImVec2(beam_dsx.constraints.main.width, beam_dsx.constraints.main.height))
     im.Begin("BeamDSX v" ..version.. " - by Feche", beam_dsx.main.show, beam_dsx.constraints.main.flags)
+    im.SetWindowFontScale(profiles:getFontSize())
 
-    im.TextColored(im.ImVec4(1, 1, 1, 0.6), lang.strings.welcomeMessage)
+    im.PushTextWrapPos(0.0)
+    im.TextColored(im.ImVec4(1, 1, 1, 0.6), languagues.strings.welcomeMessage)
+    im.PopTextWrapPos()
     im.Separator()
 
     -- Profile tabs
-    renderTabs()
+    renderProfileTabs()
 
     -- Profile settings
     renderProfileSettings()
 
     im.Separator()
 
-    -- Mod settings
-    renderModSettings()
-
     -- Buttons
     renderButtons()
+
+    if(not beam_dsx.main.show[0]) then
+        
+    end
 end
 
 local function renderCreateProfileWindow()
@@ -2790,10 +2861,11 @@ local function renderCreateProfileWindow()
         return
     end
 
-    local tooltip = lang.strings
+    local tooltip = languagues.strings
 
     im.SetNextWindowSizeConstraints(im.ImVec2(beam_dsx.constraints.createProfile.width, beam_dsx.constraints.createProfile.height), im.ImVec2(beam_dsx.constraints.createProfile.width, beam_dsx.constraints.createProfile.height))
     im.Begin(tooltip.profileCreateTitle, beam_dsx.createProfile.show, beam_dsx.constraints.createProfile.flags)
+    im.SetWindowFontScale(profiles:getFontSize())
 
     im.PushTextWrapPos(0.0)
     im.TextColored(im.ImVec4(1, 1, 1, 0.6), tooltip.profileCreateName)
@@ -2817,22 +2889,248 @@ local function renderCreateProfileWindow()
 
     -- Player clicks 'cancel' button
     if im.Button(tooltip.profileCreateButton2) then
-        beam_dsx:showCreateProfile(false)
+        beam_dsx:toggleCreateProfileWindow()
+    end
+
+    im.End()
+
+    if(not beam_dsx.createProfile.show[0]) then
+
     end
 end
 
--- BeamNG events
-local function onUpdate(dt)
-    if(beam_dsx.disabled) then
+local function renderSettingsWindow()
+    if(not beam_dsx.settings.show[0]) then
         return
     end
 
-    tick = tick + dt
+    -- DualSenseX app status
+    local t = tick:getTick()
 
-    -- Detects if user exits menu via X close button
-    if(beam_dsx.main.show[0] == false) then
-        if(beam_dsx.main.closed == false) then
-            beam_dsx:toggle(false)
+    if(beam_dsx.settings.statusTick == -1 or (t - beam_dsx.settings.statusTick >= 1000)) then
+        beam_dsx.settings.statusTick = t
+        ds:updateDsxStatus()
+    end
+
+    local tooltip = languagues.strings
+
+    im.SetNextWindowSizeConstraints(im.ImVec2(beam_dsx.constraints.settings.width, beam_dsx.constraints.settings.height), im.ImVec2(beam_dsx.constraints.settings.width, beam_dsx.constraints.settings.height))
+    im.Begin(tooltip.settingsTitle, beam_dsx.settings.show, beam_dsx.constraints.settings.flags)
+    im.SetWindowFontScale(profiles:getFontSize())
+
+    -- Network settings
+    if im.TreeNode1(tooltip.settingsDSXNetwork) then
+        im.PushItemWidth(185)
+        im.Spacing()
+
+        -- IP
+        im.Text(tooltip.settingsNetworkIP)
+        im.InputText("##udpIP", beam_dsx.settings.udpIP, 32, im.InputTextFlags_EnterReturnsTrue)
+
+        im.Spacing()
+
+        -- Port
+        im.Text(tooltip.settingsNetworkPort)
+        im.InputText("##udpPort", beam_dsx.settings.udpPort, 6, im.InputTextFlags_EnterReturnsTrue) 
+
+        im.Spacing()
+
+        -- Save button
+        if im.Button(tooltip.save) then
+            local udpIP = ffi.string(beam_dsx.settings.udpIP)
+            local udpPort = ffi.string(beam_dsx.settings.udpPort)
+
+            beam_dsx:onUdpSave(udpIP, udpPort)
+        end
+
+        im.SameLine()
+
+        -- Reset button
+        if im.Button(tooltip.settingsNetworkRestore) then
+            beam_dsx.settings.udpIP = im.ArrayChar(32, "127.0.0.1")
+            beam_dsx.settings.udpPort = im.ArrayChar(8, "6969")
+            beam_dsx:onUdpSave("127.0.0.1", 6969)
+        end
+
+        im.Spacing()
+        im.Spacing()
+
+        im.TreePop()
+    end
+
+    -- Font size
+    if im.TreeNode1(tooltip.settingsFontSize) then
+        local fontSize = profiles:getFontSize()
+
+        im.Text(string.format(tooltip.settingsFontCurrentSize, fontSize))
+        im.Spacing()
+
+        if im.Button(tooltip.settingsFontSizePlus) then
+            beam_dsx:setFontSize(fontSize + 0.025)
+        end
+
+        im.SameLine()
+
+        if im.Button(tooltip.settingsFontSizeMinus) then
+            beam_dsx:setFontSize(fontSize - 0.025)
+        end
+
+        im.SameLine()
+
+        if im.Button(tooltip.settingsFontSizeReset) then
+            beam_dsx:setFontSize(1)
+        end
+
+        im.TreePop()
+    end
+
+    -- Controller index
+    if im.TreeNode1(tooltip.settingsControllerIndexTitle) then
+        im.PushItemWidth(185)
+        im.Spacing()
+
+        im.PushTextWrapPos(0.0)
+        im.Text(tooltip.settingsControllerIndexText)
+        im.PopTextWrapPos()
+
+        im.InputText("##controllerIndex", beam_dsx.settings.controllerIndex, 32, im.InputTextFlags_EnterReturnsTrue)
+
+        im.Spacing()
+
+        -- Save button
+        if im.Button(tooltip.save) then
+            local newControllerIndex = ffi.string(beam_dsx.settings.controllerIndex)
+            beam_dsx:onControllerIndexChange(tonumber(newControllerIndex))
+        end
+
+        im.Spacing()
+        im.Spacing()
+
+        im.TreePop()
+    end
+
+    -- Status
+    if im.TreeNode1(tooltip.settingsStatusTitle) then
+        im.Text("Beam DSX:")
+        im.SameLine()
+
+        if(beam_dsx.status == modStates.enabled) then
+            im.TextColored(im.ImVec4(0, 1, 0, 0.6), tooltip.settingsStatusEnabled)
+        else                                             
+            im.TextColored(im.ImVec4(1, 0, 0, 0.8), tooltip.settingsStatusDisabled)
+        end
+
+        im.Text("DualSenseX:")
+        im.SameLine()
+
+        if(not ds:getDsxStatus()) then
+            im.TextColored(im.ImVec4(1, 0, 0, 0.8), tooltip.settingsStatusDisconnected)
+        else                                      
+            im.TextColored(im.ImVec4(0, 1, 0, 0.6), tooltip.settingsStatusConnected)
+            im.SameLine()
+            im.Text("-> %s:%s", profiles:getUDPIp(), tostring(profiles:getUDPPort()))
+        end
+
+        local controllerIndex = profiles:getControllerIndex()
+        local device = ds:getDsxDeviceType()
+
+        if(ds:getDsxStatus() and device) then
+            im.Text(tooltip.settingsStatusControllerText1)
+            im.SameLine()
+            im.Text(tooltip.settingsStatusControllerText2, (device == -1) and tooltip.settingsStatusControllerUnknown or device, tostring(controllerIndex))
+            im.Text(tooltip.settingsStatusCharge, ds:getDsxBatttery())
+            im.Text(tooltip.settingsStatusMacAddress, ds:getDsxMacAddress())
+        end
+
+        if(not device) then
+            im.Text(tooltip.settingsStatusControllerText1)
+            im.SameLine()
+            im.TextColored(im.ImVec4(1, 0, 0, 0.8), tooltip.settingsStatusControllerText2, tooltip.settingsStatusDisconnected, tostring(controllerIndex))
+        end
+
+        im.Text(tooltip.settingsStatusTime, ds:getDsxTime())
+        im.TreePop()
+    end
+
+    im.Spacing()
+    im.Separator()
+    im.Spacing()
+
+    -- Disable mod
+    local enable = im.BoolPtr(profiles:isProfilesEnabled())
+
+    if im.Checkbox(tooltip.modEnable, enable) then
+        profiles:setProfilesEnabled(enable[0])
+
+        if(not enable[0]) then
+            beam_dsx:mailboxToVE("mod_disable")
+            beam_dsx.status = modStates.disabled
+            ds:resetController()
+        else
+            beam_dsx.status = modStates.enabled
+            beam_dsx:mailboxToVE("mod_enable")
+        end
+    end
+
+    if im.IsItemHovered() then
+        im.BeginTooltip()
+        im.Text(tooltip.modEnableHover)
+        im.EndTooltip()
+    end
+
+    im.Spacing()
+
+    -- Allow on BeamMp servers
+    -- Detect if mod is running on a BeamMp server as extension; if it is, then do not display 'Allow on BeamMp servers' text
+    if(not MPModManager or not MPModManager.getModList().multiplayerbeam_dsx) then
+        local enable = im.BoolPtr(profiles:isBeamMpAllowed())
+
+        if im.Checkbox(tooltip.allowBeamMp, enable) then
+            profiles:setBeamMpAllowed(enable[0])
+            beam_dsx:toggleBeamMpHook()
+        end
+
+        if im.IsItemHovered() then
+            im.BeginTooltip()
+            im.Text(tooltip.allowBeamMpHover)
+            im.EndTooltip()
+        end
+
+        im.Spacing()
+    end
+
+    -- Close all GUIs when vehicle moves
+    local enable = im.BoolPtr(profiles.closeOnVehicleMove)
+
+    if im.Checkbox(tooltip.closeOnVehicleMove, enable) then
+        profiles.closeOnVehicleMove = enable[0]
+    end
+
+    if im.IsItemHovered() then
+        im.BeginTooltip()
+        im.Text(tooltip.closeOnVehicleMoveHover)
+        im.EndTooltip()
+    end
+
+    if(not beam_dsx.settings.show[0]) then
+       
+    end
+end
+
+--
+-- BeamNG events
+--
+local function onUpdate(dt)
+    tick:handleGameTick(dt)
+
+    -- Mod is not compatible with current game version
+    if(beam_dsx.status == modStates.version_fail) then
+        local t = tick:getTick()
+        -- Fix for BeamMp not showing toast message
+        if(t > 2000 and t < 2500) then
+            local v = beam_dsx:gameVersionCheck()
+            guihooks.trigger("toastrMsg", { type = "error", title = "", msg = "Beam DSX v" ..version.. " is not compatible with game version '" ..v.version.. "', check console for more info.", config = { closeButton = true, timeOut = 0, extendedTimeOut = 0 } })
+            log("E", "onExtensionLoaded", "mod is not compatible with game version '%s', please check if a compatible Beam DSX version exists, mod disabled.", v.version)
         end
         return
     end
@@ -2843,26 +3141,30 @@ local function onUpdate(dt)
     -- Main window
     renderMainWindow()
     
-    im.End()
+    -- Settings window
+    renderSettingsWindow()
+
+    -- Close all windows if vehicle is moving
+    if(profiles.closeOnVehicleMove) then
+        if(utils.getAirSpeed() > 10) then
+            beam_dsx:hideAllWindows()
+        end
+    end
 end
 
 local function onExtensionLoaded() 
     local v = beam_dsx:gameVersionCheck()
 
     if(v.status == false) then
-        guihooks.trigger("toastrMsg", { type = "error", title = "Beam DSX", msg = "Beam DSX v" ..version.. " is incompatible with game version '" ..v.version.. "', check console for more info." })
-        return log("E", "onExtensionLoaded", "[beam_dsx] GE: mod is incompatible with version '" ..v.version.. "', please check if a compatible game version exists, mod disabled.")
+        beam_dsx.status = modStates.version_fail
+        return 
     end
 
-    log("I", "onExtensionLoaded", "[beam_dsx] GE: mod is compatible with version '" ..v.version.. "'")
-
-    -- Load user settings
     profiles:init()
-    -- Init GUI text
     text:init()
 
-    lang = text:getText()
-    settings = profiles:getProfileSettings()
+    languagues = text:getText() -- get current language
+    settings = profiles:getProfileSettings() -- get profile settings
 
     if(not settings) then
         profiles:createDefaultProfile()
@@ -2871,21 +3173,27 @@ local function onExtensionLoaded()
         settings = profiles:getProfileSettings()
     end
     
-    beam_dsx.modEnable = profiles:isProfilesEnabled()
+    beam_dsx.status = profiles:isProfilesEnabled() and modStates.enabled or modStates.disabled
     beam_dsx:toggleBeamMpHook()
-    beam_dsx.disabled = false
 
-    log("I", "onExtensionLoaded", "[beam_dsx] GE: extension loaded, active profile: '" ..profiles:getProfileName().. "'")
+    profiles:setUDPAddress(profiles:getUDPIp(), profiles:getUDPPort())
+    profiles:setControllerIndex(profiles:getControllerIndex())
+
+    beam_dsx:setFontSize(profiles:getFontSize())
+    beam_dsx:onVehicleUpdate()
+
+    log("I", "onExtensionLoaded", "extension loaded, active profile: '%s'", profiles:getProfileName())
 end
 
 local function onExtensionUnloaded()
-	log("I", "onExtensionUnloaded", "[beam_dsx] GE: extension unloaded")
+	log("I", "onExtensionUnloaded", "extension unloaded")
 end
 
 local function onClientEndMission()
-    log("I", "onClientEndMission", "[beam_dsx] GE: player quit, disabling controller ..")
+    log("I", "onClientEndMission", "player quit, disabling controller ..")
 
     ds:resetController()
+    beam_dsx:hideAllWindows()
 end
 
 local function onVehicleSwitched(oldId, newId, player)
@@ -2906,6 +3214,20 @@ local function onPursuitModeUpdate(targetId, mode)
     beam_dsx:mailboxToVE("police_chase_update")    
 end
 
+local function onAiModeChange(objectId, mode)
+    local playerVehicleId = be:getPlayerVehicleID(0)
+
+    if(playerVehicleId ~= objectId) then
+        return
+    end
+
+    if(mode == "disabled") then
+        beam_dsx:onVehicleUpdate(playerVehicleId)
+    else
+        beam_dsx:mailboxToVE("vehicle_invalid")
+    end
+end
+
 return
 {
     dependencies = { "ui_imgui" },
@@ -2916,6 +3238,7 @@ return
     onVehicleResetted = onVehicleResetted,
     onVehicleSwitched = onVehicleSwitched,
     onUpdate = onUpdate,
-    toggle = function() beam_dsx:toggle() end,
+    toggleMainWindow = function() beam_dsx:toggleMainWindow() end,
     onPursuitModeUpdate = onPursuitModeUpdate,
+    onAiModeChange = onAiModeChange,
 }
