@@ -13,7 +13,7 @@ local ds = require("common.ds")
 
 local log = common.log
 local defaultPath = "settings/beam_dsx/profiles.json"
-local forceAlwaysDefaultSettings = true
+local forceAlwaysDefaultSettings = false
 
 return
 {
@@ -27,7 +27,7 @@ return
     port = 6969,
     enableOnBeamMPServers = false,
     controllerIndex = 0,
-    closeOnVehicleMove = true,
+    closeOnVehicleMove = false,
     temp = nil,
 	-- Functions
 	init = function(self)
@@ -126,13 +126,7 @@ return
 
         log("I", "setActiveProfile", "switching active profile to '%s' (id: %d)", self:getProfileName(), self.active)
 
-        -- Update active profile in config file
-        local s = jsonReadFile(self.path)
-
-        if(s) then
-            s.active = self.active
-            jsonWriteFile(self.path, common.deep_copy_safe(s), true)
-        end
+        utils.saveJsonValue(self.path, "active", self.active)
     end,
     setProfileSettings = function(self, settings, index)
         index = index and index or self.active
@@ -177,35 +171,17 @@ return
     setBeamMpAllowed = function(self, value)
         self.enableOnBeamMPServers = value
 
-        -- Update enableOnBeamMPServers in config file
-        local s = jsonReadFile(self.path)
-
-        if(s) then
-            s.enableOnBeamMPServers = self.enableOnBeamMPServers
-            jsonWriteFile(self.path, common.deep_copy_safe(s), true)
-        end
+        utils.saveJsonValue(self.path, "enableOnBeamMPServers", self.enableOnBeamMPServers)
     end,
     setProfilesEnabled = function(self, value)
         self.enable = value
 
-        -- Update enable in config file
-        local s = jsonReadFile(self.path)
-
-        if(s) then
-            s.enable = self.enable
-            jsonWriteFile(self.path, common.deep_copy_safe(s), true)
-        end
+        utils.saveJsonValue(self.path, "enable", self.enable)
     end,
     setFontSize = function(self, size)
         self.fontSize = size
 
-        -- Update fontSize in config file
-        local s = jsonReadFile(self.path)
-
-        if(s) then
-            s.fontSize = self.fontSize
-            jsonWriteFile(self.path, common.deep_copy_safe(s), true)
-        end
+        utils.saveJsonValue(self.path, "fontSize", self.fontSize)
     end,
     setUDPAddress = function(self, ip, port)
         self.ip = ip
@@ -222,6 +198,11 @@ return
         utils.saveJsonValue(self.path, "controllerIndex", index)
 
         ds:setControllerIndex(index, "GE")
+    end,
+    setCloseOnVehicleMove = function(self, value)
+        self.closeOnVehicleMove = value
+
+        utils.saveJsonValue(self.path, "closeOnVehicleMove", self.closeOnVehicleMove)
     end,
     --
     -- get

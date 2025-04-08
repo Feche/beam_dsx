@@ -8,7 +8,7 @@ local defaultLanguages = require("ge.extensions.utils.default_languages")
 
 local log = common.log
 local defaultPath = "settings/beam_dsx/languages.json"
-local forceAlwaysDefaultSettings = true
+local forceAlwaysDefaultSettings = false
 
 return
 {
