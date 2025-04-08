@@ -3,6 +3,9 @@
 -- file, You can obtain one at http://beamng.com/bCDDL-1.1.txt
 -- Code author: Feche
 
+local common = require("common.common")
+local log = common.log
+
 local function deep_copy_safe(t, skip)
     if(type(t) == "table") then
         local copy = {}
@@ -28,12 +31,12 @@ return
         for i = 0, #v.data.controller do
             local fileName = v.data.controller[i].fileName
             if(fileName) then
-                tmp[fileName] = utils.deep_copy_safe(v.data.controller[i])
+                tmp[fileName] = common.deep_copy_safe(v.data.controller[i])
             end
         end
 
-        self.data = utils.deep_copy_safe(tmp)
-        log("I", "controllers.init", "[beam_dsx] VE: " ..#v.data.controller.. " controllers loaded")
+        self.data = common.deep_copy_safe(tmp)
+        log("I", "controllers.load", "%d controllers loaded", #v.data.controller)
     end,
     getControllerData = function(self, controllerName)
         return self.data[controllerName]
