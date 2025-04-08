@@ -3103,7 +3103,7 @@ local function renderSettingsWindow()
     local enable = im.BoolPtr(profiles.closeOnVehicleMove)
 
     if im.Checkbox(tooltip.closeOnVehicleMove, enable) then
-        profiles.closeOnVehicleMove = enable[0]
+        profiles:setCloseOnVehicleMove(enable[0])
     end
 
     if im.IsItemHovered() then
