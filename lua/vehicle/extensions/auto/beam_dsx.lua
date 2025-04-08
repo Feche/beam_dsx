@@ -4,14 +4,18 @@
 -- Code author: Feche
 -- VE beam_dsx
 
-local controllers = require("vehicle.extensions.auto.utils.controllers")
-local tick = require("vehicle.extensions.auto.utils.tick")
-local utils = require("vehicle.extensions.auto.utils.utils")
 local ds = require("common.ds")
+local tick = require("common.tick")
+local common = require("common.common")
+local controllers = require("vehicle.extensions.auto.utils.controllers")
+local utils = require("vehicle.extensions.auto.utils.utils")
 
+local log = common.log
 local settings = nil
+
 local beam_dsx =
 {
+    state = nil,
     gearLast = 0,
     brakeRigidity = 0,
 
@@ -43,7 +47,7 @@ local beam_dsx =
         color = nil,
         tick = 0,
         escModes = {},
-        init = function(self)
+        load = function(self)
             if(not v.data.esc) then
                 return
             end
@@ -54,8 +58,7 @@ local beam_dsx =
             end
 
             table.sort(tmp, function(a, b) return b.order > a.order end)
-
-            self.escModes = utils.deep_copy_safe(tmp)
+            self.escModes = common.deep_copy_safe(tmp)
         end,
         getCurrentDriveMode = function(self)
             local driveModes = controller.getController("driveModes")
@@ -73,7 +76,85 @@ local beam_dsx =
 
             return nil
         end,
-    }
+    },
+    onReceiveMailbox = function(self, buffer)
+        self.state = nil
+
+        if(not playerInfo.firstPlayerSeated) then
+            log("W", "onReceiveMailbox", "not the player vehicle (firstPlayerSeated)")
+            return
+        end
+
+        -- Disable if spectating or driving a self-driving AI car (supports BeamMp spectating)
+        if(ai.mode ~= "disabled" or (v.mpVehicleType and v.mpVehicleType ~= "L")) then
+            log("W", "onReceiveMailbox", "not the player vehicle (ai or remote mpVehicle)")
+            return ds:resetController()
+        end
+
+        local mailbox = jsonDecode(buffer)
+
+        if(not mailbox.code) then
+            return log("E", "onReceiveMailbox", "received nil mailbox ..")
+        end
+
+        local vehicleName = utils.getVehicleName()
+
+        self.state = true
+        self.lastCrashStartTick = 0
+        self.driveMode:load()
+
+        log("W", "onReceiveMailbox", "received mailbox '%s', vehicle '%s' ..", mailbox.code, vehicleName)
+
+        if(mailbox.code == "mod_disable") then
+            self.state = nil  
+            log("W", "onReceiveMailbox", "mod disabled")
+        elseif(mailbox.code == "vehicle_invalid") then
+            self.state = nil
+            log("W", "onReceiveMailbox", "no longer in a valid vehicle, disabling controller")
+        elseif(mailbox.code == "save" or mailbox.code == "profile_change" or mailbox.code == "vehicle_reset_or_switch" or mailbox.code == "mod_enable" or mailbox.code == "udp_address_change" or mailbox.code == "controller_index_change") then
+            controllers:load()
+
+            local p = jsonReadFile(mailbox.path)
+
+            if(not p or not p.profiles or not p.profiles[p.active] or not p.profiles[p.active].settings or not p.profiles[p.active].color or not p.ip or not p.port or not p.controllerIndex) then
+                self.state = nil
+                return log("E", "onReceiveMailbox", "error while loading profile ID %d", p and p.active or -1)
+            end
+
+            -- Blink lightbar on save or profile switch
+            if(mailbox.code == "save" or mailbox.code == "profile_change") then
+                self.saveTick = tick:getTick()
+            end
+
+            settings = p.profiles[p.active].settings
+            self.profileColor = p.profiles[p.active].color
+            self.policeMode = mailbox.policeMode
+
+            ds:setUDPAddress(p.ip, p.port, "VE")
+            ds:setControllerIndex(p.controllerIndex, "VE")
+
+            log("I", "onReceiveMailbox", "applying user config, profile '%s', police mode: %d, controller index: %d ..", p.profiles[p.active].name, self.policeMode, p.controllerIndex)
+        elseif(mailbox.code == "police_chase_update") then
+            if(mailbox.policeMode == -1) then
+                self.policeModeLast = self.policeMode
+            end
+
+            self.policeMode = mailbox.policeMode
+            self.policeModeTick = 0
+
+            log("I", "onReceiveMailbox", "chase update received, police mode: %d", self.policeMode)
+        end
+    end,
+    onDriveModeSwitch = function(self, oldDriveMode, newDriveMode)
+        if(not newDriveMode) then
+            return
+        end
+
+        self.driveMode.color = utils.getDriveModeColor(newDriveMode)
+        self.driveMode.tick = tick:getTick()
+
+        log("I", "onDriveModeSwitch", "player switched from drivemode '%s' to '%s'", oldDriveMode, newDriveMode)
+    end,
 }
 
 local function onExtensionLoaded()
@@ -92,79 +173,7 @@ local function onExtensionLoaded()
         beam_dsx.adaptiveBrakeLights = true
     end
 
-    log("I", "onExtensionLoaded", "[beam_dsx] VE: extension loaded.")
-end
-
-local function onReceiveMailbox(buffer)
-    local mailbox = jsonDecode(buffer)
-    
-    if(mailbox.playerVehicleId ~= obj:getID()) then
-        settings = nil
-        return
-    end
-
-    -- Disable if spectating or driving a self-driving AI car
-    if(ai.mode ~= "disabled") then
-        settings = nil
-        ds:resetController()
-        return
-    end
-
-    local vehicleName = utils.getVehicleName()
-
-    beam_dsx.lastCrashStartTick = 0
-    beam_dsx.driveMode:init()
-
-    log("W", "onReceiveMailbox", "[beam_dsx] VE: received mailbox '" ..tostring(mailbox.code).. "', vehicle '" ..tostring(vehicleName).. "' ..")
-
-    if(mailbox.code == "mod_disable") then
-        settings = nil
-        
-        log("W", "onReceiveMailbox", "[beam_dsx] VE: mod disabled ..")
-    elseif(mailbox.code == "vehicle_invalid") then
-        log("W", "onReceiveMailbox", "[beam_dsx] VE: no longer in a vehicle, disabling controller ..")
-
-        settings = nil
-    elseif(mailbox.code == "save" or mailbox.code == "profile_change" or mailbox.code == "vehicle_reset_or_switch" or mailbox.code == "mod_enable") then
-        controllers:load()
-
-        local p = jsonReadFile(mailbox.path)
-
-        settings = p.profiles[p.active].settings
-        beam_dsx.profileColor = p.profiles[p.active].color
-        beam_dsx.policeMode = mailbox.policeMode
-
-        if(not settings) then
-            return log("E", "onReceiveMailbox", "[beam_dsx] VE: could not load settings file '" ..tostring(mailbox.path).. "''")
-        end
-
-        -- Blink lightbar on save or profile switching
-        if(mailbox.code == "save" or mailbox.code == "profile_change") then
-            beam_dsx.saveTick = tick:getTick()
-        end
-
-        log("I", "onReceiveMailbox", "[beam_dsx] VE: applying user config, profile '" ..tostring(p.profiles[p.active].name).. "', police mode: " ..tostring(beam_dsx.policeMode).. " ..")
-    elseif(mailbox.code == "police_chase_update") then
-        if(mailbox.policeMode == -1) then
-            beam_dsx.policeModeLast = beam_dsx.policeMode
-        end
-
-        beam_dsx.policeMode = mailbox.policeMode
-        beam_dsx.policeModeTick = 0
-
-        log("I", "onReceiveMailbox", "[beam_dsx] VE: chase update received, police mode: " ..tostring(beam_dsx.policeMode))
-    end
-end
-
-local function onDriveModeSwitch(oldDriveMode, newDriveMode)
-    if(newDriveMode == nil) then
-        return
-    end
-
-    beam_dsx.driveMode.color = utils.getDriveModeColor(newDriveMode)
-    beam_dsx.driveMode.tick = tick:getTick()
-
-    log("I", "onDriveModeSwitch", "[beam_dsx] VE: player switched from drivemode '" ..tostring(oldDriveMode).. "' to '" ..newDriveMode.. "'")
+    log("I", "onExtensionLoaded", "extension loaded.")
 end
 
 local function updateTriggerL(activeTrigger, throttle, brake, gear)
@@ -219,8 +228,8 @@ local function updateTriggerL(activeTrigger, throttle, brake, gear)
             
             local progress = 1 - absCoef
             local startPos = math.min(9, ((beam_dsx.brakeRigidity / 255) * 9) + 1)
-            local amplitude = utils.lerp(maxAmplitude, minAmplitude, progress)
-            local frequency = utils.lerp(minHz, maxHz, progress)
+            local amplitude = common.lerp(maxAmplitude, minAmplitude, progress)
+            local frequency = common.lerp(minHz, maxHz, progress)
 
             ds:sendDsx(2, 1, ds.type.triggerUpdate, activeTrigger, ds.mode.vibration, startPos, amplitude, frequency)
             return
@@ -241,9 +250,9 @@ local function updateTriggerL(activeTrigger, throttle, brake, gear)
         local force2 = 0
 
         if(setting.inverted == false) then
-            force2 = utils.lerp(minForce, maxForce, progress)
+            force2 = common.lerp(minForce, maxForce, progress)
         else
-            force2 = utils.lerp(maxForce, minForce, progress)
+            force2 = common.lerp(maxForce, minForce, progress)
         end
 
         beam_dsx.brakeRigidity = force2
@@ -260,7 +269,7 @@ local function updateTriggerL(activeTrigger, throttle, brake, gear)
         local maxForce = setting.maxForce
 
         local force1 = 0
-        local force2 = utils.lerp(minForce, maxForce, brake)
+        local force2 = common.lerp(minForce, maxForce, brake)
 
         beam_dsx.brakeRigidity = force2
 
@@ -313,7 +322,7 @@ local function updateTriggerR(activeTrigger, throttle, brake, gear)
             local maxForce = setting.maxForce
             local timeOn = setting.timeOn
 
-            local force1 = utils.lerp(minHz, maxHz, progress)
+            local force1 = common.lerp(minHz, maxHz, progress)
             local force2 = maxForce
             local force3 = 135
 
@@ -337,8 +346,8 @@ local function updateTriggerR(activeTrigger, throttle, brake, gear)
 
             local progress = (isWheelSlip / maxForceAt) * throttle
             local startPos = 1
-            local amplitude = utils.lerp(minAmplitude, maxAmplitude, progress)
-            local frequency = utils.lerp(minHz, maxHz, progress)
+            local amplitude = common.lerp(minAmplitude, maxAmplitude, progress)
+            local frequency = common.lerp(minHz, maxHz, progress)
 
             return ds:sendDsx(2, 1, ds.type.triggerUpdate, activeTrigger, ds.mode.vibration, startPos, amplitude, frequency)
         end
@@ -359,16 +368,16 @@ local function updateTriggerR(activeTrigger, throttle, brake, gear)
             local progress = 0
             
             if(setting.bounces == 0) then 
-                progress = utils.lerpNonLineal(0, 1, rpmProgress, 6)
+                progress = common.lerpNonLineal(0, 1, rpmProgress, 6)
             else
-                progress = utils.bounceLerp(rpmProgress, bounces)
+                progress = common.bounceLerp(rpmProgress, bounces)
             end
 
             local minHz = setting.minHz
             local maxHz = setting.maxHz
             local vibrationForce = setting.vibrationForce
 
-            local force1 = utils.lerp(minHz, maxHz, progress)
+            local force1 = common.lerp(minHz, maxHz, progress)
             local force2 = vibrationForce == 1 and 1 or (vibrationForce / 3) * 255 
             local force3 = 135
 
@@ -381,8 +390,7 @@ local function updateTriggerR(activeTrigger, throttle, brake, gear)
 
     if(setting.enable) then
         if(utils.isEngineOn() == false and utils.getGearboxMode() == "arcade") then
-            ds:sendDsx(4, 1, ds.type.triggerUpdate, activeTrigger, ds.mode.gameCube)
-            return
+            return ds:sendDsx(4, 1, ds.type.triggerUpdate, activeTrigger, ds.mode.gameCube)
         end
     end
 
@@ -391,8 +399,7 @@ local function updateTriggerR(activeTrigger, throttle, brake, gear)
 
     if(setting.enable) then
         if(utils.isEngineOn() == false) then
-            ds:sendDsx(5, 1, ds.type.triggerUpdate, activeTrigger, ds.mode.off)
-            return
+            return ds:sendDsx(5, 1, ds.type.triggerUpdate, activeTrigger, ds.mode.off)
         end
     end
 
@@ -410,13 +417,12 @@ local function updateTriggerR(activeTrigger, throttle, brake, gear)
         local force2 = 0
 
         if(setting.inverted == false) then
-            force2 = utils.lerp(minForce, maxForce, progress)
+            force2 = common.lerp(minForce, maxForce, progress)
         else
-            force2 = utils.lerp(maxForce, minForce, progress)
+            force2 = common.lerp(maxForce, minForce, progress)
         end
 
-        ds:sendDsx(6, 1, ds.type.triggerUpdate, activeTrigger, ds.mode.customTriggerValue, ds.mode.custom.rigid, force1, force2)
-        return
+        return ds:sendDsx(6, 1, ds.type.triggerUpdate, activeTrigger, ds.mode.customTriggerValue, ds.mode.custom.rigid, force1, force2)
     end
 
     -- Constant
@@ -427,10 +433,9 @@ local function updateTriggerR(activeTrigger, throttle, brake, gear)
         local maxForce = setting.maxForce
 
         local force1 = 0
-        local force2 = utils.lerp(minForce, maxForce, throttle)
+        local force2 = common.lerp(minForce, maxForce, throttle)
 
-        ds:sendDsx(7, 1, ds.type.triggerUpdate, activeTrigger, ds.mode.customTriggerValue, ds.mode.custom.rigid, force1, force2)
-        return
+        return ds:sendDsx(7, 1, ds.type.triggerUpdate, activeTrigger, ds.mode.customTriggerValue, ds.mode.custom.rigid, force1, force2)
     end
 
     ds:sendDsx(100, 1000, ds.type.triggerUpdate, activeTrigger, ds.mode.off)
@@ -538,6 +543,11 @@ local function updatePlayerLed(t, throttle, brake)
 end
 
 local function updateLightbar(t, throttle, brake)
+    -- Lightbar disabled
+    if(settings.lightBar.enable == false) then
+        return
+    end
+
     -- Save profile lightbar flash
     local saveTick = beam_dsx.saveTick
 
@@ -555,12 +565,6 @@ local function updateLightbar(t, throttle, brake)
             beam_dsx.saveTick = 0
             ds:sendDsx(-1, 16, ds.type.rgbUpdate, 0, 0, 0, 0)
         end
-
-        return
-    end
-
-    -- Lightbar disabled
-    if(settings.lightBar.enable == false) then
         return
     end
 
@@ -574,7 +578,7 @@ local function updateLightbar(t, throttle, brake)
         if(beam_dsx.driveMode.tick > 0 and beam_dsx.driveMode.color) then
             local blinkTime = setting.blinkTime
             local elapsed = t - beam_dsx.driveMode.tick
-            local progress = utils.bounceLerp(elapsed / blinkTime, 3 * (blinkTime / 2000))
+            local progress = common.bounceLerp(elapsed / blinkTime, 3 * (blinkTime / 2000))
 
             if(elapsed > blinkTime) then
                 beam_dsx.driveMode.tick = 0
@@ -612,12 +616,12 @@ local function updateLightbar(t, throttle, brake)
                 local blinkSpeed = setting.blinkSpeed * (timeOn / 2000)
 
                 local progress = (elapsedStart / timeOn) % 1
-                local bounceProgress = utils.bounceLerp(progress, blinkSpeed)
-                local color = utils.lerpRgb2(colorOn, colorOff, bounceProgress)
+                local bounceProgress = common.bounceLerp(progress, blinkSpeed)
+                local color = common.lerpRgb2(colorOn, colorOff, bounceProgress)
 
                 return ds:sendDsx(-2, 1, ds.type.rgbUpdate, color[1], color[2], color[3], beam_dsx.profileColor[4])
             else
-                log("I", "updateLightbar.vehicleDamage", "[beam_dsx] VE: crash duration " ..t - beam_dsx.lastCrashStartTick.. " ms.")
+                log("I", "updateLightbar.vehicleDamage", "crash duration %d ms.", t - beam_dsx.lastCrashStartTick)
                 beam_dsx.lastCrashStartTick = 0
             end
         end
@@ -651,7 +655,7 @@ local function updateLightbar(t, throttle, brake)
 
             local elapsed = t - beam_dsx.policeModeTick
             local progress = (elapsed / 5000)
-            local color = utils.lerpRgb2({ 255, 165, 0, 255 }, { 255, 200, 128, 255 }, progress)
+            local color = common.lerpRgb2({ 255, 165, 0, 255 }, { 255, 200, 128, 255 }, progress)
 
             ds:sendDsx(-1, 6, ds.type.rgbUpdate, color[1], color[2], color[3], beam_dsx.profileColor[4])
             return
@@ -664,7 +668,7 @@ local function updateLightbar(t, throttle, brake)
 
             local elapsed = t - beam_dsx.policeModeTick
             local bounceProgress = (elapsed % bounceTime) / bounceTime
-            local progress = utils.bounceLerp(bounceProgress, 2)
+            local progress = common.bounceLerp(bounceProgress, 2)
             local color = nil
 
             if((elapsed % (bounceTime * 2)) < bounceTime) then
@@ -698,7 +702,7 @@ local function updateLightbar(t, throttle, brake)
 
             local colorOff = inReverse and settings.lightBar.reverse.colorOn or setting.colorOff
             local progress = beam_dsx.hazardState and ((t - beam_dsx.hazardTick) / 100) or (1 - ((t - beam_dsx.hazardTick) / 100))
-            local color = utils.lerpRgb2(colorOff, setting.colorOn, progress)
+            local color = common.lerpRgb2(colorOff, setting.colorOn, progress)
 
             ds:sendDsx(0, tick:msToTickRate(400), ds.type.rgbUpdate, color[1], color[2], color[3], beam_dsx.profileColor[4])
             return
@@ -728,7 +732,7 @@ local function updateLightbar(t, throttle, brake)
 
             -- Redline limiter
             if(progress > 0) then
-                local color = ds:getColor()
+                local color = ds:getDsxColor()
 
                 ds:sendDsx(2, 1, ds.type.rgbUpdate, color[1], color[2], color[3], 0)
                 return
@@ -744,7 +748,7 @@ local function updateLightbar(t, throttle, brake)
                     progress = (rpm - setting.offset) / (maxRpm - setting.offset - minRpm)
                 end
 
-                local color = utils.lerpRgb3(setting.colorLow, setting.colorMed, setting.colorHi, progress)
+                local color = common.lerpRgb3(setting.colorLow, setting.colorMed, setting.colorHi, progress)
 
                 ds:sendDsx(2, 1, ds.type.rgbUpdate, color[1], color[2], color[3], beam_dsx.profileColor[4])
                 return
@@ -760,27 +764,26 @@ local function updateGFX(dtSim)
 
     local t = tick:getTick()
 
-    if(t - beam_dsx.gfxTick > tick:getTickRate()) then
+    if(t - beam_dsx.gfxTick >= tick:getTickRate()) then
         beam_dsx.gfxTick = t
 
         -- onReceiveMailbox
         local mailboxNew = obj:getLastMailbox("beam_dsx_mailboxToVE")
-
         if(mailboxNew ~= beam_dsx.mbLast) then
+            beam_dsx:onReceiveMailbox(mailboxNew)
             beam_dsx.mbLast = mailboxNew
-            onReceiveMailbox(mailboxNew)
         end
 
-        if(not settings or not playerInfo.firstPlayerSeated) then 
-            return 
+        -- disable VE if mod should not run on current vehicle
+        if(beam_dsx.state == nil) then
+            return
         end
 
         -- onDriveModeSwitch
-        local driveMode = beam_dsx.driveMode:getCurrentDriveMode()
-
-        if(beam_dsx.driveMode.last ~= driveMode) then
-            onDriveModeSwitch(beam_dsx.driveMode.last, driveMode)
-            beam_dsx.driveMode.last = driveMode
+        local driveModeNew = beam_dsx.driveMode:getCurrentDriveMode()
+        if(beam_dsx.driveMode.last ~= driveModeNew) then
+            beam_dsx:onDriveModeSwitch(beam_dsx.driveMode.last, driveModeNew)
+            beam_dsx.driveMode.last = driveModeNew
         end
 
         local gear = utils.getGear()
