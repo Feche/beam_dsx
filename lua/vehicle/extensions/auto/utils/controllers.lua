@@ -6,19 +6,6 @@
 local common = require("common.common")
 local log = common.log
 
-local function deep_copy_safe(t, skip)
-    if(type(t) == "table") then
-        local copy = {}
-        for key, value in pairs(t) do
-            if((type(value) == "number" or type(value) == "string" or type(value) == "boolean" or type(value) == "table") and key ~= skip) then
-                copy[key] = (type(value) == "table") and deep_copy_safe(value) or value
-            end
-        end
-        return copy
-    end
-    return nil
-end
-
 return
 {
     data = {},
@@ -36,7 +23,7 @@ return
         end
 
         self.data = common.deep_copy_safe(tmp)
-        log("I", "controllers.load", "%d controllers loaded", #v.data.controller)
+        log("I", "controllers.load", "%d vehicle controllers loaded", #v.data.controller)
     end,
     getControllerData = function(self, controllerName)
         return self.data[controllerName]
