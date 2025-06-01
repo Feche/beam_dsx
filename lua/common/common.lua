@@ -141,6 +141,10 @@ local function bounceLerp(t, bounces)
 end
 
 local function hexToRGB(hex)
+    if(hex == nil) then
+        return false
+    end
+
     hex = hex:gsub("#", "")
     return { tonumber(hex:sub(1, 2), 16), tonumber(hex:sub(3, 4), 16), tonumber(hex:sub(5, 6), 16) }
 end
