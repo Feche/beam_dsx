@@ -3,7 +3,7 @@
 -- file, You can obtain one at http://beamng.com/bCDDL-1.1.txt
 -- Code author: Feche
 
--- TODO: testing | color picker | close gui windows on exit/car move
+-- TODO: testing | color picker
 
 local defaultSettings = require("ge.extensions.utils.default_settings")
 local utils = require("ge.extensions.utils.utils")
