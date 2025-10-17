@@ -17,7 +17,7 @@ local ffi = require("ffi")
 local log = common.log
 local im = ui_imgui
 
-local version = "1.0"
+local version = "1.1"
 local settings = nil
 
 local languagues = {}
@@ -33,6 +33,8 @@ local allowedVersions =
 { 
     ["0.34"] = true,
     ["0.35"] = true,
+	["0.36"] = true,
+	["0.37"] = true,
 }
 
 local beam_dsx =
