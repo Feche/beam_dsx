@@ -35,6 +35,7 @@ local allowedVersions =
     ["0.35"] = true,
 	["0.36"] = true,
 	["0.37"] = true,
+	["0.38"] = true,
 }
 
 local beam_dsx =
